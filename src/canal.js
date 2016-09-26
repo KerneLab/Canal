@@ -3,158 +3,170 @@
  */
 (function()
 {
-	var root = (typeof global === "object" && global) || this;
+	var ROOT = (typeof global === "object" && global) || this;
 
-	function Canal()
+	function Pond()
 	{
-		this.source = [];
-
-		this.index = 0;
-
-		this.operator = function(d)
-		{
-			return d;
-		};
-
-		switch (arguments.length)
-		{
-			case 0:
-				break;
-
-			case 1: // Array
-				// TODO direct source
-				this.source.push(new CanalSource(arguments[0]));
-				break;
-
-			case 2: // source,intermediate
-				this.source.push(arguments[0]);
-				this.operator = arguments[1];
-				break;
-		}
+		this.downstream = null;
 	}
-
-	// /////////////////Basic////////////////
-
-	Canal.prototype.gather = function()
+	Pond.prototype.accept = function(data) // Boolean
 	{
-		// TODO
+	};
+	Pond.prototype.end = function() // Void
+	{
 	};
 
-	Canal.prototype.iterator = function()
+	function Desilter()
 	{
-		return new CanalIterator(this);
-	};
-
-	// /////////////////Convert////////////////
-
-	Canal.prototype.map = function(f)
-	{
-		return new Canal(this, f);
-	};
-
-	// /////////////////Taking////////////////
-
-	Canal.prototype.collect = function() // Array
-	{
-		var result = [];
-		var iter = this.iterator();
-
-		while (iter.hasNext())
-		{
-			result.push(iter.next());
-		}
-		return result;
-	};
-
-	// /////////////////Class////////////////
-
-	function CanalIterator(canal)
-	{
-		this.canal = canal;
-		this.index = 0;
-		this.iter = undefined;
-		this.value = undefined;
+		this.sediment = this.settle();
 	}
-
-	CanalIterator.prototype.hasNext = function()
+	Desilter.prototype = new Pond();
+	Desilter.prototype.settle = function() // Sediment
 	{
-		while (this.index < this.canal.source.length && this.index >= 0)
-		{
-			if (this.iter === undefined)
-			{
-				this.iter = this.canal.source[this.index].iterator();
-			}
-
-			if (this.iter.hasNext())
-			{
-				this.value = this.iter.next();
-				return true;
-			}
-			else
-			{
-				this.index++;
-				this.iter = undefined;
-			}
-		}
-		return false;
+		return [];
 	};
 
-	CanalIterator.prototype.next = function()
-	{
-		return this.canal.operator(this.value);
-	};
+	// Intermediate Operators
 
-	// ============================
-
-	function SourceIterator(source)
+	function FilterOp(pred)
 	{
-		this.source = source;
-		this.index = 0;
-		this.value = undefined;
+		this.pred = pred;
 	}
-
-	SourceIterator.prototype.hasNext = function() // Boolean
+	FilterOp.prototype = new Pond();
+	FilterOp.prototype.accept = function(d)
 	{
-		this.value = this.source.get(this.index++);
-		return this.value !== undefined;
-	};
-
-	SourceIterator.prototype.next = function() // Object
-	{
-		return this.value;
-	};
-
-	// ============================
-
-	function CanalSource(data)
-	{
-		this.data = data;
-	}
-
-	CanalSource.prototype.iterator = function()
-	{
-		return new SourceIterator(this);
-	};
-
-	CanalSource.prototype.get = function(index)
-	{
-		if (index < this.data.length)
+		if (this.pred(d))
 		{
-			return this.data[index];
+			return this.downstream.accept(d);
 		}
 		else
 		{
-			return undefined;
+			return true;
 		}
 	};
 
-	// Canal.derive = function(sub)
-	// {
-	// var hyp = arguments.length > 1 ? arguments[1] : new Canal();
-	// sub.prototype = hyp;
-	// sub.prototype.constructor = sub;
-	// sub.prototype.hyper = hyp;
-	// };
+	function MapOp(fn)
+	{
+		this.fn = fn;
+	}
+	MapOp.prototype = new Pond();
+	MapOp.prototype.accept = function(d)
+	{
+		return this.downstream.accept(this.fn(d));
+	};
 
-	root.Canal = Canal;
+	// Terminate Operators
+
+	function Terminator()
+	{
+	}
+	Terminator.prototype = new Desilter();
+	Terminator.prototype.get = function()
+	{
+		return this.sediment;
+	};
+
+	function TakeOp(num)
+	{
+		this.num = num;
+	}
+	TakeOp.prototype = new Terminator();
+	TakeOp.prototype.accept = function(d)
+	{
+		if (this.sediment.length < this.num)
+		{
+			this.sediment.push(d);
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	};
+	TakeOp.prototype.settle = function()
+	{
+		return [];
+	};
+
+	function Canal()
+	{
+		var self = this;
+		var head = null;
+		var tail = null;
+		var data = null;
+
+		var add = function(pond)
+		{
+			if (head == null)
+			{
+				head = pond;
+			}
+			if (tail != null)
+			{
+				tail.downstream = pond;
+			}
+			tail = pond;
+			return self;
+		};
+
+		this.source = function() //
+		{
+			if (arguments.length > 0)
+			{
+				data = arguments[0];
+				return self;
+			}
+			else
+			{
+				return data;
+			}
+		};
+
+		// Intermediate Operations
+
+		this.filter = function(pred)
+		{
+			return add(new FilterOp(pred));
+		};
+
+		this.map = function(fn)
+		{
+			return add(new MapOp(fn));
+		};
+
+		// Terminate Operations
+
+		this.evaluate = function(source)
+		{
+			if (source != null)
+			{
+				for (i in source)
+				{
+					if (!head.accept(source[i]))
+					{
+						break;
+					}
+				}
+				return tail.get();
+			}
+			else
+			{
+				return undefined;
+			}
+		};
+
+		this.take = function(num)
+		{
+			add(new TakeOp(num));
+			return this.evaluate(data);
+		};
+	}
+
+	Canal.of = function(data)
+	{
+		return new Canal().source(data);
+	};
+
+	ROOT.Canal = Canal;
+
 }.call(this));
