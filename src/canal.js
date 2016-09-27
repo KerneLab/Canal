@@ -302,7 +302,6 @@
 			if (this.downstream != null)
 			{
 				var left = this.settle();
-				console.log(left);
 				var rightData = canal.groupBy(keyR, null).collect();
 				var right = {};
 				for (i in rightData)
@@ -313,7 +312,7 @@
 
 				out: for (k in left)
 				{
-					var ls = left[k][0];
+					var ls = left[k];
 					if (ls != null)
 					{
 						var rs = right[k];
