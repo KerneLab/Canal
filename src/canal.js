@@ -260,11 +260,11 @@
 		GroupPond.prototype = new Grouper();
 		GroupPond.prototype.keyOf = function(d)
 		{
-			return key(d);
+			return key == null ? d[0] : key(d);
 		};
 		GroupPond.prototype.valOf = function(d)
 		{
-			return val == null ? d : val(d);
+			return val == null ? d[1] : val(d);
 		};
 
 		this.newPond = function()
@@ -609,10 +609,9 @@
 			return this.add(new ForeachOp(fn));
 		};
 
-		this.groupBy = function(key)
+		this.groupBy = function()
 		{
-			return this.add(new GroupOp(key,
-					arguments.length > 1 ? arguments[1] : null));
+			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
 
 		this.join = function(canal)
