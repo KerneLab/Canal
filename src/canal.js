@@ -68,7 +68,6 @@
 	};
 	Grouper.prototype.keyOf = function(d)
 	{
-
 	};
 	Grouper.prototype.valOf = function(d)
 	{
@@ -294,11 +293,16 @@
 		{
 			return keyL(d);
 		};
+		JoinPond.prototype.valOf = function(d)
+		{
+			return d[1];
+		};
 		JoinPond.prototype.done = function()
 		{
 			if (this.downstream != null)
 			{
 				var left = this.settle();
+				console.log(left);
 				var rightData = canal.groupBy(keyR, null).collect();
 				var right = {};
 				for (i in rightData)
@@ -309,7 +313,7 @@
 
 				out: for (k in left)
 				{
-					var ls = left[k];
+					var ls = left[k][0];
 					if (ls != null)
 					{
 						var rs = right[k];
@@ -319,8 +323,8 @@
 							{
 								for (r in rs)
 								{
-									if (!this.downstream.accept([ ls[l][1],
-											rs[r][1] ]))
+									if (!this.downstream
+											.accept([ ls[l], rs[r] ]))
 									{
 										break out;
 									}
