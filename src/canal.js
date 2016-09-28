@@ -6,6 +6,21 @@
 {
 	var ROOT = (typeof global === "object" && global) || this;
 
+	// Constant of an empty array which MUST not be changed.
+	var emptyArray = [];
+
+	// Default key of a pair is the 1st element of Array[2]
+	var keyOfPair = function(p)
+	{
+		return p[0];
+	};
+
+	// Default value of a pair is the 2nd element of Array[2]
+	var valOfPair = function(p)
+	{
+		return p[1];
+	};
+
 	function Pond()
 	{
 		this.downstream = null;
@@ -66,13 +81,8 @@
 	{
 		return {};
 	};
-	Grouper.prototype.keyOf = function(d)
-	{
-	};
-	Grouper.prototype.valOf = function(d)
-	{
-		return d;
-	};
+	Grouper.prototype.keyOf = keyOfPair;
+	Grouper.prototype.valOf = valOfPair;
 	Grouper.prototype.accept = function(d)
 	{
 		var key = this.keyOf(d);
@@ -104,6 +114,54 @@
 		}
 	};
 
+	function Joiner()
+	{
+		this.keyR = keyOfPair;
+		this.valR = valOfPair;
+	}
+	Joiner.prototype = new Grouper();
+	Joiner.prototype.canal = function()
+	{
+		return undefined;
+	};
+	Joiner.prototype.base = function(left, right)
+	{
+		return undefined;
+	};
+	Joiner.prototype.join = function(down, key, lefts, rights)
+	{
+		return false; // Do not join any more
+	};
+	Joiner.prototype.done = function()
+	{
+		if (this.downstream != null)
+		{
+			var left = this.settle();
+			var rights = this.canal() //
+			.groupByKey(this.keyR, this.valR) //
+			.collect();
+			var right = {};
+			for (i in rights)
+			{
+				var d = rights[i];
+				right[d[0]] = d[1];
+			}
+
+			var base = this.base(left, right);
+			var down = this.downstream;
+
+			for (k in base)
+			{
+				if (!this.join(down, k, left[k], right[k]))
+				{
+					break;
+				}
+			}
+
+			down.done();
+		}
+	};
+
 	// Operators
 
 	function Operator()
@@ -122,7 +180,7 @@
 		cmp = cmp != null // (a,b) -> 0(=)
 		? cmp : function(a, b)
 		{
-			return a == b ? 0 : 1;
+			return a === b ? 0 : 1;
 		};
 
 		function DistinctPond()
@@ -253,17 +311,19 @@
 
 	function GroupOp(key, val) // (data) -> key, [(data) -> val]
 	{
+		key = key != null ? key : keyOfPair;
+		val = val != null ? val : valOfPair;
 		function GroupPond()
 		{
 		}
 		GroupPond.prototype = new Grouper();
 		GroupPond.prototype.keyOf = function(d)
 		{
-			return key == null ? d[0] : key(d);
+			return key(d);
 		};
 		GroupPond.prototype.valOf = function(d)
 		{
-			return val == null ? d[1] : val(d);
+			return val(d);
 		};
 
 		this.newPond = function()
@@ -273,76 +333,129 @@
 	}
 	GroupOp.prototype = new Operator();
 
-	function JoinOp(canal, keyL, keyR)
+	function JoinOp(canal, keyL, keyR, valL, valR)
 	{
-		keyL = keyL != null ? keyL : function(d)
-		{
-			return d[0];
-		};
-		keyR = keyR != null ? keyR : function(d)
-		{
-			return d[0];
-		};
+		keyL = keyL != null ? keyL : keyOfPair;
+		keyR = keyR != null ? keyR : keyOfPair;
+		valL = valL != null ? valL : valOfPair;
+		valR = valR != null ? valR : valOfPair;
 
 		function JoinPond()
 		{
-
 		}
-		JoinPond.prototype = new Grouper();
+		JoinPond.prototype = new Joiner();
 		JoinPond.prototype.keyOf = function(d)
 		{
 			return keyL(d);
 		};
 		JoinPond.prototype.valOf = function(d)
 		{
-			return d[1];
+			return valL(d);
 		};
-		JoinPond.prototype.done = function()
+		JoinPond.prototype.canal = function()
 		{
-			if (this.downstream != null)
+			return canal;
+		};
+		JoinPond.prototype.base = function(left, right)
+		{
+			return left;
+		};
+		JoinPond.prototype.join = function(down, key, lefts, rights)
+		{
+			if (lefts != null && rights != null)
 			{
-				var left = this.settle();
-				var rightData = canal.groupBy(keyR, null).collect();
-				var right = {};
-				for (i in rightData)
+				for (l in lefts)
 				{
-					var d = rightData[i];
-					right[d[0]] = d[1];
-				}
-
-				out: for (k in left)
-				{
-					var ls = left[k];
-					if (ls != null)
+					for (r in rights)
 					{
-						var rs = right[k];
-						if (rs != null)
+						if (!down.accept([ key, [ lefts[l], rights[r] ] ]))
 						{
-							for (l in ls)
-							{
-								for (r in rs)
-								{
-									if (!this.downstream
-											.accept([ ls[l], rs[r] ]))
-									{
-										break out;
-									}
-								}
-							}
+							return false;
 						}
 					}
 				}
-
-				this.downstream.done();
 			}
+			return true;
 		};
 
 		this.newPond = function()
 		{
-			return new JoinPond();
+			var pond = new JoinPond();
+			pond.keyR = keyR;
+			pond.valR = valR;
+			return pond;
 		};
 	}
 	JoinOp.prototype = new Operator();
+
+	function LeftJoinOp(canal, keyL, keyR, valL, valR)
+	{
+		keyL = keyL != null ? keyL : keyOfPair;
+		keyR = keyR != null ? keyR : keyOfPair;
+		valL = valL != null ? valL : valOfPair;
+		valR = valR != null ? valR : valOfPair;
+
+		function LeftJoinPond()
+		{
+		}
+		LeftJoinPond.prototype = new Joiner();
+		LeftJoinPond.prototype.keyOf = function(d)
+		{
+			return keyL(d);
+		};
+		LeftJoinPond.prototype.valOf = function(d)
+		{
+			return valL(d);
+		};
+		LeftJoinPond.prototype.canal = function()
+		{
+			return canal;
+		};
+		LeftJoinPond.prototype.base = function(left, right)
+		{
+			return left;
+		};
+		LeftJoinPond.prototype.join = function(down, key, lefts, rights)
+		{
+			if (lefts != null)
+			{
+				if (rights != null)
+				{
+					for (l in lefts)
+					{
+						for (r in rights)
+						{
+							if (!down.accept([ key,
+									[ lefts[l], Optional.Some(rights[r]) ] ]))
+							{
+								return false;
+							}
+						}
+					}
+				}
+				else
+				{
+					for (l in lefts)
+					{
+						if (!down.accept([ key, [ lefts[l], Optional.None ] ]))
+						{
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			var pond = new LeftJoinPond();
+			pond.keyR = keyR;
+			pond.valR = valR;
+			return pond;
+		};
+	}
+	LeftJoinOp.prototype = new Operator();
 
 	function MapOp(fn)
 	{
@@ -362,15 +475,18 @@
 	}
 	MapOp.prototype = new Operator();
 
-	function MapValuesOp(fn) // ([val..]) -> Value
+	function MapValuesOp(fn, key, val) // ([val..]) -> Value
 	{
+		key = key != null ? key : keyOfPair;
+		val = val != null ? val : valOfPair;
+
 		function MapValuesPond()
 		{
 		}
 		MapValuesPond.prototype = new Pond();
 		MapValuesPond.prototype.accept = function(d)
 		{
-			return this.downstream.accept([ d[0], fn(d[1]) ]);
+			return this.downstream.accept([ key(d), fn(val(d)) ]);
 		};
 
 		this.newPond = function()
@@ -379,6 +495,75 @@
 		};
 	}
 	MapValuesOp.prototype = new Operator();
+
+	function RightJoinOp(canal, keyL, keyR, valL, valR)
+	{
+		keyL = keyL != null ? keyL : keyOfPair;
+		keyR = keyR != null ? keyR : keyOfPair;
+		valL = valL != null ? valL : valOfPair;
+		valR = valR != null ? valR : valOfPair;
+
+		function RightJoinPond()
+		{
+		}
+		RightJoinPond.prototype = new Joiner();
+		RightJoinPond.prototype.keyOf = function(d)
+		{
+			return keyL(d);
+		};
+		RightJoinPond.prototype.valOf = function(d)
+		{
+			return valL(d);
+		};
+		RightJoinPond.prototype.canal = function()
+		{
+			return canal;
+		};
+		RightJoinPond.prototype.base = function(left, right)
+		{
+			return right;
+		};
+		RightJoinPond.prototype.join = function(down, key, lefts, rights)
+		{
+			if (rights != null)
+			{
+				if (lefts != null)
+				{
+					for (r in rights)
+					{
+						for (l in lefts)
+						{
+							if (!down.accept([ key,
+									[ Optional.Some(lefts[l]), rights[r] ] ]))
+							{
+								return false;
+							}
+						}
+					}
+				}
+				else
+				{
+					for (r in rights)
+					{
+						if (!down.accept([ key, [ Optional.None, rights[r] ] ]))
+						{
+							return false;
+						}
+					}
+				}
+			}
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			var pond = new RightJoinPond();
+			pond.keyR = keyR;
+			pond.valR = valR;
+			return pond;
+		};
+	}
+	RightJoinOp.prototype = new Operator();
 
 	function SortOp(cmp) // (a,b) -> 0(=) -1(<) 1(>)
 	{
@@ -612,14 +797,21 @@
 			return this.add(new ForeachOp(fn));
 		};
 
-		this.groupBy = function()
+		this.groupByKey = function()
 		{
 			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
 
 		this.join = function(canal)
 		{
-			return this.add(new JoinOp(canal, arguments[1], arguments[2]));
+			return this.add(new JoinOp(canal, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
+		};
+
+		this.leftJoin = function(canal)
+		{
+			return this.add(new LeftJoinOp(canal, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
 		};
 
 		this.map = function(fn)
@@ -629,7 +821,13 @@
 
 		this.mapValues = function(fn)
 		{
-			return this.add(new MapValuesOp(fn));
+			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
+		};
+
+		this.rightJoin = function(canal)
+		{
+			return this.add(new RightJoinOp(canal, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
 		};
 
 		this.sort = function()
@@ -671,6 +869,84 @@
 	{
 		return new Canal().source(data);
 	};
+
+	function Optional()
+	{
+	}
+	Optional.prototype.get = function()
+	{
+		return undefined;
+	};
+	Optional.prototype.or = function(other)
+	{
+		return undefined;
+	};
+	Optional.prototype.orNull = function()
+	{
+		return undefined;
+	};
+	Optional.prototype.given = function()
+	{
+		return undefined;
+	};
+	Optional.prototype.canal = function()
+	{
+		return undefined;
+	};
+
+	function Some(val)
+	{
+		this.val = val;
+	}
+	Some.prototype = new Optional();
+	Some.prototype.get = function()
+	{
+		return this.val;
+	};
+	Some.prototype.or = function(other)
+	{
+		return this.get();
+	};
+	Some.prototype.orNull = function()
+	{
+		return this.get();
+	};
+	Some.prototype.given = function()
+	{
+		return true;
+	};
+	Some.prototype.canal = function()
+	{
+		return new Canal().source([ this.get() ]);
+	};
+
+	Optional.Some = function(val)
+	{
+		return new Some(val);
+	};
+
+	function None()
+	{
+	}
+	None.prototype = new Optional();
+	None.prototype.or = function(other)
+	{
+		return other;
+	};
+	None.prototype.orNull = function()
+	{
+		return null;
+	};
+	None.prototype.given = function()
+	{
+		return false;
+	};
+	None.prototype.canal = function()
+	{
+		return new Canal().source(emptyArray);
+	};
+
+	Optional.None = new None();
 
 	ROOT.Canal = Canal;
 
