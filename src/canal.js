@@ -73,6 +73,20 @@
 		}
 	};
 
+	function Heaper()
+	{
+	}
+	Heaper.prototype = new Desilter();
+	Heaper.prototype.settling = function()
+	{
+		return [];
+	};
+	Heaper.prototype.accept = function(d)
+	{
+		this.settle().push(d);
+		return true;
+	};
+
 	function Grouper()
 	{
 	}
@@ -137,15 +151,8 @@
 		if (this.downstream != null)
 		{
 			var left = this.settle();
-			var rights = this.canal() //
-			.groupByKey(this.keyR, this.valR) //
-			.collect();
-			var right = {};
-			for (i in rights)
-			{
-				var d = rights[i];
-				right[d[0]] = d[1];
-			}
+			var right = Canal.mapOfPairs(this.canal() //
+			.groupByKey(this.keyR, this.valR).collect());
 
 			var base = this.base(left, right);
 			var down = this.downstream;
@@ -186,11 +193,7 @@
 		function DistinctPond()
 		{
 		}
-		DistinctPond.prototype = new Desilter();
-		DistinctPond.prototype.settling = function()
-		{
-			return [];
-		};
+		DistinctPond.prototype = new Heaper();
 		DistinctPond.prototype.accept = function(d)
 		{
 			var found = false;
@@ -256,6 +259,46 @@
 		};
 	}
 	FilterOp.prototype = new Operator();
+
+	function FirstOp(num)
+	{
+		if (num == null)
+		{
+			num = 1;
+		}
+
+		function FirstPond()
+		{
+			this.count = 0;
+		}
+		FirstPond.prototype = new Pond();
+		FirstPond.prototype.begin = function()
+		{
+			this.count = 0;
+			if (this.downstream != null)
+			{
+				this.downstream.begin();
+			}
+		};
+		FirstPond.prototype.accept = function(d)
+		{
+			if (this.count < num)
+			{
+				this.count++;
+				return this.downstream.accept(d);
+			}
+			else
+			{
+				return false;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new FirstPond();
+		};
+	}
+	FirstOp.prototype = new Operator();
 
 	function FlatMapOp(fn)
 	{
@@ -457,15 +500,24 @@
 	}
 	LeftJoinOp.prototype = new Operator();
 
-	function MapOp(fn)
+	function MapOp(fn) // (data [, index]) -> Value
 	{
 		function MapPond()
 		{
+			this.index = 0;
 		}
 		MapPond.prototype = new Pond();
+		MapPond.prototype.begin = function()
+		{
+			this.index = 0;
+			if (this.downstream != null)
+			{
+				this.downstream.begin();
+			}
+		};
 		MapPond.prototype.accept = function(d)
 		{
-			return this.downstream.accept(fn(d));
+			return this.downstream.accept(fn(d, this.index++));
 		};
 
 		this.newPond = function()
@@ -474,6 +526,25 @@
 		};
 	}
 	MapOp.prototype = new Operator();
+
+	function MapJointOp(fn) // (left,right,key) -> Value
+	{
+		function MapJointPond()
+		{
+		}
+		MapJointPond.prototype = new Pond();
+		MapJointPond.prototype.accept = function(d)
+		{
+			var joint = d[1];
+			return this.downstream.accept(fn(joint[0], joint[1], d[0]));
+		};
+
+		this.newPond = function()
+		{
+			return new MapJointPond();
+		};
+	}
+	MapJointOp.prototype = new Operator();
 
 	function MapValuesOp(fn, key, val) // ([val..]) -> Value
 	{
@@ -495,6 +566,36 @@
 		};
 	}
 	MapValuesOp.prototype = new Operator();
+
+	function ReverseOp()
+	{
+		function ReversePond()
+		{
+		}
+		ReversePond.prototype = new Heaper();
+		ReversePond.prototype.done = function()
+		{
+			if (this.downstream != null)
+			{
+				var settle = this.settle();
+				settle.reverse();
+				for (i in settle)
+				{
+					if (!this.downstream.accept(settle[i]))
+					{
+						break;
+					}
+				}
+				this.downstream.done();
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new ReversePond();
+		};
+	}
+	ReverseOp.prototype = new Operator();
 
 	function RightJoinOp(canal, keyL, keyR, valL, valR)
 	{
@@ -565,33 +666,39 @@
 	}
 	RightJoinOp.prototype = new Operator();
 
-	function SortOp(cmp) // (a,b) -> 0(=) -1(<) 1(>)
+	function SortOp(asc, cmp) // (a,b) -> 0(=) -1(<) 1(>)
 	{
+		asc = asc != null ? asc : true;
+
+		var comp = cmp;
+		if (cmp != null && !asc)
+		{
+			comp = function(a, b)
+			{
+				return cmp(b, a);
+			}
+		}
+
 		function SortPond()
 		{
 		}
-		SortPond.prototype = new Desilter();
-		SortPond.prototype.settling = function()
-		{
-			return [];
-		};
-		SortPond.prototype.accept = function(d)
-		{
-			this.settle().push(d);
-			return true;
-		};
+		SortPond.prototype = new Heaper();
 		SortPond.prototype.done = function(d)
 		{
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				if (cmp != null)
+				if (comp != null)
 				{
-					settle.sort(cmp);
+					settle.sort(comp);
 				}
 				else
 				{
 					settle.sort();
+					if (!asc)
+					{
+						settle.reverse();
+					}
 				}
 				for (i in settle)
 				{
@@ -657,7 +764,11 @@
 		};
 		ReducePond.prototype.accept = function(d)
 		{
-			this.settle(reducer(this.settle(), d));
+			var res = reducer(this.settle(), d);
+			if (res !== undefined)
+			{
+				this.settle(res);
+			}
 			return true;
 		};
 
@@ -787,6 +898,11 @@
 			return this.add(new FilterOp(pred));
 		};
 
+		this.first = function(num)
+		{
+			return this.add(new FirstOp(num));
+		};
+
 		this.flatMap = function(fn)
 		{
 			return this.add(new FlatMapOp(fn));
@@ -819,9 +935,19 @@
 			return this.add(new MapOp(fn));
 		};
 
+		this.mapJoint = function(fn)
+		{
+			return this.add(new MapJointOp(fn));
+		};
+
 		this.mapValues = function(fn)
 		{
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
+		};
+
+		this.reverse = function()
+		{
+			return this.add(new ReverseOp());
 		};
 
 		this.rightJoin = function(canal)
@@ -830,10 +956,9 @@
 					arguments[3], arguments[4]));
 		};
 
-		this.sort = function()
+		this.sortBy = function() // [asc[, cmp]]
 		{
-			return this.add(new SortOp(arguments.length > 0 ? arguments[0]
-					: null));
+			return this.add(new SortOp(arguments[0], arguments[1]));
 		};
 
 		// Terminate Operations
@@ -854,6 +979,24 @@
 			}));
 		};
 
+		this.countByValue = function()
+		{
+			var val = arguments.length > 0 ? arguments[0] : function(d)
+			{
+				return d;
+			};
+			return this.map(function(d)
+			{
+				return [ val(d), 1 ];
+			}).groupByKey().mapValues(function(arr)
+			{
+				return Canal.of(arr).reduce(0, function(a, b)
+				{
+					return a + b;
+				});
+			}).collect();
+		};
+
 		this.reduce = function(init, reducer)
 		{
 			return this.evaluate(new ReduceOp(init, reducer));
@@ -868,6 +1011,31 @@
 	Canal.of = function(data)
 	{
 		return new Canal().source(data);
+	};
+
+	Canal.mapOfPairs = function(pairs)
+	{
+		var map = {};
+
+		for (i in pairs)
+		{
+			var pair = pairs[i];
+			map[pair[0]] = pair[1];
+		}
+
+		return map;
+	};
+
+	Canal.pairsOfMap = function(map)
+	{
+		var pairs = [];
+
+		for (i in map)
+		{
+			pairs.push([ i, map[i] ]);
+		}
+
+		return pairs;
 	};
 
 	function Optional()
