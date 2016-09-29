@@ -173,7 +173,6 @@
 
 	function Operator()
 	{
-		this.upstream = null;
 	}
 	Operator.prototype.newPond = function() // () -> Pond
 	{
@@ -812,14 +811,17 @@
 	function Canal()
 	{
 		var self = this;
-		var tail = null;
+		var upstream = null;
+		var operator = null;
 		var data = null;
 
 		var chain = function(pond)
 		{
-			for (prev = tail; prev != null; prev = prev.upstream)
+			for (prev = self; //
+			prev != null && prev.operator() != null; //
+			prev = prev.upstream())
 			{
-				var temp = prev.newPond();
+				var temp = prev.operator().newPond();
 				temp.downstream = pond;
 				pond = temp;
 			}
@@ -839,6 +841,51 @@
 			}
 
 			entr.done();
+		};
+
+		this.upstream = function()
+		{
+			if (arguments.length > 0)
+			{
+				upstream = arguments[0];
+				return self;
+			}
+			else
+			{
+				return upstream;
+			}
+		};
+
+		this.operator = function()
+		{
+			if (arguments.length > 0)
+			{
+				operator = arguments[0];
+				return self;
+			}
+			else
+			{
+				return operator;
+			}
+		};
+
+		this.add = function(op)
+		{
+			return new Canal().operator(op).upstream(self)
+					.source(this.source());
+		};
+
+		this.source = function() // access data
+		{
+			if (arguments.length > 0)
+			{
+				data = arguments[0];
+				return self;
+			}
+			else
+			{
+				return data;
+			}
 		};
 
 		this.evaluate = function(op) // T -> Value
@@ -863,26 +910,6 @@
 			else
 			{
 				return undefined;
-			}
-		};
-
-		this.add = function(op)
-		{
-			op.upstream = tail;
-			tail = op;
-			return self;
-		};
-
-		this.source = function() // access data
-		{
-			if (arguments.length > 0)
-			{
-				data = arguments[0];
-				return self;
-			}
-			else
-			{
-				return data;
 			}
 		};
 
@@ -985,7 +1012,7 @@
 			{
 				return d;
 			};
-			return this.map(function(d)
+			return Canal.mapOfPairs(this.map(function(d)
 			{
 				return [ val(d), 1 ];
 			}).groupByKey().mapValues(function(arr)
@@ -994,7 +1021,7 @@
 				{
 					return a + b;
 				});
-			}).collect();
+			}).collect());
 		};
 
 		this.reduce = function(init, reducer)
