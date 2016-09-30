@@ -468,7 +468,7 @@
 						for (r in rights)
 						{
 							if (!down.accept([ key,
-									[ lefts[l], Optional.Some(rights[r]) ] ]))
+									[ lefts[l], Option.Some(rights[r]) ] ]))
 							{
 								return false;
 							}
@@ -479,7 +479,7 @@
 				{
 					for (l in lefts)
 					{
-						if (!down.accept([ key, [ lefts[l], Optional.None ] ]))
+						if (!down.accept([ key, [ lefts[l], Option.None ] ]))
 						{
 							return false;
 						}
@@ -634,7 +634,7 @@
 						for (l in lefts)
 						{
 							if (!down.accept([ key,
-									[ Optional.Some(lefts[l]), rights[r] ] ]))
+									[ Option.Some(lefts[l]), rights[r] ] ]))
 							{
 								return false;
 							}
@@ -645,7 +645,7 @@
 				{
 					for (r in rights)
 					{
-						if (!down.accept([ key, [ Optional.None, rights[r] ] ]))
+						if (!down.accept([ key, [ Option.None, rights[r] ] ]))
 						{
 							return false;
 						}
@@ -1065,26 +1065,26 @@
 		return pairs;
 	};
 
-	function Optional()
+	function Option()
 	{
 	}
-	Optional.prototype.get = function()
+	Option.prototype.get = function()
 	{
 		return undefined;
 	};
-	Optional.prototype.or = function(other)
+	Option.prototype.or = function(other)
 	{
 		return undefined;
 	};
-	Optional.prototype.orNull = function()
+	Option.prototype.orNull = function()
 	{
 		return undefined;
 	};
-	Optional.prototype.given = function()
+	Option.prototype.given = function()
 	{
 		return undefined;
 	};
-	Optional.prototype.canal = function()
+	Option.prototype.canal = function()
 	{
 		return undefined;
 	};
@@ -1093,7 +1093,7 @@
 	{
 		this.val = val;
 	}
-	Some.prototype = new Optional();
+	Some.prototype = new Option();
 	Some.prototype.get = function()
 	{
 		return this.val;
@@ -1115,7 +1115,7 @@
 		return new Canal().source([ this.get() ]);
 	};
 
-	Optional.Some = function(val)
+	Option.Some = function(val)
 	{
 		return new Some(val);
 	};
@@ -1123,7 +1123,7 @@
 	function None()
 	{
 	}
-	None.prototype = new Optional();
+	None.prototype = new Option();
 	None.prototype.or = function(other)
 	{
 		return other;
@@ -1141,7 +1141,7 @@
 		return new Canal().source(emptyArray);
 	};
 
-	Optional.None = new None();
+	Option.None = new None();
 
 	ROOT.Canal = Canal;
 
