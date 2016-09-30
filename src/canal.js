@@ -303,11 +303,20 @@
 	{
 		function FlatMapPond()
 		{
+			this.index = 0;
 		}
 		FlatMapPond.prototype = new Pond();
+		FlatMapPond.prototype.begin = function()
+		{
+			this.index = 0;
+			if (this.downstream != null)
+			{
+				this.downstream.begin();
+			}
+		};
 		FlatMapPond.prototype.accept = function(d)
 		{
-			var data = fn(d);
+			var data = fn(d, this.index++);
 			if (data instanceof Array)
 			{
 				for (i in data)
