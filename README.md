@@ -2,6 +2,7 @@
 Functional Programming Framework of Calculation in Javascript.
 
 > Common Transform
+
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
   .filter(function(d)
@@ -21,6 +22,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 ```
 
 > Group Operation
+
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
   .filter(function(d)
@@ -40,6 +42,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 ```
 
 > Join Operation
+
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
   .filter(function(d)
