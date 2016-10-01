@@ -43,6 +43,19 @@
 		}
 	};
 
+	function Wheel()
+	{
+	}
+	Wheel.prototype = new Pond();
+	Wheel.prototype.begin = function() // Void
+	{
+		this.index = 0;
+		if (this.downstream != null)
+		{
+			this.downstream.begin();
+		}
+	};
+
 	function Desilter()
 	{
 		this.sediment = undefined;
@@ -268,22 +281,13 @@
 
 		function FirstPond()
 		{
-			this.count = 0;
 		}
-		FirstPond.prototype = new Pond();
-		FirstPond.prototype.begin = function()
-		{
-			this.count = 0;
-			if (this.downstream != null)
-			{
-				this.downstream.begin();
-			}
-		};
+		FirstPond.prototype = new Wheel();
 		FirstPond.prototype.accept = function(d)
 		{
-			if (this.count < num)
+			if (this.index < num)
 			{
-				this.count++;
+				this.index++;
 				return this.downstream.accept(d);
 			}
 			else
@@ -303,17 +307,8 @@
 	{
 		function FlatMapPond()
 		{
-			this.index = 0;
 		}
-		FlatMapPond.prototype = new Pond();
-		FlatMapPond.prototype.begin = function()
-		{
-			this.index = 0;
-			if (this.downstream != null)
-			{
-				this.downstream.begin();
-			}
-		};
+		FlatMapPond.prototype = new Wheel();
 		FlatMapPond.prototype.accept = function(d)
 		{
 			var data = fn(d, this.index++);
@@ -341,15 +336,15 @@
 	}
 	FlatMapOp.prototype = new Operator();
 
-	function ForeachOp(fn) // (data) -> Void
+	function ForeachOp(fn) // (data[,index]) -> Void
 	{
 		function ForeachPond()
 		{
 		}
-		ForeachPond.prototype = new Pond();
+		ForeachPond.prototype = new Wheel();
 		ForeachPond.prototype.accept = function(d)
 		{
-			fn(d);
+			fn(d, this.index++);
 			return this.downstream.accept(d);
 		};
 
@@ -512,17 +507,8 @@
 	{
 		function MapPond()
 		{
-			this.index = 0;
 		}
-		MapPond.prototype = new Pond();
-		MapPond.prototype.begin = function()
-		{
-			this.index = 0;
-			if (this.downstream != null)
-			{
-				this.downstream.begin();
-			}
-		};
+		MapPond.prototype = new Wheel();
 		MapPond.prototype.accept = function(d)
 		{
 			return this.downstream.accept(fn(d, this.index++));
