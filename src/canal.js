@@ -830,6 +830,152 @@
 	}
 	TakeOp.prototype = new Operator();
 
+	function Option()
+	{
+	}
+	Option.prototype.get = function()
+	{
+		return undefined;
+	};
+	Option.prototype.or = function(other)
+	{
+		return undefined;
+	};
+	Option.prototype.orNull = function()
+	{
+		return undefined;
+	};
+	Option.prototype.given = function()
+	{
+		return undefined;
+	};
+	Option.prototype.canal = function()
+	{
+		return undefined;
+	};
+
+	function Some(val)
+	{
+		this.val = val;
+	}
+	Some.prototype = new Option();
+	Some.prototype.get = function()
+	{
+		return this.val;
+	};
+	Some.prototype.or = function(other)
+	{
+		return this.get();
+	};
+	Some.prototype.orNull = function()
+	{
+		return this.get();
+	};
+	Some.prototype.given = function()
+	{
+		return true;
+	};
+	Some.prototype.canal = function()
+	{
+		return new Canal().source([ this.get() ]);
+	};
+
+	Option.Some = function(val)
+	{
+		return new Some(val);
+	};
+
+	function None()
+	{
+	}
+	None.prototype = new Option();
+	None.prototype.or = function(other)
+	{
+		return other;
+	};
+	None.prototype.orNull = function()
+	{
+		return null;
+	};
+	None.prototype.given = function()
+	{
+		return false;
+	};
+	None.prototype.canal = function()
+	{
+		return new Canal().source(emptyArray);
+	};
+
+	Option.None = new None();
+
+	function Iterator()
+	{
+	}
+	Iterator.prototype.hasNext = function()
+	{
+		return undefined;
+	};
+	Iterator.prototype.next = function()
+	{
+		return undefined;
+	};
+
+	function Iterable()
+	{
+	}
+	Iterable.prototype.iterator = function()
+	{
+		return undefined;
+	};
+
+	function Source(array)
+	{
+		var length = array.length;
+
+		function SourceIterator()
+		{
+			this.index = 0;
+		}
+		SourceIterator.prototype = new Iterator();
+		SourceIterator.prototype.hasNext = function()
+		{
+			return this.index < length;
+		};
+		SourceIterator.prototype.next = function()
+		{
+			return array[this.index++];
+		};
+
+		this.iterator = function()
+		{
+			return new SourceIterator();
+		};
+	}
+	Source.prototype = new Iterable();
+
+	function Spring(gen)
+	{
+		function SpringIterator()
+		{
+			this.index = 0;
+		}
+		SpringIterator.prototype = new Iterator();
+		SpringIterator.prototype.hasNext = function()
+		{
+			return true;
+		};
+		SpringIterator.prototype.next = function()
+		{
+			return gen(this.index++);
+		};
+
+		this.iterator = function()
+		{
+			return new SpringIterator();
+		};
+	}
+	Spring.prototype = new Iterable();
+
 	function Canal()
 	{
 		var self = this;
@@ -854,9 +1000,11 @@
 		{
 			entr.begin();
 
-			for (i in data)
+			var iter = data.iterator();
+
+			while (iter.hasNext())
 			{
-				if (!entr.accept(data[i]))
+				if (!entr.accept(iter.next()))
 				{
 					break;
 				}
@@ -1064,7 +1212,18 @@
 
 	Canal.of = function(data)
 	{
-		return new Canal().source(data);
+		if (data instanceof Array)
+		{
+			return new Canal().source(new Source(data));
+		}
+		else if (data instanceof Function)
+		{
+			return new Canal().source(new Spring(data));
+		}
+		else
+		{
+			return Canal.of(Canal.pairsOfMap(data));
+		}
 	};
 
 	Canal.mapOfPairs = function(pairs)
@@ -1091,84 +1250,6 @@
 
 		return pairs;
 	};
-
-	function Option()
-	{
-	}
-	Option.prototype.get = function()
-	{
-		return undefined;
-	};
-	Option.prototype.or = function(other)
-	{
-		return undefined;
-	};
-	Option.prototype.orNull = function()
-	{
-		return undefined;
-	};
-	Option.prototype.given = function()
-	{
-		return undefined;
-	};
-	Option.prototype.canal = function()
-	{
-		return undefined;
-	};
-
-	function Some(val)
-	{
-		this.val = val;
-	}
-	Some.prototype = new Option();
-	Some.prototype.get = function()
-	{
-		return this.val;
-	};
-	Some.prototype.or = function(other)
-	{
-		return this.get();
-	};
-	Some.prototype.orNull = function()
-	{
-		return this.get();
-	};
-	Some.prototype.given = function()
-	{
-		return true;
-	};
-	Some.prototype.canal = function()
-	{
-		return new Canal().source([ this.get() ]);
-	};
-
-	Option.Some = function(val)
-	{
-		return new Some(val);
-	};
-
-	function None()
-	{
-	}
-	None.prototype = new Option();
-	None.prototype.or = function(other)
-	{
-		return other;
-	};
-	None.prototype.orNull = function()
-	{
-		return null;
-	};
-	None.prototype.given = function()
-	{
-		return false;
-	};
-	None.prototype.canal = function()
-	{
-		return new Canal().source(emptyArray);
-	};
-
-	Option.None = new None();
 
 	ROOT.Canal = Canal;
 
