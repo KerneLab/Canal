@@ -45,6 +45,7 @@
 
 	function Wheel()
 	{
+		this.index = undefined;
 	}
 	Wheel.prototype = new Pond();
 	Wheel.prototype.begin = function() // Void
