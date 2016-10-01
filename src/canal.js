@@ -562,6 +562,41 @@
 	}
 	MapValuesOp.prototype = new Operator();
 
+	function OffsetOp(skip, limit)
+	{
+		skip = Math.max(skip, 0);
+		limit = limit != null ? limit : -1;
+		max = skip + limit;
+
+		function OffsetPond()
+		{
+		}
+		OffsetPond.prototype = new Wheel();
+		OffsetPond.prototype.accept = function(d)
+		{
+			if (this.index < skip)
+			{
+				this.index++;
+				return true;
+			}
+			else if (this.index < max || limit < 0)
+			{
+				this.index++;
+				return this.downstream.accept(d);
+			}
+			else
+			{
+				return false;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new OffsetPond();
+		};
+	}
+	OffsetOp.prototype = new Operator();
+
 	function ReverseOp()
 	{
 		function ReversePond()
@@ -660,6 +695,32 @@
 		};
 	}
 	RightJoinOp.prototype = new Operator();
+
+	function SkipOp(num)
+	{
+		function SkipPond()
+		{
+		}
+		SkipPond.prototype = new Wheel();
+		SkipPond.prototype.accept = function(d)
+		{
+			if (this.index >= num)
+			{
+				return this.downstream.accept(d);
+			}
+			else
+			{
+				this.index++;
+				return true;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new SkipPond();
+		};
+	}
+	SkipOp.prototype = new Operator();
 
 	function SortOp(asc, cmp) // (a,b) -> 0(=) -1(<) 1(>)
 	{
@@ -968,6 +1029,11 @@
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
 		};
 
+		this.offset = function(skip, limit)
+		{
+			return this.add(new OffsetOp(skip, limit));
+		};
+
 		this.reverse = function()
 		{
 			return this.add(new ReverseOp());
@@ -977,6 +1043,11 @@
 		{
 			return this.add(new RightJoinOp(canal, arguments[1], arguments[2],
 					arguments[3], arguments[4]));
+		};
+
+		this.skip = function(num)
+		{
+			return this.add(new SkipOp(num));
 		};
 
 		this.sortBy = function() // [asc[, cmp]]
