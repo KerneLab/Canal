@@ -1013,6 +1013,29 @@
 			entr.done();
 		};
 
+		var check = function()
+		{
+			var slow = self, fast = self;
+
+			while (slow != null && fast.upstream() != null)
+			{
+				slow = slow.upstream();
+
+				fast = fast.upstream().upstream();
+				if (fast == null)
+				{
+					break;
+				}
+
+				if (slow == fast)
+				{
+					return false;
+				}
+			}
+
+			return true;
+		};
+
 		this.upstream = function()
 		{
 			if (arguments.length > 0)
@@ -1041,8 +1064,15 @@
 
 		this.add = function(op)
 		{
-			return new Canal().operator(op).upstream(self)
-					.source(this.source());
+			if (op != null)
+			{
+				return new Canal().operator(op).upstream(self).source(
+						this.source());
+			}
+			else
+			{
+				throw new Error("Intermediate Operator Should Not Be null.");
+			}
 		};
 
 		this.source = function() // access data
@@ -1066,20 +1096,27 @@
 
 				if (data != null)
 				{
-					var pond = op.newPond();
+					if (check())
+					{
+						var pond = op.newPond();
 
-					calc(chain(pond), data);
+						calc(chain(pond), data);
 
-					return pond.get();
+						return pond.get();
+					}
+					else
+					{
+						throw new Error("Loop Dependency Was Detected.");
+					}
 				}
 				else
 				{
-					return undefined;
+					throw new Error("Data Source Was Not Specified.");
 				}
 			}
 			else
 			{
-				return undefined;
+				throw new Error("Terminate Operator Was Not Specified.");
 			}
 		};
 
