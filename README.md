@@ -34,7 +34,8 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   {
     return [ d % 2, d ];
   })
-  .groupByKey().collect()
+  .groupBy()
+  .collect()
 ```
 ```js
 [0,[4]]
@@ -54,7 +55,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   {
     return [ d % 2, d ];
   })
-  .groupByKey()
+  .groupBy()
   .join(Canal.of([ 0, 1, 2 ]).map(function(d)
   {
 	  return [ d, d ];
