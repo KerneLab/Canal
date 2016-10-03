@@ -59,7 +59,8 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   .join(Canal.of([ 0, 1, 2 ]).map(function(d)
   {
 	  return [ d, d ];
-  })).collect()
+  }))
+  .collect()
 ```
 ```js
 [0, [[4],0]]
