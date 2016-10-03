@@ -687,7 +687,7 @@
 	}
 	SkipOp.prototype = new Operator();
 
-	function SortOp(asc, cmp) // (a,b) -> 0(=) -1(<) 1(>)
+	function SortOp(cmp, asc) // cmp: (a,b) -> 0(=) -1(<) 1(>)
 	{
 		asc = asc != null ? asc : true;
 
@@ -1195,7 +1195,7 @@
 			return this.add(new SkipOp(num));
 		};
 
-		this.sortBy = function() // [asc[, cmp]]
+		this.sortWith = function() // [cmp[,asc]]
 		{
 			return this.add(new SortOp(arguments[0], arguments[1]));
 		};
