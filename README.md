@@ -9,7 +9,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   {
     return d > 2;
   }).distinct()
-  .sortBy()
+  .sortWith()
   .map(function(d)
   {
     return [ d % 2, d ];
@@ -29,7 +29,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   {
     return d > 2;
   }).distinct()
-  .sortBy()
+  .sortWith()
   .map(function(d)
   {
     return [ d % 2, d ];
@@ -50,7 +50,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   {
     return d > 2;
   }).distinct()
-  .sortBy()
+  .sortWith()
   .map(function(d)
   {
     return [ d % 2, d ];
