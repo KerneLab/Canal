@@ -1200,6 +1200,20 @@
 			return this.add(new SortOp(arguments[0], arguments[1]));
 		};
 
+		this.zip = function(canal)
+		{
+			return this.map(function(d, i)
+			{
+				return [ i, d ];
+			}).join(canal.map(function(d, i)
+			{
+				return [ i, d ];
+			})).mapJoint(function(left, right)
+			{
+				return [ left, right ];
+			});
+		};
+
 		// Terminate Operations
 
 		this.collect = function()
