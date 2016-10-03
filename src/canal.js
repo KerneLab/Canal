@@ -166,7 +166,7 @@
 		{
 			var left = this.settle();
 			var right = Canal.mapOfPairs(this.canal() //
-			.groupByKey(this.keyR, this.valR).collect());
+			.groupBy(this.keyR, this.valR).collect());
 
 			var base = this.base(left, right);
 			var down = this.downstream;
@@ -1147,7 +1147,7 @@
 			return this.add(new ForeachOp(fn));
 		};
 
-		this.groupByKey = function()
+		this.groupBy = function()
 		{
 			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
@@ -1227,7 +1227,7 @@
 			return Canal.mapOfPairs(this.map(function(d)
 			{
 				return [ val(d), 1 ];
-			}).groupByKey().mapValues(function(arr)
+			}).groupBy().mapValues(function(arr)
 			{
 				return Canal.of(arr).reduce(0, function(a, b)
 				{
