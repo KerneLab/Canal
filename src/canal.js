@@ -195,6 +195,40 @@
 
 	// Intermediate Operators
 
+	function CartesianOp(canal)
+	{
+		function CartesianPond()
+		{
+		}
+		CartesianPond.prototype = new Pond();
+		CartesianPond.prototype.begin = function()
+		{
+			if (this.downstream != null)
+			{
+				this.mate = canal.collect();
+				this.downstream.begin();
+			}
+		};
+		CartesianPond.prototype.accept = function(d)
+		{
+			var mate = this.mate;
+			for (i in mate)
+			{
+				if (!this.downstream.accept([ d, mate[i] ]))
+				{
+					return false;
+				}
+			}
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			return new CartesianPond();
+		};
+	}
+	CartesianOp.prototype = new Operator();
+
 	function DistinctOp(cmp)
 	{
 		cmp = cmp != null // (a,b) -> 0(=)
@@ -1121,6 +1155,11 @@
 		};
 
 		// Intermediate Operations
+
+		this.cartesian = function(canal)
+		{
+			return this.add(new CartesianOp(canal));
+		};
 
 		this.distinct = function()
 		{
