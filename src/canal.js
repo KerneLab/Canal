@@ -976,7 +976,14 @@
 		{
 			if (this.downstream != null)
 			{
-				other.converge(this.downstream);
+				if (other != null)
+				{
+					other.converge(this.downstream);
+				}
+				else
+				{
+					this.downstream.done();
+				}
 			}
 		};
 
