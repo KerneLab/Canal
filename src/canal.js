@@ -231,24 +231,17 @@
 		{
 			this.mate = undefined;
 		}
-		CartesianPond.prototype = new Pond();
-		CartesianPond.prototype.begin = function()
+		CartesianPond.prototype = new Dam();
+		CartesianPond.prototype.tributary = function()
 		{
-			if (this.mate === undefined)
-			{
-				this.mate = canal.collect();
-			}
-			if (this.downstream != null)
-			{
-				this.downstream.begin();
-			}
+			return canal;
 		};
 		CartesianPond.prototype.accept = function(d)
 		{
-			var mate = this.mate;
-			for (i in mate)
+			var branch = this.branch;
+			for (i in branch)
 			{
-				if (!this.downstream.accept([ d, mate[i] ]))
+				if (!this.downstream.accept([ d, branch[i] ]))
 				{
 					return false;
 				}
