@@ -56,7 +56,10 @@
 	Wheel.prototype = new Pond();
 	Wheel.prototype.begin = function() // Void
 	{
-		this.index = 0;
+		if (this.index === undefined)
+		{
+			this.index = 0;
+		}
 		if (this.downstream != null)
 		{
 			this.downstream.begin();
@@ -71,7 +74,7 @@
 	Desilter.prototype.settling = null; // () -> new Sediment
 	Desilter.prototype.begin = function()
 	{
-		if (this.settling != null)
+		if (this.settle() === undefined && this.settling != null)
 		{
 			this.settle(this.settling());
 		}
@@ -150,6 +153,7 @@
 
 	function Dam()
 	{
+		this.branch = undefined;
 	}
 	Dam.prototype = new Pond();
 	Dam.prototype.tributary = function()
@@ -158,9 +162,12 @@
 	};
 	Dam.prototype.begin = function()
 	{
-		if (this.downstream != null)
+		if (this.branch === undefined)
 		{
 			this.branch = this.tributary().collect();
+		}
+		if (this.downstream != null)
+		{
 			this.downstream.begin();
 		}
 	};
@@ -222,13 +229,17 @@
 	{
 		function CartesianPond()
 		{
+			this.mate = undefined;
 		}
 		CartesianPond.prototype = new Pond();
 		CartesianPond.prototype.begin = function()
 		{
-			if (this.downstream != null)
+			if (this.mate === undefined)
 			{
 				this.mate = canal.collect();
+			}
+			if (this.downstream != null)
+			{
 				this.downstream.begin();
 			}
 		};
@@ -887,7 +898,7 @@
 		CollectPond.prototype.settling = function()
 		{
 			return [];
-		}
+		};
 		CollectPond.prototype.accept = function(d)
 		{
 			this.settle().push(d);
@@ -972,19 +983,7 @@
 		{
 			if (this.downstream != null)
 			{
-				if (other != null)
-				{
-					var another = other.collect();
-
-					for (i in another)
-					{
-						if (!this.downstream.accept(another[i]))
-						{
-							break;
-						}
-					}
-				}
-				this.downstream.done();
+				other.execute(this.downstream);
 			}
 		};
 
@@ -1253,20 +1252,17 @@
 			}
 		};
 
-		this.evaluate = function(op) // T -> Value
+		this.execute = function(pond, data)
 		{
-			if (op != null)
+			if (pond != null)
 			{
-				var data = arguments.length > 1 ? arguments[1] : this.source();
+				data = data != null ? data : this.source();
 
 				if (data != null)
 				{
 					if (check())
 					{
-						var pond = op.newPond();
-
 						calc(chain(pond), data);
-
 						return pond.get();
 					}
 					else
@@ -1278,6 +1274,18 @@
 				{
 					throw new Error("Data Source Was Not Specified.");
 				}
+			}
+			else
+			{
+				throw new Error("Downstream Pond Was Not Specified.");
+			}
+		};
+
+		this.evaluate = function(op) // T -> Value
+		{
+			if (op != null)
+			{
+				return this.execute(op.newPond(), arguments[1]);
 			}
 			else
 			{
