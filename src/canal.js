@@ -976,7 +976,7 @@
 		{
 			if (this.downstream != null)
 			{
-				other.execute(this.downstream);
+				other.converge(this.downstream);
 			}
 		};
 
@@ -1245,7 +1245,7 @@
 			}
 		};
 
-		this.execute = function(pond, data)
+		this.converge = function(pond, data)
 		{
 			if (pond != null)
 			{
@@ -1278,7 +1278,7 @@
 		{
 			if (op != null)
 			{
-				return this.execute(op.newPond(), arguments[1]);
+				return this.converge(op.newPond(), arguments[1]);
 			}
 			else
 			{
