@@ -21,6 +21,12 @@
 		return p[1];
 	};
 
+	// Default equality
+	var equality = function(a, b)
+	{
+		return a === b;
+	}
+
 	function Pond()
 	{
 		this.downstream = null;
@@ -142,6 +148,23 @@
 		}
 	};
 
+	function Dam()
+	{
+	}
+	Dam.prototype = new Pond();
+	Dam.prototype.tributary = function()
+	{
+		return undefined;
+	};
+	Dam.prototype.begin = function()
+	{
+		if (this.downstream != null)
+		{
+			this.branch = this.tributary().collect();
+			this.downstream.begin();
+		}
+	};
+
 	function Joiner()
 	{
 		this.keyR = keyOfPair;
@@ -229,13 +252,9 @@
 	}
 	CartesianOp.prototype = new Operator();
 
-	function DistinctOp(cmp)
+	function DistinctOp(eq)
 	{
-		cmp = cmp != null // (a,b) -> 0(=)
-		? cmp : function(a, b)
-		{
-			return a === b ? 0 : 1;
-		};
+		eq = eq != null ? eq : equality;
 
 		function DistinctPond()
 		{
@@ -247,7 +266,7 @@
 			var settle = this.settle();
 			for (i in settle)
 			{
-				if (cmp(settle[i], d) == 0)
+				if (eq(d, settle[i]))
 				{
 					found = true;
 					break;
@@ -386,9 +405,43 @@
 		this.newPond = function()
 		{
 			return new ForeachPond();
-		}
+		};
 	}
 	ForeachOp.prototype = new Operator();
+
+	function IntersectionOp(canal, eq)
+	{
+		eq = eq != null ? eq : equality;
+
+		function IntersectionPond()
+		{
+		}
+		IntersectionPond.prototype = new Dam();
+		IntersectionPond.prototype.tributary = function()
+		{
+			return canal;
+		};
+		IntersectionPond.prototype.accept = function(d)
+		{
+			var branch = this.branch;
+
+			for (i in branch)
+			{
+				if (eq(d, branch[i]))
+				{
+					return this.downstream.accept(d);
+				}
+			}
+
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			return new IntersectionPond();
+		};
+	}
+	IntersectionOp.prototype = new Operator();
 
 	function GroupOp(key, val) // (data) -> key, [(data) -> val]
 	{
@@ -773,6 +826,47 @@
 	}
 	SortOp.prototype = new Operator();
 
+	function SubtractOp(canal, eq)
+	{
+		eq = eq != null ? eq : equality;
+
+		function SubtractPond()
+		{
+		}
+		SubtractPond.prototype = new Dam();
+		SubtractPond.prototype.tributary = function()
+		{
+			return canal;
+		};
+		SubtractPond.prototype.accept = function(d)
+		{
+			var found = false;
+			var branch = this.branch;
+			for (i in branch)
+			{
+				if (eq(d, branch[i]))
+				{
+					found = true;
+					break;
+				}
+			}
+			if (!found)
+			{
+				return this.downstream.accept(d);
+			}
+			else
+			{
+				return true;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new SubtractPond();
+		};
+	}
+	SubtractOp.prototype = new Operator();
+
 	// Terminate Operators
 
 	function Terminal()
@@ -803,7 +897,7 @@
 		this.newPond = function()
 		{
 			return new CollectPond();
-		}
+		};
 	}
 	CollectOp.prototype = new Operator();
 
@@ -1191,6 +1285,11 @@
 			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
 
+		this.intersection = function(canal)
+		{
+			return this.add(new IntersectionOp(canal, arguments[1]));
+		};
+
 		this.join = function(canal)
 		{
 			return this.add(new JoinOp(canal, arguments[1], arguments[2],
@@ -1237,6 +1336,11 @@
 		this.sortWith = function() // [cmp[,asc]]
 		{
 			return this.add(new SortOp(arguments[0], arguments[1]));
+		};
+
+		this.subtract = function(canal)
+		{
+			return this.add(new SubtractOp(canal, arguments[1]));
 		};
 
 		this.zip = function(canal)
