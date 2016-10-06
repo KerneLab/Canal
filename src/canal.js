@@ -958,6 +958,43 @@
 	}
 	TakeOp.prototype = new Operator();
 
+	function UnionOp(other)
+	{
+		function UnionPond()
+		{
+		}
+		UnionPond.prototype = new Pond();
+		UnionPond.prototype.accept = function(d)
+		{
+			return this.downstream.accept(d);
+		};
+		UnionPond.prototype.done = function()
+		{
+			if (this.downstream != null)
+			{
+				if (other != null)
+				{
+					var another = other.collect();
+
+					for (i in another)
+					{
+						if (!this.downstream.accept(another[i]))
+						{
+							break;
+						}
+					}
+				}
+				this.downstream.done();
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new UnionPond();
+		};
+	}
+	UnionOp.prototype = new Operator();
+
 	function Option()
 	{
 	}
@@ -1341,6 +1378,11 @@
 		this.subtract = function(canal)
 		{
 			return this.add(new SubtractOp(canal, arguments[1]));
+		};
+
+		this.union = function(canal)
+		{
+			return this.add(new UnionOp(canal));
 		};
 
 		this.zip = function(canal)
