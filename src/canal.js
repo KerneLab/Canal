@@ -310,10 +310,10 @@
 		function FilterPond()
 		{
 		}
-		FilterPond.prototype = new Pond();
+		FilterPond.prototype = new Wheel();
 		FilterPond.prototype.accept = function(d)
 		{
-			if (pred(d))
+			if (pred(d, this.index++))
 			{
 				return this.downstream.accept(d);
 			}
@@ -329,37 +329,6 @@
 		};
 	}
 	FilterOp.prototype = new Operator();
-
-	function FirstOp(num)
-	{
-		if (num == null)
-		{
-			num = 1;
-		}
-
-		function FirstPond()
-		{
-		}
-		FirstPond.prototype = new Wheel();
-		FirstPond.prototype.accept = function(d)
-		{
-			if (this.index < num)
-			{
-				this.index++;
-				return this.downstream.accept(d);
-			}
-			else
-			{
-				return false;
-			}
-		};
-
-		this.newPond = function()
-		{
-			return new FirstPond();
-		};
-	}
-	FirstOp.prototype = new Operator();
 
 	function FlatMapOp(fn)
 	{
@@ -1263,7 +1232,7 @@
 					if (check())
 					{
 						calc(chain(pond), data);
-						return pond.get();
+						return pond;
 					}
 					else
 					{
@@ -1285,7 +1254,7 @@
 		{
 			if (op != null)
 			{
-				return this.converge(op.newPond(), arguments[1]);
+				return this.converge(op.newPond(), arguments[1]).get();
 			}
 			else
 			{
@@ -1308,11 +1277,6 @@
 		this.filter = function(pred)
 		{
 			return this.add(new FilterOp(pred));
-		};
-
-		this.first = function(num)
-		{
-			return this.add(new FirstOp(num));
 		};
 
 		this.flatMap = function(fn)
@@ -1388,6 +1352,16 @@
 			return this.add(new SubtractOp(canal, arguments[1]));
 		};
 
+		this.top = function()
+		{
+			var num = arguments.length > 0 ? arguments[0] : 1;
+
+			return this.filter(function(d, i)
+			{
+				return i < num;
+			});
+		};
+
 		this.union = function(canal)
 		{
 			return this.add(new UnionOp(canal));
@@ -1441,6 +1415,12 @@
 					return a + b;
 				});
 			}).collect());
+		};
+
+		this.first = function()
+		{
+			var arr = this.take(1);
+			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
 		};
 
 		this.reduce = function(init, reducer)
