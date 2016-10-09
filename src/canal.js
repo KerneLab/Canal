@@ -612,7 +612,8 @@
 		MapValuesPond.prototype = new Pond();
 		MapValuesPond.prototype.accept = function(d)
 		{
-			return this.downstream.accept([ key(d), fn(val(d)) ]);
+			var k = key(d);
+			return this.downstream.accept([ k, fn(val(d), k) ]);
 		};
 
 		this.newPond = function()
@@ -1324,6 +1325,14 @@
 		this.mapValues = function(fn)
 		{
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
+		};
+
+		this.reduceByKey = function(zero, reducer)
+		{
+			return this.groupBy().mapValues(function(arr, key)
+			{
+				return Canal.of(arr).reduce(zero(key), reducer);
+			});
 		};
 
 		this.reverse = function()
