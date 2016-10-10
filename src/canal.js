@@ -156,7 +156,7 @@
 		this.branch = undefined;
 	}
 	Dam.prototype = new Pond();
-	Dam.prototype.tributary = function()
+	Dam.prototype.that = function()
 	{
 		return undefined;
 	};
@@ -164,7 +164,7 @@
 	{
 		if (this.branch === undefined)
 		{
-			this.branch = this.tributary().collect();
+			this.branch = this.that().collect();
 		}
 		if (this.downstream != null)
 		{
@@ -178,7 +178,7 @@
 		this.valR = valOfPair;
 	}
 	Joiner.prototype = new Grouper();
-	Joiner.prototype.canal = function()
+	Joiner.prototype.that = function()
 	{
 		return undefined;
 	};
@@ -195,7 +195,7 @@
 		if (this.downstream != null)
 		{
 			var left = this.settle();
-			var right = Canal.mapOfPairs(this.canal() //
+			var right = Canal.mapOfPairs(this.that() //
 			.groupBy(this.keyR, this.valR).collect());
 
 			var base = this.base(left, right);
@@ -225,16 +225,15 @@
 
 	// Intermediate Operators
 
-	function CartesianOp(canal)
+	function CartesianOp(that)
 	{
 		function CartesianPond()
 		{
-			this.mate = undefined;
 		}
 		CartesianPond.prototype = new Dam();
-		CartesianPond.prototype.tributary = function()
+		CartesianPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		CartesianPond.prototype.accept = function(d)
 		{
@@ -382,7 +381,7 @@
 	}
 	ForeachOp.prototype = new Operator();
 
-	function IntersectionOp(canal, eq)
+	function IntersectionOp(that, eq)
 	{
 		eq = eq != null ? eq : equality;
 
@@ -390,9 +389,9 @@
 		{
 		}
 		IntersectionPond.prototype = new Dam();
-		IntersectionPond.prototype.tributary = function()
+		IntersectionPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		IntersectionPond.prototype.accept = function(d)
 		{
@@ -440,7 +439,7 @@
 	}
 	GroupOp.prototype = new Operator();
 
-	function JoinOp(canal, keyL, keyR, valL, valR)
+	function JoinOp(that, keyL, keyR, valL, valR)
 	{
 		keyL = keyL != null ? keyL : keyOfPair;
 		keyR = keyR != null ? keyR : keyOfPair;
@@ -459,9 +458,9 @@
 		{
 			return valL(d);
 		};
-		JoinPond.prototype.canal = function()
+		JoinPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		JoinPond.prototype.base = function(left, right)
 		{
@@ -495,7 +494,7 @@
 	}
 	JoinOp.prototype = new Operator();
 
-	function LeftJoinOp(canal, keyL, keyR, valL, valR)
+	function LeftJoinOp(that, keyL, keyR, valL, valR)
 	{
 		keyL = keyL != null ? keyL : keyOfPair;
 		keyR = keyR != null ? keyR : keyOfPair;
@@ -514,9 +513,9 @@
 		{
 			return valL(d);
 		};
-		LeftJoinPond.prototype.canal = function()
+		LeftJoinPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		LeftJoinPond.prototype.base = function(left, right)
 		{
@@ -653,7 +652,7 @@
 	}
 	ReverseOp.prototype = new Operator();
 
-	function RightJoinOp(canal, keyL, keyR, valL, valR)
+	function RightJoinOp(that, keyL, keyR, valL, valR)
 	{
 		keyL = keyL != null ? keyL : keyOfPair;
 		keyR = keyR != null ? keyR : keyOfPair;
@@ -672,9 +671,9 @@
 		{
 			return valL(d);
 		};
-		RightJoinPond.prototype.canal = function()
+		RightJoinPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		RightJoinPond.prototype.base = function(left, right)
 		{
@@ -800,7 +799,7 @@
 	}
 	SortOp.prototype = new Operator();
 
-	function SubtractOp(canal, eq)
+	function SubtractOp(that, eq)
 	{
 		eq = eq != null ? eq : equality;
 
@@ -808,9 +807,9 @@
 		{
 		}
 		SubtractPond.prototype = new Dam();
-		SubtractPond.prototype.tributary = function()
+		SubtractPond.prototype.that = function()
 		{
-			return canal;
+			return that;
 		};
 		SubtractPond.prototype.accept = function(d)
 		{
@@ -932,7 +931,7 @@
 	}
 	TakeOp.prototype = new Operator();
 
-	function UnionOp(other)
+	function UnionOp(that)
 	{
 		function UnionPond()
 		{
@@ -946,9 +945,9 @@
 		{
 			if (this.downstream != null)
 			{
-				if (other != null)
+				if (that != null)
 				{
-					other.converge(this.downstream);
+					that.converge(this.downstream);
 				}
 				else
 				{
@@ -971,7 +970,7 @@
 	{
 		return undefined;
 	};
-	Option.prototype.or = function(other)
+	Option.prototype.or = function(that)
 	{
 		return undefined;
 	};
@@ -997,7 +996,7 @@
 	{
 		return this.val;
 	};
-	Some.prototype.or = function(other)
+	Some.prototype.or = function(that)
 	{
 		return this.get();
 	};
@@ -1023,9 +1022,9 @@
 	{
 	}
 	None.prototype = new Option();
-	None.prototype.or = function(other)
+	None.prototype.or = function(that)
 	{
-		return other;
+		return that;
 	};
 	None.prototype.orNull = function()
 	{
@@ -1263,17 +1262,17 @@
 			}
 		};
 
-		// Intermediate Operations
+		// General Intermediate Operations
 
-		this.cartesian = function(canal)
+		this.cartesian = function(that)
 		{
-			return this.add(new CartesianOp(canal));
+			return this.add(new CartesianOp(that));
 		};
 
 		this.distinct = function()
 		{
 			return this.add(new DistinctOp(arguments[0]));
-		}
+		};
 
 		this.filter = function(pred)
 		{
@@ -1295,20 +1294,20 @@
 			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
 
-		this.intersection = function(canal)
+		this.intersection = function(that)
 		{
-			return this.add(new IntersectionOp(canal, arguments[1]));
+			return this.add(new IntersectionOp(that, arguments[1]));
 		};
 
-		this.join = function(canal)
+		this.join = function(that)
 		{
-			return this.add(new JoinOp(canal, arguments[1], arguments[2],
+			return this.add(new JoinOp(that, arguments[1], arguments[2],
 					arguments[3], arguments[4]));
 		};
 
-		this.leftJoin = function(canal)
+		this.leftJoin = function(that)
 		{
-			return this.add(new LeftJoinOp(canal, arguments[1], arguments[2],
+			return this.add(new LeftJoinOp(that, arguments[1], arguments[2],
 					arguments[3], arguments[4]));
 		};
 
@@ -1327,22 +1326,14 @@
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
 		};
 
-		this.reduceByKey = function(zero, reducer)
-		{
-			return this.groupBy().mapValues(function(arr, key)
-			{
-				return Canal.of(arr).reduce(zero(key), reducer);
-			});
-		};
-
 		this.reverse = function()
 		{
 			return this.add(new ReverseOp());
 		};
 
-		this.rightJoin = function(canal)
+		this.rightJoin = function(that)
 		{
-			return this.add(new RightJoinOp(canal, arguments[1], arguments[2],
+			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
 					arguments[3], arguments[4]));
 		};
 
@@ -1356,9 +1347,9 @@
 			return this.add(new SortOp(arguments[0], arguments[1]));
 		};
 
-		this.subtract = function(canal)
+		this.subtract = function(that)
 		{
-			return this.add(new SubtractOp(canal, arguments[1]));
+			return this.add(new SubtractOp(that, arguments[1]));
 		};
 
 		this.top = function()
@@ -1371,17 +1362,17 @@
 			});
 		};
 
-		this.union = function(canal)
+		this.union = function(that)
 		{
-			return this.add(new UnionOp(canal));
+			return this.add(new UnionOp(that));
 		};
 
-		this.zip = function(canal)
+		this.zip = function(that)
 		{
 			return this.map(function(d, i)
 			{
 				return [ i, d ];
-			}).join(canal.map(function(d, i)
+			}).join(that.map(function(d, i)
 			{
 				return [ i, d ];
 			})).mapJoint(function(left, right)
@@ -1390,7 +1381,17 @@
 			});
 		};
 
-		// Terminate Operations
+		// Pair Intermediate Operations
+
+		this.reduceByKey = function(zero, reducer)
+		{
+			return this.groupBy().mapValues(function(arr, key)
+			{
+				return Canal.of(arr).reduce(zero(key), reducer);
+			});
+		};
+
+		// General Terminate Operations
 
 		this.collect = function()
 		{
@@ -1440,6 +1441,27 @@
 		this.take = function(num)
 		{
 			return this.evaluate(new TakeOp(num));
+		};
+
+		// Pair Terminate Operations
+
+		this.collectAsMap = function()
+		{
+			return Canal.mapOfPairs(this.collect());
+		};
+
+		this.countByKey = function()
+		{
+			return this.mapValues(function()
+			{
+				return 1;
+			}).reduceByKey(function()
+			{
+				return 0;
+			}, function(a, b)
+			{
+				return a + b;
+			}).collectAsMap();
 		};
 	}
 
