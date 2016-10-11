@@ -381,6 +381,96 @@
 	}
 	ForeachOp.prototype = new Operator();
 
+	function FullJoinOp(that, keyL, keyR, valL, valR)
+	{
+		keyL = keyL != null ? keyL : keyOfPair;
+		keyR = keyR != null ? keyR : keyOfPair;
+		valL = valL != null ? valL : valOfPair;
+		valR = valR != null ? valR : valOfPair;
+
+		function FullJoinPond()
+		{
+		}
+		FullJoinPond.prototype = new Joiner();
+		FullJoinPond.prototype.keyOf = function(d)
+		{
+			return keyL(d);
+		};
+		FullJoinPond.prototype.valOf = function(d)
+		{
+			return valL(d);
+		};
+		FullJoinPond.prototype.that = function()
+		{
+			return that;
+		};
+		FullJoinPond.prototype.base = function(left, right)
+		{
+			var base = {};
+
+			for (i in left)
+			{
+				base[i] = null;
+			}
+
+			for (i in right)
+			{
+				base[i] = null;
+			}
+
+			return base;
+		};
+		FullJoinPond.prototype.join = function(down, key, lefts, rights)
+		{
+			if (lefts != null && rights != null)
+			{
+				for (l in lefts)
+				{
+					for (r in rights)
+					{
+						if (!down.accept([ key, //
+						[ Option.Some(lefts[l]), Option.Some(rights[r]) ] ]))
+						{
+							return false;
+						}
+					}
+				}
+			}
+			else if (lefts != null)
+			{
+				for (l in lefts)
+				{
+					if (!down.accept([ key, //
+					[ Option.Some(lefts[l]), Option.None ] ]))
+					{
+						return false;
+					}
+				}
+			}
+			else if (rights != null)
+			{
+				for (r in rights)
+				{
+					if (!down.accept([ key, //
+					[ Option.None, Option.Some(rights[r]) ] ]))
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			var pond = new FullJoinPond();
+			pond.keyR = keyR;
+			pond.valR = valR;
+			return pond;
+		};
+	}
+	FullJoinOp.prototype = new Operator();
+
 	function IntersectionOp(that, eq)
 	{
 		eq = eq != null ? eq : equality;
@@ -1299,42 +1389,14 @@
 			return this.add(new IntersectionOp(that, arguments[1]));
 		};
 
-		this.join = function(that)
-		{
-			return this.add(new JoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
-		};
-
-		this.leftJoin = function(that)
-		{
-			return this.add(new LeftJoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
-		};
-
 		this.map = function(fn)
 		{
 			return this.add(new MapOp(fn));
 		};
 
-		this.mapJoint = function(fn)
-		{
-			return this.add(new MapJointOp(fn));
-		};
-
-		this.mapValues = function(fn)
-		{
-			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
-		};
-
 		this.reverse = function()
 		{
 			return this.add(new ReverseOp());
-		};
-
-		this.rightJoin = function(that)
-		{
-			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
 		};
 
 		this.skip = function(num)
@@ -1383,12 +1445,57 @@
 
 		// Pair Intermediate Operations
 
+		this.cogroup = function(that)
+		{
+			return this.groupBy(arguments[1], arguments[3]) //
+			.fullJoin(that.groupBy(arguments[2], arguments[4])) //
+			.mapJoint(function(l, r, k)
+			{
+				return [ k, [ l.or([]), r.or([]) ] ];
+			});
+		};
+
+		this.fullJoin = function(that)
+		{
+			return this.add(new FullJoinOp(that, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
+		};
+
+		this.join = function(that)
+		{
+			return this.add(new JoinOp(that, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
+		};
+
+		this.leftJoin = function(that)
+		{
+			return this.add(new LeftJoinOp(that, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
+		};
+
+		this.mapJoint = function(fn)
+		{
+			return this.add(new MapJointOp(fn));
+		};
+
+		this.mapValues = function(fn)
+		{
+			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
+		};
+
 		this.reduceByKey = function(zero, reducer)
 		{
-			return this.groupBy().mapValues(function(arr, key)
+			return this.groupBy(arguments[2], arguments[3]) //
+			.mapValues(function(arr, key)
 			{
 				return Canal.of(arr).reduce(zero(key), reducer);
 			});
+		};
+
+		this.rightJoin = function(that)
+		{
+			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
+					arguments[3], arguments[4]));
 		};
 
 		// General Terminate Operations
