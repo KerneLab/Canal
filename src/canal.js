@@ -1645,7 +1645,7 @@
 			}, function(a, b)
 			{
 				return a + b;
-			}).collectAsMap();
+			}, arguments[0]).collectAsMap();
 		};
 	}
 
