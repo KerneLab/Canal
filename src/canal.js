@@ -195,8 +195,8 @@
 		if (this.downstream != null)
 		{
 			var left = this.settle();
-			var right = Canal.mapOfPairs(this.that() //
-			.groupBy(this.keyR, this.valR).collect());
+			var right = this.that().groupBy(this.keyR, this.valR)
+					.collectAsMap();
 
 			var base = this.base(left, right);
 			var down = this.downstream;
@@ -254,6 +254,62 @@
 		};
 	}
 	CartesianOp.prototype = new Operator();
+
+	function CogroupOp(those)
+	{
+		function CogroupPond()
+		{
+
+		}
+		CogroupPond.prototype = new Grouper();
+		CogroupPond.prototype.done = function()
+		{
+			if (this.downstream != null)
+			{
+				var settle = this.settle();
+				var groups = [ settle ];
+				var keys = {};
+				for (k in settle)
+				{
+					keys[k] = null;
+				}
+
+				for (i in those)
+				{
+					settle = those[i].groupBy().collectAsMap();
+					for (k in settle)
+					{
+						keys[k] = null;
+					}
+					groups.push(settle);
+				}
+
+				for (key in keys)
+				{
+					var comb = [];
+
+					for (g in groups)
+					{
+						var group = groups[g][key];
+						comb.push(group != null ? group : []);
+					}
+
+					if (!this.downstream.accept([ key, comb ]))
+					{
+						break;
+					}
+				}
+
+				this.downstream.done();
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new CogroupPond();
+		};
+	}
+	CogroupOp.prototype = new Operator();
 
 	function DistinctOp(eq)
 	{
@@ -1445,14 +1501,9 @@
 
 		// Pair Intermediate Operations
 
-		this.cogroup = function(that)
+		this.cogroup = function()
 		{
-			return this.groupBy(arguments[1], arguments[3]) //
-			.fullJoin(that.groupBy(arguments[2], arguments[4])) //
-			.mapJoint(function(l, r, k)
-			{
-				return [ k, [ l.or([]), r.or([]) ] ];
-			});
+			return this.add(new CogroupOp(arguments));
 		};
 
 		this.fullJoin = function(that)
@@ -1522,7 +1573,7 @@
 			{
 				return d;
 			};
-			return Canal.mapOfPairs(this.map(function(d)
+			return this.map(function(d)
 			{
 				return [ val(d), 1 ];
 			}).groupBy().mapValues(function(arr)
@@ -1531,7 +1582,7 @@
 				{
 					return a + b;
 				});
-			}).collect());
+			}).collectAsMap();
 		};
 
 		this.first = function()
