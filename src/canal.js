@@ -1020,6 +1020,31 @@
 	}
 	CollectOp.prototype = new Operator();
 
+	function CollectAsMapOp(key, val)
+	{
+		key = key != null ? key : keyOfPair;
+		val = val != null ? val : valOfPair;
+		function CollectMapPond()
+		{
+		}
+		CollectMapPond.prototype = new Terminal();
+		CollectMapPond.prototype.settling = function()
+		{
+			return {};
+		};
+		CollectMapPond.prototype.accept = function(d)
+		{
+			this.settle()[key(d)] = val(d);
+			return true;
+		};
+
+		this.newPond = function()
+		{
+			return new CollectMapPond();
+		};
+	}
+	CollectAsMapOp.prototype = new Operator();
+
 	function ReduceOp(init, reducer) // (res,data) -> res
 	{
 		function ReducePond()
@@ -1605,7 +1630,8 @@
 
 		this.collectAsMap = function()
 		{
-			return Canal.mapOfPairs(this.collect());
+			return this
+					.evaluate(new CollectAsMapOp(arguments[0], arguments[1]));
 		};
 
 		this.countByKey = function()
