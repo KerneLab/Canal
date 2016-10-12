@@ -1470,6 +1470,14 @@
 			return this.add(new IntersectionOp(that, arguments[1]));
 		};
 
+		this.keyBy = function(kop)
+		{
+			return this.map(function(d, i)
+			{
+				return [ kop(d, i), d ];
+			});
+		};
+
 		this.map = function(fn)
 		{
 			return this.add(new MapOp(fn));
