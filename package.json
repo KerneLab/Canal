@@ -21,8 +21,8 @@
   "engines": {
     "node": ">=0.12"
   },
-  "main": "src/canal.js",
+  "main": "canal.js",
   "files": [
-    "src/canal.js"
+    "canal.js"
   ]
 }
