@@ -13,13 +13,13 @@ module.exports = function(grunt) {
         dest: 'build/<%= pkg.name %>.min.js'
       }
     },
-    test: {
+    qunit: {
       files: ['test/index.html']
     }
   });
 
-  grunt.registerTask('test', ['test']);
+  grunt.registerTask('test', ['qunit']);
 
-  grunt.registerTask('default', ['test', 'uglify']);
+  grunt.registerTask('default', ['qunit', 'uglify']);
 
 };
