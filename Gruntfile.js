@@ -5,16 +5,21 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
     uglify: {
       options: {
-        banner: '/*! canal <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'src/canal.js',
-        dest: 'build/canal.min.js'
+        src: 'src/<%= pkg.name %>.js',
+        dest: 'build/<%= pkg.name %>.min.js'
       }
+    },
+    qunit: {
+      files: ['test/index.html']
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
+
+  grunt.registerTask('test', ['qunit']);
 
   grunt.registerTask('default', ['uglify']);
 
