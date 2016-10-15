@@ -5,3 +5,11 @@ node_js:
 before_install: npm install -g grunt-cli
 install: npm install
 script: grunt default --verbose
+deploy:
+  provider: releases
+  api_key: "25754abb0d2916cb48377f34df0c061f048a106a"
+  file: "canal.min.js"
+  skip_cleanup: true
+  overwrite: true
+  on:
+    tags: true
