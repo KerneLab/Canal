@@ -9,8 +9,9 @@ module.exports = function(grunt) {
         banner: '/*! <%= pkg.name %> v<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
-        src: 'src/canal.js',
-        dest: 'canal.min.js'
+        files: {
+          'canal.min.js': ['canal.js']
+        }
       }
     },
     qunit: {
