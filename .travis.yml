@@ -7,7 +7,7 @@ install: npm install
 script: grunt default --verbose
 deploy:
   provider: releases
-  api_key: "25754abb0d2916cb48377f34df0c061f048a106a"
+  api_key: "9a4b59b58c595b126575e4c9dc62885df922cd06"
   file: "canal.min.js"
   skip_cleanup: true
   overwrite: true
