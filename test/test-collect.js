@@ -1,8 +1,11 @@
-QUnit.test("collect", function(assert)
+QUnit.test("collect()", function(assert)
 {
 	var result = Canal.of([ 1, 2, 3 ]).collect();
-	assert.equal(result.length, 3);
-	assert.equal(result[0], 1);
-	assert.equal(result[1], 2);
-	assert.equal(result[2], 3);
+	assert.propEqual(result, [ 1, 2, 3 ]);
+});
+
+QUnit.test("collect() empty", function(assert)
+{
+	var result = Canal.of([]).collect();
+	assert.propEqual(result, []);
 });
