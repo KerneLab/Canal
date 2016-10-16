@@ -9,6 +9,9 @@
 	// Constant of an empty array which MUST not be changed.
 	var emptyArray = [];
 
+	// Constant of the end of the data flow which MUST not be changed.
+	var endOfData = {};
+
 	// Default key of a pair is the 1st element of Array[2]
 	var keyOfPair = function(p)
 	{
@@ -1262,15 +1265,17 @@
 		function SpringIterator()
 		{
 			this.index = 0;
+			this.value = undefined;
 		}
 		SpringIterator.prototype = new Iterator();
 		SpringIterator.prototype.hasNext = function()
 		{
-			return true;
+			this.value = gen(this.index++);
+			return this.value !== endOfData;
 		};
 		SpringIterator.prototype.next = function()
 		{
-			return gen(this.index++);
+			return this.value;
 		};
 
 		this.iterator = function()
@@ -1656,6 +1661,11 @@
 			}, arguments[0]).collectAsMap();
 		};
 	}
+
+	Canal.eod = function()
+	{
+		return endOfData;
+	};
 
 	Canal.of = function(data)
 	{
