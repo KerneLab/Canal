@@ -1,5 +1,7 @@
-# Canal
-Functional Programming Framework of Calculation in Javascript.
+Canal.js [![Travic CI](https://travis-ci.org/KerneLab/Canal.svg?branch=master)](https://travis-ci.org/KerneLab/Canal)
+=========================
+
+> Functional Programming Framework of Calculation in Javascript.
 
 > Common Transform
 
