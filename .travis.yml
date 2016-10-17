@@ -8,7 +8,9 @@ script: grunt default --verbose
 deploy:
   provider: releases
   api_key: "${GH_TOKEN}"
-  file: "canal.min.js"
+  file:
+    - "canal.min.js"
+    - "canal.min.map"
   skip_cleanup: true
   overwrite: true
   on:
