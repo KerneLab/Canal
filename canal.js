@@ -142,7 +142,7 @@
 		{
 			var settle = this.settle();
 
-			for (group in settle)
+			for ( var group in settle)
 			{
 				if (!this.downstream.accept([ group, settle[group] ]))
 				{
@@ -241,7 +241,7 @@
 		CartesianPond.prototype.accept = function(d)
 		{
 			var branch = this.branch;
-			for (i in branch)
+			for ( var i in branch)
 			{
 				if (!this.downstream.accept([ d, branch[i] ]))
 				{
@@ -272,12 +272,12 @@
 				var settle = this.settle();
 				var groups = [ settle ];
 				var keys = {};
-				for (k in settle)
+				for ( var k in settle)
 				{
 					keys[k] = null;
 				}
 
-				for (i in those)
+				for ( var i in those)
 				{
 					settle = those[i].groupBy().collectAsMap();
 					for (k in settle)
@@ -287,11 +287,11 @@
 					groups.push(settle);
 				}
 
-				for (key in keys)
+				for ( var key in keys)
 				{
 					var comb = [];
 
-					for (g in groups)
+					for ( var g in groups)
 					{
 						var group = groups[g][key];
 						comb.push(group != null ? group : []);
@@ -326,7 +326,7 @@
 		{
 			var found = false;
 			var settle = this.settle();
-			for (i in settle)
+			for ( var i in settle)
 			{
 				if (eq(d, settle[i]))
 				{
@@ -345,7 +345,7 @@
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				for (i in settle)
+				for ( var i in settle)
 				{
 					if (!this.downstream.accept(settle[i]))
 					{
@@ -399,7 +399,7 @@
 			var data = fn(d, this.index++);
 			if (data instanceof Array)
 			{
-				for (i in data)
+				for ( var i in data)
 				{
 					if (!this.downstream.accept(data[i]))
 					{
@@ -467,12 +467,12 @@
 		{
 			var base = {};
 
-			for (i in left)
+			for ( var i in left)
 			{
 				base[i] = null;
 			}
 
-			for (i in right)
+			for ( var i in right)
 			{
 				base[i] = null;
 			}
@@ -546,7 +546,7 @@
 		{
 			var branch = this.branch;
 
-			for (i in branch)
+			for ( var i in branch)
 			{
 				if (eq(d, branch[i]))
 				{
@@ -783,7 +783,7 @@
 			{
 				var settle = this.settle();
 				settle.reverse();
-				for (i in settle)
+				for ( var i in settle)
 				{
 					if (!this.downstream.accept(settle[i]))
 					{
@@ -930,7 +930,7 @@
 						settle.reverse();
 					}
 				}
-				for (i in settle)
+				for ( var i in settle)
 				{
 					if (!this.downstream.accept(settle[i]))
 					{
@@ -964,7 +964,7 @@
 		{
 			var found = false;
 			var branch = this.branch;
-			for (i in branch)
+			for ( var i in branch)
 			{
 				if (eq(d, branch[i]))
 				{
@@ -1294,7 +1294,7 @@
 
 		var chain = function(pond)
 		{
-			for (prev = self; //
+			for (var prev = self; //
 			prev != null && prev.operator() != null; //
 			prev = prev.upstream())
 			{
@@ -1455,6 +1455,16 @@
 			return this.add(new FilterOp(pred));
 		};
 
+		this.first = function()
+		{
+			var num = arguments.length > 0 ? arguments[0] : 1;
+
+			return this.filter(function(d, i)
+			{
+				return i < num;
+			});
+		};
+
 		this.flatMap = function(fn)
 		{
 			return this.add(new FlatMapOp(fn));
@@ -1472,7 +1482,8 @@
 
 		this.intersection = function(that)
 		{
-			return this.add(new IntersectionOp(that, arguments[1]));
+			return this.distinct(arguments[1]) //
+			.add(new IntersectionOp(that.distinct(arguments[1]), arguments[1]));
 		};
 
 		this.keyBy = function(kop)
@@ -1505,17 +1516,8 @@
 
 		this.subtract = function(that)
 		{
-			return this.add(new SubtractOp(that, arguments[1]));
-		};
-
-		this.top = function()
-		{
-			var num = arguments.length > 0 ? arguments[0] : 1;
-
-			return this.filter(function(d, i)
-			{
-				return i < num;
-			});
+			return this.add(new SubtractOp(that.distinct(arguments[1]),
+					arguments[1]));
 		};
 
 		this.union = function(that)
@@ -1623,7 +1625,7 @@
 			}).collectAsMap();
 		};
 
-		this.first = function()
+		this.head = function()
 		{
 			var arr = this.take(1);
 			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
@@ -1687,7 +1689,7 @@
 	{
 		var map = {};
 
-		for (i in pairs)
+		for ( var i in pairs)
 		{
 			var pair = pairs[i];
 			map[pair[0]] = pair[1];
@@ -1700,7 +1702,7 @@
 	{
 		var pairs = [];
 
-		for (i in map)
+		for ( var i in map)
 		{
 			pairs.push([ i, map[i] ]);
 		}
