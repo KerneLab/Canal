@@ -1048,19 +1048,19 @@
 	}
 	CollectAsMapOp.prototype = new Operator();
 
-	function ReduceOp(init, reducer) // (res,data) -> res
+	function MergeOp(init, merger) // (res,data) -> res
 	{
-		function ReducePond()
+		function MergePond()
 		{
 		}
-		ReducePond.prototype = new Terminal();
-		ReducePond.prototype.settling = function()
+		MergePond.prototype = new Terminal();
+		MergePond.prototype.settling = function()
 		{
 			return init;
 		};
-		ReducePond.prototype.accept = function(d)
+		MergePond.prototype.accept = function(d)
 		{
-			var res = reducer(this.settle(), d);
+			var res = merger(this.settle(), d);
 			if (res !== undefined)
 			{
 				this.settle(res);
@@ -1070,10 +1070,10 @@
 
 		this.newPond = function()
 		{
-			return new ReducePond();
+			return new MergePond();
 		};
 	}
-	ReduceOp.prototype = new Operator();
+	MergeOp.prototype = new Operator();
 
 	function TakeOp(num)
 	{
@@ -1574,12 +1574,12 @@
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
 		};
 
-		this.reduceByKey = function(zero, reducer)
+		this.mergeByKey = function(zero, merger)
 		{
 			return this.groupBy(arguments[2], arguments[3]) //
 			.mapValues(function(arr, key)
 			{
-				return Canal.of(arr).reduce(zero(key), reducer);
+				return Canal.of(arr).merge(zero(key), merger);
 			});
 		};
 
@@ -1601,7 +1601,7 @@
 			return this.map(function(d)
 			{
 				return 1;
-			}).evaluate(new ReduceOp(0, function(res, dat)
+			}).evaluate(new MergeOp(0, function(res, dat)
 			{
 				return res + dat;
 			}));
@@ -1618,7 +1618,7 @@
 				return [ val(d), 1 ];
 			}).groupBy().mapValues(function(arr)
 			{
-				return Canal.of(arr).reduce(0, function(a, b)
+				return Canal.of(arr).merge(0, function(a, b)
 				{
 					return a + b;
 				});
@@ -1631,9 +1631,9 @@
 			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
 		};
 
-		this.reduce = function(init, reducer)
+		this.merge = function(init, merger)
 		{
-			return this.evaluate(new ReduceOp(init, reducer));
+			return this.evaluate(new MergeOp(init, merger));
 		};
 
 		this.take = function(num)
@@ -1654,7 +1654,7 @@
 			return this.mapValues(function()
 			{
 				return 1;
-			}).reduceByKey(function()
+			}).mergeByKey(function()
 			{
 				return 0;
 			}, function(a, b)
