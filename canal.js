@@ -204,7 +204,7 @@
 			var base = this.base(left, right);
 			var down = this.downstream;
 
-			for (k in base)
+			for ( var k in base)
 			{
 				if (!this.join(down, k, left[k], right[k]))
 				{
@@ -280,7 +280,7 @@
 				for ( var i in those)
 				{
 					settle = those[i].groupBy().collectAsMap();
-					for (k in settle)
+					for ( var k in settle)
 					{
 						keys[k] = null;
 					}
@@ -483,9 +483,9 @@
 		{
 			if (lefts != null && rights != null)
 			{
-				for (l in lefts)
+				for ( var l in lefts)
 				{
-					for (r in rights)
+					for ( var r in rights)
 					{
 						if (!down.accept([ key, //
 						[ Option.Some(lefts[l]), Option.Some(rights[r]) ] ]))
@@ -497,7 +497,7 @@
 			}
 			else if (lefts != null)
 			{
-				for (l in lefts)
+				for ( var l in lefts)
 				{
 					if (!down.accept([ key, //
 					[ Option.Some(lefts[l]), Option.None ] ]))
@@ -508,7 +508,7 @@
 			}
 			else if (rights != null)
 			{
-				for (r in rights)
+				for ( var r in rights)
 				{
 					if (!down.accept([ key, //
 					[ Option.None, Option.Some(rights[r]) ] ]))
@@ -619,9 +619,9 @@
 		{
 			if (lefts != null && rights != null)
 			{
-				for (l in lefts)
+				for ( var l in lefts)
 				{
-					for (r in rights)
+					for ( var r in rights)
 					{
 						if (!down.accept([ key, [ lefts[l], rights[r] ] ]))
 						{
@@ -676,9 +676,9 @@
 			{
 				if (rights != null)
 				{
-					for (l in lefts)
+					for ( var l in lefts)
 					{
-						for (r in rights)
+						for ( var r in rights)
 						{
 							if (!down.accept([ key,
 									[ lefts[l], Option.Some(rights[r]) ] ]))
@@ -690,7 +690,7 @@
 				}
 				else
 				{
-					for (l in lefts)
+					for ( var l in lefts)
 					{
 						if (!down.accept([ key, [ lefts[l], Option.None ] ]))
 						{
@@ -834,9 +834,9 @@
 			{
 				if (lefts != null)
 				{
-					for (r in rights)
+					for ( var r in rights)
 					{
-						for (l in lefts)
+						for ( var l in lefts)
 						{
 							if (!down.accept([ key,
 									[ Option.Some(lefts[l]), rights[r] ] ]))
@@ -848,7 +848,7 @@
 				}
 				else
 				{
-					for (r in rights)
+					for ( var r in rights)
 					{
 						if (!down.accept([ key, [ Option.None, rights[r] ] ]))
 						{
