@@ -281,9 +281,9 @@
 
 				for ( var i in those)
 				{
-					console.log("i:"+i);
+					console.log("i:" + i);
 					settle = those[i].groupBy().collectAsMap();
-					console.log("settle:"+JSON.stringify(settle));
+					console.log("settle:" + JSON.stringify(settle));
 					for ( var k in settle)
 					{
 						keys[k] = null;
@@ -1553,7 +1553,14 @@
 		this.cogroup = function()
 		{
 			console.log("args:" + arguments.length);
-			return this.add(new CogroupOp(arguments));
+
+			var those = [];
+			for (var i = 0; i < arguments.length; i++)
+			{
+				those.push(arguments[i]);
+			}
+
+			return this.add(new CogroupOp(those));
 		};
 
 		this.fullJoin = function(that)
