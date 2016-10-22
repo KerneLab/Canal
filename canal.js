@@ -289,13 +289,18 @@
 
 				for ( var key in keys)
 				{
+					console.log("K:" + key);
 					var comb = [];
 
 					for ( var g in groups)
 					{
+						console.log("G:" + g);
 						var group = groups[g][key];
 						comb.push(group != null ? group : []);
 					}
+
+					console.log("comb length:"+comb.length);
+					console.log("comb:"+JSON.stringify(comb));
 
 					if (!this.downstream.accept([ key, comb ]))
 					{
