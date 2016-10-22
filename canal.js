@@ -277,6 +277,8 @@
 					keys[k] = null;
 				}
 
+				console.log("those:" + those.length);
+
 				for ( var i in those)
 				{
 					settle = those[i].groupBy().collectAsMap();
@@ -299,8 +301,8 @@
 						comb.push(group != null ? group : []);
 					}
 
-					console.log("comb length:"+comb.length);
-					console.log("comb:"+JSON.stringify(comb));
+					console.log("comb length:" + comb.length);
+					console.log("comb:" + JSON.stringify(comb));
 
 					if (!this.downstream.accept([ key, comb ]))
 					{
@@ -1548,6 +1550,7 @@
 
 		this.cogroup = function()
 		{
+			console.log("args:" + arguments.length);
 			return this.add(new CogroupOp(arguments));
 		};
 
