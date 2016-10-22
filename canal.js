@@ -1623,6 +1623,14 @@
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
 		};
 
+		this.reduceByKey = function(reducer)
+		{
+			return this.groupBy(arguments[1], arguments[2]) //
+			.mapValues(function(arr, key)
+			{
+			});
+		};
+
 		this.rightJoin = function(that)
 		{
 			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
