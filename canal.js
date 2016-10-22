@@ -1628,6 +1628,7 @@
 			return this.groupBy(arguments[1], arguments[2]) //
 			.mapValues(function(arr, key)
 			{
+				return Canal.of(arr).reduce(reducer).get();
 			});
 		};
 
