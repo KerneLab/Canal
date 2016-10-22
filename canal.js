@@ -1075,6 +1075,40 @@
 	}
 	FoldOp.prototype = new Operator();
 
+	function ReduceOp(reducer) // (dat1,dat2) -> dat3
+	{
+		function ReducePond()
+		{
+		}
+		ReducePond.prototype = new Terminal();
+		ReducePond.prototype.settling = function()
+		{
+			return endOfData;
+		};
+		ReducePond.prototype.accept = function(d)
+		{
+			if (this.settle() !== endOfData)
+			{
+				this.settle(reducer(this.settle(), d));
+			}
+			else
+			{
+				this.settle(d);
+			}
+			return true;
+		};
+		ReducePond.prototype.get = function()
+		{
+			return this.settle() !== endOfData ? this.settle() : undefined;
+		};
+
+		this.newPond = function()
+		{
+			return new ReducePond();
+		};
+	}
+	ReduceOp.prototype = new Operator();
+
 	function TakeOp(num)
 	{
 		function TakePond()
@@ -1639,6 +1673,11 @@
 		{
 			var arr = this.take(1);
 			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
+		};
+
+		this.reduce = function(reducer)
+		{
+			return this.evaluate(new ReduceOp(reducer));
 		};
 
 		this.take = function(num)
