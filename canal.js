@@ -1099,7 +1099,8 @@
 		};
 		ReducePond.prototype.get = function()
 		{
-			return this.settle() !== endOfData ? this.settle() : undefined;
+			return this.settle() !== endOfData //
+			? Option.Some(this.settle()) : Option.None;
 		};
 
 		this.newPond = function()
