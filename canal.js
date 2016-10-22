@@ -281,7 +281,9 @@
 
 				for ( var i in those)
 				{
+					console.log("i:"+i);
 					settle = those[i].groupBy().collectAsMap();
+					console.log("settle:"+JSON.stringify(settle));
 					for ( var k in settle)
 					{
 						keys[k] = null;
