@@ -2,7 +2,6 @@ QUnit.test("cogroup()", function(assert)
 {
 	var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "b", 3 ], [ "c", 4 ] ])
 			.cogroup(Canal.of([ [ "b", 1 ], [ "c", 2 ] ])).collect();
-	console.log(JSON.stringify(result));
 	assert.propEqual(result, [ [ "a", [ [ 1 ], [] ] ],
 			[ "b", [ [ 2, 3 ], [ 1 ] ] ], [ "c", [ [ 4 ], [ 2 ] ] ] ]);
 });
