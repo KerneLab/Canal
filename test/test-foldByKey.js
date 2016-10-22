@@ -1,6 +1,6 @@
-QUnit.test("mergeByKey()", function(assert)
+QUnit.test("foldByKey()", function(assert)
 {
-	var result = Canal.of([ [ "a", 1 ], [ "a", 2 ], [ "b", 4 ] ]).mergeByKey(
+	var result = Canal.of([ [ "a", 1 ], [ "a", 2 ], [ "b", 4 ] ]).foldByKey(
 			function()
 			{
 				return 0;

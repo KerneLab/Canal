@@ -1048,19 +1048,19 @@
 	}
 	CollectAsMapOp.prototype = new Operator();
 
-	function MergeOp(init, merger) // (res,data) -> res
+	function FoldOp(init, folder) // (res,data) -> res
 	{
-		function MergePond()
+		function FoldPond()
 		{
 		}
-		MergePond.prototype = new Terminal();
-		MergePond.prototype.settling = function()
+		FoldPond.prototype = new Terminal();
+		FoldPond.prototype.settling = function()
 		{
 			return init;
 		};
-		MergePond.prototype.accept = function(d)
+		FoldPond.prototype.accept = function(d)
 		{
-			var res = merger(this.settle(), d);
+			var res = folder(this.settle(), d);
 			if (res !== undefined)
 			{
 				this.settle(res);
@@ -1070,10 +1070,10 @@
 
 		this.newPond = function()
 		{
-			return new MergePond();
+			return new FoldPond();
 		};
 	}
-	MergeOp.prototype = new Operator();
+	FoldOp.prototype = new Operator();
 
 	function TakeOp(num)
 	{
@@ -1551,6 +1551,15 @@
 			return this.add(new CogroupOp(those));
 		};
 
+		this.foldByKey = function(zero, folder)
+		{
+			return this.groupBy(arguments[2], arguments[3]) //
+			.mapValues(function(arr, key)
+			{
+				return Canal.of(arr).fold(zero(key), folder);
+			});
+		};
+
 		this.fullJoin = function(that)
 		{
 			return this.add(new FullJoinOp(that, arguments[1], arguments[2],
@@ -1579,15 +1588,6 @@
 			return this.add(new MapValuesOp(fn, arguments[1], arguments[2]));
 		};
 
-		this.mergeByKey = function(zero, merger)
-		{
-			return this.groupBy(arguments[2], arguments[3]) //
-			.mapValues(function(arr, key)
-			{
-				return Canal.of(arr).merge(zero(key), merger);
-			});
-		};
-
 		this.rightJoin = function(that)
 		{
 			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
@@ -1606,10 +1606,10 @@
 			return this.map(function(d)
 			{
 				return 1;
-			}).evaluate(new MergeOp(0, function(res, dat)
+			}).fold(0, function(res, dat)
 			{
 				return res + dat;
-			}));
+			});
 		};
 
 		this.countByValue = function()
@@ -1623,22 +1623,22 @@
 				return [ val(d), 1 ];
 			}).groupBy().mapValues(function(arr)
 			{
-				return Canal.of(arr).merge(0, function(a, b)
+				return Canal.of(arr).fold(0, function(a, b)
 				{
 					return a + b;
 				});
 			}).collectAsMap();
 		};
 
+		this.fold = function(init, folder)
+		{
+			return this.evaluate(new FoldOp(init, folder));
+		};
+
 		this.head = function()
 		{
 			var arr = this.take(1);
 			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
-		};
-
-		this.merge = function(init, merger)
-		{
-			return this.evaluate(new MergeOp(init, merger));
 		};
 
 		this.take = function(num)
@@ -1659,7 +1659,7 @@
 			return this.mapValues(function()
 			{
 				return 1;
-			}).mergeByKey(function()
+			}).foldByKey(function()
 			{
 				return 0;
 			}, function(a, b)
