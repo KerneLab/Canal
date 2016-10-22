@@ -277,13 +277,9 @@
 					keys[k] = null;
 				}
 
-				console.log("those:" + those.length);
-
 				for ( var i in those)
 				{
-					console.log("i:" + i);
 					settle = those[i].groupBy().collectAsMap();
-					console.log("settle:" + JSON.stringify(settle));
 					for ( var k in settle)
 					{
 						keys[k] = null;
@@ -293,18 +289,13 @@
 
 				for ( var key in keys)
 				{
-					console.log("K:" + key);
 					var comb = [];
 
 					for ( var g in groups)
 					{
-						console.log("G:" + g);
 						var group = groups[g][key];
 						comb.push(group != null ? group : []);
 					}
-
-					console.log("comb length:" + comb.length);
-					console.log("comb:" + JSON.stringify(comb));
 
 					if (!this.downstream.accept([ key, comb ]))
 					{
@@ -1552,14 +1543,11 @@
 
 		this.cogroup = function()
 		{
-			console.log("args:" + arguments.length);
-
 			var those = [];
 			for (var i = 0; i < arguments.length; i++)
 			{
 				those.push(arguments[i]);
 			}
-
 			return this.add(new CogroupOp(those));
 		};
 
