@@ -1,7 +1,7 @@
 {
   "name": "canal.js",
   "version": "1.0.0",
-  "description": "Functional Programming Framework of Calculation in Javascript.",
+  "description": "Functional Programming Framework of Data Processing in Javascript.",
   "homepage": "https://github.com/KerneLab/Canal",
   "repository": {
     "type": "git",

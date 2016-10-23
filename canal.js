@@ -1,5 +1,5 @@
 /**
- * Functional Programming Framework of Calculation in Javascript.
+ * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
  */
 (function()
