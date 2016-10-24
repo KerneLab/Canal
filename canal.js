@@ -421,25 +421,6 @@
 	}
 	FlatMapOp.prototype = new Operator();
 
-	function ForeachOp(fn) // (data[,index]) -> Void
-	{
-		function ForeachPond()
-		{
-		}
-		ForeachPond.prototype = new Wheel();
-		ForeachPond.prototype.accept = function(d)
-		{
-			fn(d, this.index++);
-			return this.downstream.accept(d);
-		};
-
-		this.newPond = function()
-		{
-			return new ForeachPond();
-		};
-	}
-	ForeachOp.prototype = new Operator();
-
 	function FullJoinOp(that, keyL, keyR, valL, valR)
 	{
 		keyL = keyL != null ? keyL : keyOfPair;
@@ -771,6 +752,32 @@
 	}
 	MapValuesOp.prototype = new Operator();
 
+	function PeekOp(action) // (data[,index]) -> Void
+	{
+		function PeekPond()
+		{
+		}
+		PeekPond.prototype = new Wheel();
+		PeekPond.prototype.accept = function(d)
+		{
+			if (this.downstream.accept(d))
+			{
+				action(d, this.index++);
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new PeekPond();
+		};
+	}
+	PeekOp.prototype = new Operator();
+
 	function ReverseOp()
 	{
 		function ReversePond()
@@ -1074,6 +1081,29 @@
 		};
 	}
 	FoldOp.prototype = new Operator();
+
+	function ForeachOp(action) // (data[,index]) -> Void
+	{
+		function ForeachPond()
+		{
+		}
+		ForeachPond.prototype = new Wheel();
+		ForeachPond.prototype.accept = function(d)
+		{
+			action(d, this.index++);
+			return true;
+		};
+		ForeachPond.prototype.get = function()
+		{
+			return undefined;
+		};
+
+		this.newPond = function()
+		{
+			return new ForeachPond();
+		};
+	}
+	ForeachOp.prototype = new Operator();
 
 	function ReduceOp(reducer) // (dat1,dat2) -> dat3
 	{
@@ -1500,14 +1530,9 @@
 			});
 		};
 
-		this.flatMap = function(fn)
+		this.flatMap = function(mapper)
 		{
-			return this.add(new FlatMapOp(fn));
-		};
-
-		this.foreach = function(fn)
-		{
-			return this.add(new ForeachOp(fn));
+			return this.add(new FlatMapOp(mapper));
 		};
 
 		this.groupBy = function()
@@ -1529,9 +1554,14 @@
 			});
 		};
 
-		this.map = function(fn)
+		this.map = function(mapper)
 		{
-			return this.add(new MapOp(fn));
+			return this.add(new MapOp(mapper));
+		};
+
+		this.peek = function(action)
+		{
+			return this.add(new PeekOp(action));
 		};
 
 		this.reverse = function()
@@ -1677,6 +1707,11 @@
 		this.fold = function(init, folder)
 		{
 			return this.evaluate(new FoldOp(init, folder));
+		};
+
+		this.foreach = function(action)
+		{
+			this.evaluate(new ForeachOp(action));
 		};
 
 		this.head = function()
