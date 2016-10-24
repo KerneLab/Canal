@@ -1283,6 +1283,9 @@
 	function Iterator()
 	{
 	}
+	Iterator.prototype.close = function()
+	{
+	};
 	Iterator.prototype.hasNext = function()
 	{
 		return undefined;
@@ -1325,7 +1328,7 @@
 	}
 	Source.prototype = new Iterable();
 
-	function Spring(gen)
+	function Spring(gen, end)
 	{
 		function SpringIterator()
 		{
@@ -1333,6 +1336,13 @@
 			this.value = undefined;
 		}
 		SpringIterator.prototype = new Iterator();
+		SpringIterator.prototype.close = function()
+		{
+			if (end instanceof Function)
+			{
+				end();
+			}
+		};
 		SpringIterator.prototype.hasNext = function()
 		{
 			this.value = gen(this.index++);
@@ -1383,6 +1393,8 @@
 					break;
 				}
 			}
+			
+			iter.close();
 
 			entr.done();
 		};
@@ -1766,7 +1778,7 @@
 		}
 		else if (data instanceof Function)
 		{
-			return new Canal().source(new Spring(data));
+			return new Canal().source(new Spring(data, arguments[1]));
 		}
 		else
 		{
