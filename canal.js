@@ -469,7 +469,7 @@
 					for ( var r in rights)
 					{
 						if (!down.accept([ key, //
-						[ Option.Some(lefts[l]), Option.Some(rights[r]) ] ]))
+						[ Canal.Some(lefts[l]), Canal.Some(rights[r]) ] ]))
 						{
 							return false;
 						}
@@ -481,7 +481,7 @@
 				for ( var l in lefts)
 				{
 					if (!down.accept([ key, //
-					[ Option.Some(lefts[l]), Option.None ] ]))
+					[ Canal.Some(lefts[l]), Canal.None() ] ]))
 					{
 						return false;
 					}
@@ -492,7 +492,7 @@
 				for ( var r in rights)
 				{
 					if (!down.accept([ key, //
-					[ Option.None, Option.Some(rights[r]) ] ]))
+					[ Canal.None(), Canal.Some(rights[r]) ] ]))
 					{
 						return false;
 					}
@@ -662,7 +662,7 @@
 						for ( var r in rights)
 						{
 							if (!down.accept([ key,
-									[ lefts[l], Option.Some(rights[r]) ] ]))
+									[ lefts[l], Canal.Some(rights[r]) ] ]))
 							{
 								return false;
 							}
@@ -673,7 +673,7 @@
 				{
 					for ( var l in lefts)
 					{
-						if (!down.accept([ key, [ lefts[l], Option.None ] ]))
+						if (!down.accept([ key, [ lefts[l], Canal.None() ] ]))
 						{
 							return false;
 						}
@@ -846,7 +846,7 @@
 						for ( var l in lefts)
 						{
 							if (!down.accept([ key,
-									[ Option.Some(lefts[l]), rights[r] ] ]))
+									[ Canal.Some(lefts[l]), rights[r] ] ]))
 							{
 								return false;
 							}
@@ -857,7 +857,7 @@
 				{
 					for ( var r in rights)
 					{
-						if (!down.accept([ key, [ Option.None, rights[r] ] ]))
+						if (!down.accept([ key, [ Canal.None(), rights[r] ] ]))
 						{
 							return false;
 						}
@@ -1130,7 +1130,7 @@
 		ReducePond.prototype.get = function()
 		{
 			return this.settle() !== endOfData //
-			? Option.Some(this.settle()) : Option.None;
+			? Canal.Some(this.settle()) : Canal.None();
 		};
 
 		this.newPond = function()
@@ -1202,164 +1202,6 @@
 	}
 	UnionOp.prototype = new Operator();
 
-	function Option()
-	{
-	}
-	Option.prototype.get = function()
-	{
-		return undefined;
-	};
-	Option.prototype.or = function(that)
-	{
-		return undefined;
-	};
-	Option.prototype.orNull = function()
-	{
-		return undefined;
-	};
-	Option.prototype.given = function()
-	{
-		return undefined;
-	};
-	Option.prototype.canal = function()
-	{
-		return undefined;
-	};
-
-	function Some(val)
-	{
-		this.val = val;
-	}
-	Some.prototype = new Option();
-	Some.prototype.get = function()
-	{
-		return this.val;
-	};
-	Some.prototype.or = function(that)
-	{
-		return this.get();
-	};
-	Some.prototype.orNull = function()
-	{
-		return this.get();
-	};
-	Some.prototype.given = function()
-	{
-		return true;
-	};
-	Some.prototype.canal = function()
-	{
-		return new Canal().source([ this.get() ]);
-	};
-
-	Option.Some = function(val)
-	{
-		return new Some(val);
-	};
-
-	function None()
-	{
-	}
-	None.prototype = new Option();
-	None.prototype.or = function(that)
-	{
-		return that;
-	};
-	None.prototype.orNull = function()
-	{
-		return null;
-	};
-	None.prototype.given = function()
-	{
-		return false;
-	};
-	None.prototype.canal = function()
-	{
-		return new Canal().source(emptyArray);
-	};
-
-	Option.None = new None();
-
-	function Iterator()
-	{
-	}
-	Iterator.prototype.close = function()
-	{
-	};
-	Iterator.prototype.hasNext = function()
-	{
-		return undefined;
-	};
-	Iterator.prototype.next = function()
-	{
-		return undefined;
-	};
-
-	function Iterable()
-	{
-	}
-	Iterable.prototype.iterator = function()
-	{
-		return undefined;
-	};
-
-	function Source(array)
-	{
-		var length = array.length;
-
-		function SourceIterator()
-		{
-			this.index = 0;
-		}
-		SourceIterator.prototype = new Iterator();
-		SourceIterator.prototype.hasNext = function()
-		{
-			return this.index < length;
-		};
-		SourceIterator.prototype.next = function()
-		{
-			return array[this.index++];
-		};
-
-		this.iterator = function()
-		{
-			return new SourceIterator();
-		};
-	}
-	Source.prototype = new Iterable();
-
-	function Spring(gen, end)
-	{
-		function SpringIterator()
-		{
-			this.index = 0;
-			this.value = undefined;
-		}
-		SpringIterator.prototype = new Iterator();
-		SpringIterator.prototype.close = function()
-		{
-			if (end instanceof Function)
-			{
-				end();
-			}
-		};
-		SpringIterator.prototype.hasNext = function()
-		{
-			this.value = gen(this.index++);
-			return this.value !== endOfData;
-		};
-		SpringIterator.prototype.next = function()
-		{
-			return this.value;
-		};
-
-		this.iterator = function()
-		{
-			return new SpringIterator();
-		};
-	}
-	Spring.prototype = new Iterable();
-
 	function Canal()
 	{
 		var self = this;
@@ -1393,7 +1235,7 @@
 					break;
 				}
 			}
-			
+
 			iter.close();
 
 			entr.done();
@@ -1729,7 +1571,7 @@
 		this.head = function()
 		{
 			var arr = this.take(1);
-			return arr.length > 0 ? Option.Some(arr[0]) : Option.None;
+			return arr.length > 0 ? Canal.Some(arr[0]) : Canal.None();
 		};
 
 		this.reduce = function(reducer)
@@ -1770,22 +1612,6 @@
 		return endOfData;
 	};
 
-	Canal.of = function(data)
-	{
-		if (data instanceof Array)
-		{
-			return new Canal().source(new Source(data));
-		}
-		else if (data instanceof Function)
-		{
-			return new Canal().source(new Spring(data, arguments[1]));
-		}
-		else
-		{
-			return Canal.of(Canal.pairsOfMap(data));
-		}
-	};
-
 	Canal.mapOfPairs = function(pairs)
 	{
 		var map = {};
@@ -1809,6 +1635,177 @@
 		}
 
 		return pairs;
+	};
+
+	function Iterator()
+	{
+	}
+	Iterator.prototype.close = function()
+	{
+	};
+	Iterator.prototype.hasNext = function()
+	{
+		return undefined;
+	};
+	Iterator.prototype.next = function()
+	{
+		return undefined;
+	};
+
+	function Iterable()
+	{
+	}
+	Iterable.prototype.iterator = function()
+	{
+		return undefined;
+	};
+
+	function Source(array)
+	{
+		function SourceIterator()
+		{
+			this.index = 0;
+		}
+		SourceIterator.prototype = new Iterator();
+		SourceIterator.prototype.close = function()
+		{
+			this.index = null;
+		};
+		SourceIterator.prototype.hasNext = function()
+		{
+			return this.index < array.length;
+		};
+		SourceIterator.prototype.next = function()
+		{
+			return array[this.index++];
+		};
+
+		this.iterator = function()
+		{
+			return new SourceIterator();
+		};
+	}
+	Source.prototype = new Iterable();
+
+	function Spring(gen, end)
+	{
+		function SpringIterator()
+		{
+			this.index = 0;
+			this.value = undefined;
+		}
+		SpringIterator.prototype = new Iterator();
+		SpringIterator.prototype.close = function()
+		{
+			if (end instanceof Function)
+			{
+				end(this.index - 1);
+			}
+			this.index = null;
+			this.value = null;
+		};
+		SpringIterator.prototype.hasNext = function()
+		{
+			this.value = gen(this.index++);
+			return this.value !== endOfData;
+		};
+		SpringIterator.prototype.next = function()
+		{
+			return this.value;
+		};
+
+		this.iterator = function()
+		{
+			return new SpringIterator();
+		};
+	}
+	Spring.prototype = new Iterable();
+
+	Canal.of = function(data)
+	{
+		if (data instanceof Array)
+		{
+			return new Canal().source(new Source(data));
+		}
+		else if (data instanceof Function)
+		{
+			return new Canal().source(new Spring(data, arguments[1]));
+		}
+		else
+		{
+			return Canal.of(Canal.pairsOfMap(data));
+		}
+	};
+
+	function Option()
+	{
+	}
+	Option.prototype = new Canal();
+	Option.prototype.get = function()
+	{
+		return undefined;
+	};
+	Option.prototype.or = function(that)
+	{
+		return undefined;
+	};
+	Option.prototype.orNull = function()
+	{
+		return undefined;
+	};
+	Option.prototype.given = function()
+	{
+		return undefined;
+	};
+
+	function Some(val)
+	{
+		this.get = function()
+		{
+			return val;
+		};
+		this.source(new Source([ val ]));
+	}
+	Some.prototype = new Option();
+	Some.prototype.or = function(that)
+	{
+		return this.get();
+	};
+	Some.prototype.orNull = function()
+	{
+		return this.get();
+	};
+	Some.prototype.given = function()
+	{
+		return true;
+	};
+
+	function None()
+	{
+		this.source(new Source(emptyArray));
+	}
+	None.prototype = new Option();
+	None.prototype.or = function(that)
+	{
+		return that;
+	};
+	None.prototype.orNull = function()
+	{
+		return null;
+	};
+	None.prototype.given = function()
+	{
+		return false;
+	};
+
+	Canal.Some = function(val)
+	{
+		return new Some(val);
+	};
+
+	Canal.None = function()
+	{
+		return new None();
 	};
 
 	ROOT.Canal = Canal;

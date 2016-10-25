@@ -17,9 +17,10 @@ QUnit.test("Spring", function(assert)
 QUnit.test("Spring close", function(assert)
 {
 	var closed = false;
+	var number = 0;
 	var result = Canal.of(function(index)
 	{
-		if (index < 3)
+		if (index < 5)
 		{
 			return index;
 		}
@@ -27,11 +28,12 @@ QUnit.test("Spring close", function(assert)
 		{
 			return Canal.eod();
 		}
-	}, function()
+	}, function(n)
 	{
-		console.log("closing");
 		closed = true;
-	}).collect();
-	assert.propEqual(result, [ 0, 1, 2 ]);
+		number = n;
+	}).take(2);
+	assert.propEqual(result, [ 0, 1 ]);
 	assert.propEqual(closed, true);
+	assert.propEqual(number, 2);
 });
