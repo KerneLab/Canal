@@ -28,7 +28,24 @@
 	var equality = function(a, b)
 	{
 		return a === b;
-	}
+	};
+
+	// Signum function
+	var signum = function(a, b)
+	{
+		if (a < b)
+		{
+			return -1;
+		}
+		else if (a > b)
+		{
+			return 1;
+		}
+		else
+		{
+			return 0;
+		}
+	};
 
 	function Pond()
 	{
@@ -1426,6 +1443,53 @@
 		this.skip = function(num)
 		{
 			return this.add(new SkipOp(num));
+		};
+
+		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
+		{
+			var kops = [];
+			var ascs = [];
+			var asc = null;
+
+			for ( var i in arguments)
+			{
+				var arg = arguments[i];
+
+				if (arg instanceof Function)
+				{
+					kops.push(arg);
+					if (asc != null)
+					{
+						ascs.push(asc);
+					}
+					asc = true;
+				}
+				else if (typeof (arg) === "boolean")
+				{
+					asc = arg;
+				}
+			}
+
+			ascs.push(asc);
+
+			return this.sortWith(function(a, b)
+			{
+				var cmp = 0;
+				for ( var i in kops)
+				{
+					var kop = kops[i];
+					cmp = signum(kop(a), kop(b));
+					if (cmp != 0)
+					{
+						if (!ascs[i])
+						{
+							cmp *= -1;
+						}
+						break;
+					}
+				}
+				return cmp;
+			}, true);
 		};
 
 		this.sortWith = function() // [cmp[,asc]]
