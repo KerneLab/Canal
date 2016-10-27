@@ -1451,7 +1451,7 @@
 			var ascs = [];
 			var asc = null;
 
-			for ( var i in arguments)
+			for (var i = 0; i < arguments.length; i++)
 			{
 				var arg = arguments[i];
 

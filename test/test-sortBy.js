@@ -51,7 +51,7 @@ QUnit.test("sortBy() asc desc", function(assert)
 	.sortBy(function(d)
 	{
 		return d.id;
-	}, true, function(d)
+	}, function(d)
 	{
 		return d.score;
 	}, false).collect();
