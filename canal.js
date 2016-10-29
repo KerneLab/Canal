@@ -1013,6 +1013,56 @@
 	}
 	SubtractOp.prototype = new Operator();
 
+	function UnionOp(that)
+	{
+		function UnionPond()
+		{
+		}
+		UnionPond.prototype = new Pond();
+		UnionPond.prototype.accept = function(d)
+		{
+			return this.downstream.accept(d);
+		};
+		UnionPond.prototype.done = function()
+		{
+			if (this.downstream != null)
+			{
+				if (that != null)
+				{
+					that.converge(this.downstream);
+				}
+				else
+				{
+					this.downstream.done();
+				}
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new UnionPond();
+		};
+	}
+	UnionOp.prototype = new Operator();
+
+	function UnpackOp(fn)
+	{
+		function UnpackPond()
+		{
+		}
+		UnpackPond.prototype = new Pond();
+		UnpackPond.prototype.accept = function(arr)
+		{
+			return this.downstream.accept(fn.apply(null, arr));
+		};
+
+		this.newPond = function()
+		{
+			return new UnpackPond();
+		};
+	}
+	UnpackOp.prototype = new Operator();
+
 	// Terminate Operators
 
 	function Terminal()
@@ -1186,38 +1236,6 @@
 		};
 	}
 	TakeOp.prototype = new Operator();
-
-	function UnionOp(that)
-	{
-		function UnionPond()
-		{
-		}
-		UnionPond.prototype = new Pond();
-		UnionPond.prototype.accept = function(d)
-		{
-			return this.downstream.accept(d);
-		};
-		UnionPond.prototype.done = function()
-		{
-			if (this.downstream != null)
-			{
-				if (that != null)
-				{
-					that.converge(this.downstream);
-				}
-				else
-				{
-					this.downstream.done();
-				}
-			}
-		};
-
-		this.newPond = function()
-		{
-			return new UnionPond();
-		};
-	}
-	UnionOp.prototype = new Operator();
 
 	function Canal()
 	{
@@ -1506,6 +1524,11 @@
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
+		};
+
+		this.unpack = function(unpacker)
+		{
+			return this.add(new UnpackOp(unpacker));
 		};
 
 		this.zip = function(that)
