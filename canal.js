@@ -47,6 +47,30 @@
 		}
 	};
 
+	var flatten = function(arr, lev, res)
+	{
+		if (res == null)
+		{
+			res = [];
+		}
+
+		var e = null;
+		for (var i = 0; i < arr.length; i++)
+		{
+			e = arr[i];
+			if ((lev > 0 || lev == null) && (e instanceof Array))
+			{
+				flatten(e, (lev == null ? null : lev - 1), res);
+			}
+			else
+			{
+				res.push(e);
+			}
+		}
+
+		return res;
+	};
+
 	function Pond()
 	{
 		this.downstream = null;
@@ -437,6 +461,24 @@
 		};
 	}
 	FlatMapOp.prototype = new Operator();
+
+	function FlattenOp(level)
+	{
+		function FlattenPond()
+		{
+		}
+		FlattenPond.prototype = new Pond();
+		FlattenPond.prototype.accept = function(arr)
+		{
+			return this.downstream.accept(flatten(arr, level, []));
+		};
+
+		this.newPond = function()
+		{
+			return new FlattenPond();
+		};
+	}
+	FlattenOp.prototype = new Operator();
 
 	function FullJoinOp(that, keyL, keyR, valL, valR)
 	{
@@ -1526,11 +1568,6 @@
 			return this.add(new UnionOp(that));
 		};
 
-		this.unpack = function(unpacker)
-		{
-			return this.add(new UnpackOp(unpacker));
-		};
-
 		this.zip = function(that)
 		{
 			return this.map(function(d, i)
@@ -1607,6 +1644,18 @@
 		{
 			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
 					arguments[3], arguments[4]));
+		};
+
+		// Array Intermediate Operations
+
+		this.flatten = function() // [level]
+		{
+			return this.add(new FlattenOp(arguments[0]));
+		};
+
+		this.unpack = function(unpacker)
+		{
+			return this.add(new UnpackOp(unpacker));
 		};
 
 		// General Terminate Operations
