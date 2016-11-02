@@ -299,6 +299,31 @@
 	}
 	CartesianOp.prototype = new Operator();
 
+	function ChooseOp(fn)
+	{
+		function ChoosePond()
+		{
+		}
+		ChoosePond.prototype = new Pond();
+		ChoosePond.prototype.accept = function(arr)
+		{
+			if (fn.apply(null, arr))
+			{
+				return this.downstream.accept(arr);
+			}
+			else
+			{
+				return true;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new ChoosePond();
+		};
+	}
+	ChooseOp.prototype = new Operator();
+
 	function CogroupOp(those)
 	{
 		function CogroupPond()
@@ -1615,6 +1640,11 @@
 					arguments[3], arguments[4]));
 		};
 
+		this.keys = function()
+		{
+			return this.map(arguments[0] != null ? arguments[0] : keyOfPair);
+		};
+
 		this.leftJoin = function(that)
 		{
 			return this.add(new LeftJoinOp(that, arguments[1], arguments[2],
@@ -1646,7 +1676,17 @@
 					arguments[3], arguments[4]));
 		};
 
+		this.values = function()
+		{
+			return this.map(arguments[0] != null ? arguments[0] : valOfPair);
+		};
+
 		// Array Intermediate Operations
+
+		this.choose = function(pred)
+		{
+			return this.add(new ChooseOp(pred));
+		};
 
 		this.flatten = function() // [level]
 		{
