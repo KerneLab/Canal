@@ -178,29 +178,33 @@
 		if (comp != null)
 		{
 			data.sort(comp);
+
+			var last = null, next = null;
+			var collect = null;
+			var result = [];
+
+			for (var i = 0; i < data.length; i++)
+			{
+				next = data[i];
+				if (collect == null || comp(last, next) != 0)
+				{
+					collect = [];
+					result.push(collect);
+					collect.push(next);
+				}
+				else
+				{
+					collect.push(next);
+				}
+				last = next;
+			}
+
+			return result;
 		}
-
-		var last = null, next = null;
-		var collect = null;
-		var result = [];
-
-		for (var i = 0; i < data.length; i++)
+		else
 		{
-			next = data[i];
-			if (collect == null || (comp != null && comp(last, next) != 0))
-			{
-				collect = [];
-				result.push(collect);
-				collect.push(next);
-			}
-			else
-			{
-				collect.push(next);
-			}
-			last = next;
+			return [ data ];
 		}
-
-		return result;
 	};
 
 	function Pond()
