@@ -47,6 +47,7 @@
 		}
 	};
 
+	// Flatten the hierarchical array
 	var flatten = function(arr, lev, res)
 	{
 		if (res == null)
@@ -69,6 +70,137 @@
 		}
 
 		return res;
+	};
+
+	// Collect the orders array
+	var collectOrders = function(kops, ascs, orders)
+	{
+		var asc = null;
+
+		for (var i = 0; i < orders.length; i++)
+		{
+			var arg = orders[i];
+
+			if (arg instanceof Function)
+			{
+				kops.push(arg);
+				if (asc != null)
+				{
+					ascs.push(asc);
+				}
+				asc = true;
+			}
+			else if (typeof (arg) === "boolean")
+			{
+				asc = arg;
+			}
+		}
+
+		if (asc != null)
+		{
+			ascs.push(asc);
+		}
+	};
+
+	// Generate the comparator according to the orders array
+	var generateComparator = function(orders)
+	{
+		if (orders != null)
+		{
+			var kops = [];
+			var ascs = [];
+			collectOrders(kops, ascs, orders);
+
+			return function(a, b)
+			{
+				var cmp = 0;
+				for (var i = 0; i < kops.length; i++)
+				{
+					var kop = kops[i];
+					cmp = signum(kop(a), kop(b));
+					if (cmp != 0)
+					{
+						if (!ascs[i])
+						{
+							cmp *= -1;
+						}
+						break;
+					}
+				}
+				return cmp;
+			};
+		}
+		else
+		{
+			return null;
+		}
+	};
+
+	// Generate the row-head comparator according to the orders array
+	var generateRowHeadComparator = function(orders)
+	{
+		if (orders != null)
+		{
+			var kops = [];
+			var ascs = [];
+			collectOrders(kops, ascs, orders);
+
+			return function(a, b)
+			{
+				a = a[0]; // Compare row-head
+				b = b[0];
+				var cmp = 0;
+				for (var i = 0; i < kops.length; i++)
+				{
+					var kop = kops[i];
+					cmp = signum(kop(a), kop(b));
+					if (cmp != 0)
+					{
+						if (!ascs[i])
+						{
+							cmp *= -1;
+						}
+						break;
+					}
+				}
+				return cmp;
+			};
+		}
+		else
+		{
+			return null;
+		}
+	};
+
+	// Sort the data and collect the "same" data into each array
+	var sortCollect = function(data, comp)
+	{
+		if (comp != null)
+		{
+			data.sort(comp);
+		}
+
+		var last = null, next = null;
+		var collect = null;
+		var result = [];
+
+		for (var i = 0; i < data.length; i++)
+		{
+			next = data[i];
+			if (collect == null || (comp != null && comp(last, next) != 0))
+			{
+				collect = [];
+				result.push(collect);
+				collect.push(next);
+			}
+			else
+			{
+				collect.push(next);
+			}
+			last = next;
+		}
+
+		return result;
 	};
 
 	function Pond()
@@ -1039,6 +1171,48 @@
 	}
 	SortOp.prototype = new Operator();
 
+	function StratifyOp(cmp, asc)
+	{
+		asc = asc != null ? asc : true;
+
+		var comp = cmp;
+		if (cmp != null && !asc)
+		{
+			comp = function(a, b)
+			{
+				return cmp(b, a);
+			}
+		}
+
+		function StratifyPond()
+		{
+		}
+		StratifyPond.prototype = new Heaper();
+		StratifyPond.prototype.done = function()
+		{
+			if (this.downstream != null)
+			{
+				var collect = sortCollect(this.settle(), comp);
+
+				for ( var i in collect)
+				{
+					if (!this.downstream.accept(collect[i]))
+					{
+						break;
+					}
+				}
+
+				this.downstream.done();
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new StratifyPond();
+		};
+	}
+	StratifyOp.prototype = new Operator();
+
 	function SubtractOp(that, eq)
 	{
 		eq = eq != null ? eq : equality;
@@ -1461,6 +1635,48 @@
 
 		// General Intermediate Operations
 
+		this.actest = function(item)
+		{
+			var c = this.map(function(d)
+			{
+				return [ d ];
+			});
+
+			var init = item["init"];
+			var folder = item["folder"];
+			var partBy = generateRowHeadComparator(item["part"]);
+			var orderBy = generateRowHeadComparator(item["order"]);
+
+			return c.stratifyWith(partBy) //
+			.flatMap(function(part)
+			{
+				var ordered = Canal.of(part).stratifyBy(orderBy).collect();
+
+				var parts = [];
+
+				var layer = null;
+				var res = null;
+				for (var i = 0; i < ordered.length; i++)
+				{
+					layer = ordered[i];
+
+					for (var l = 0; l < layer.length; l++)
+					{
+						parts.push(layer[l][0]);
+					}
+
+					res = Canal.of(parts).fold(init(), folder);
+
+					for (var l = 0; l < layer.length; l++)
+					{
+						layer[l].push(res);
+					}
+				}
+
+				return flatten(ordered, 1);
+			});
+		};
+
 		this.cartesian = function(that)
 		{
 			return this.add(new CartesianOp(that));
@@ -1532,54 +1748,22 @@
 
 		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
 		{
-			var kops = [];
-			var ascs = [];
-			var asc = null;
-
-			for (var i = 0; i < arguments.length; i++)
-			{
-				var arg = arguments[i];
-
-				if (arg instanceof Function)
-				{
-					kops.push(arg);
-					if (asc != null)
-					{
-						ascs.push(asc);
-					}
-					asc = true;
-				}
-				else if (typeof (arg) === "boolean")
-				{
-					asc = arg;
-				}
-			}
-
-			ascs.push(asc);
-
-			return this.sortWith(function(a, b)
-			{
-				var cmp = 0;
-				for ( var i in kops)
-				{
-					var kop = kops[i];
-					cmp = signum(kop(a), kop(b));
-					if (cmp != 0)
-					{
-						if (!ascs[i])
-						{
-							cmp *= -1;
-						}
-						break;
-					}
-				}
-				return cmp;
-			}, true);
+			return this.sortWith(generateComparator(arguments), true);
 		};
 
 		this.sortWith = function() // [cmp[,asc]]
 		{
 			return this.add(new SortOp(arguments[0], arguments[1]));
+		};
+
+		this.stratifyBy = function()
+		{
+			return this.stratifyWith(generateComparator(arguments), true);
+		};
+
+		this.stratifyWith = function() // [cmp[,asc]]
+		{
+			return this.add(new StratifyOp(arguments[0], arguments[1]));
 		};
 
 		this.subtract = function(that)
