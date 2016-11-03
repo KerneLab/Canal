@@ -11,7 +11,7 @@ QUnit.test("stratifyBy()", function(assert)
 	} ]).stratifyBy(function(d)
 	{
 		return d.id;
-	}).collect();
+	}, true).collect();
 
 	assert.propEqual(result, 
 	[ 
