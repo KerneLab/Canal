@@ -9,7 +9,8 @@
 	// Constant of an empty array which MUST not be changed.
 	var emptyArray = [];
 
-	// Constant of the end of the data flow which MUST not be changed.
+	// Constant of the end of data flow which MUST NOT be changed or in any
+	// data.
 	var endOfData = {};
 
 	// Default key of a pair is the 1st element of Array[2]
@@ -22,12 +23,6 @@
 	var valOfPair = function(p)
 	{
 		return p[1];
-	};
-
-	// Default equality
-	var equality = function(a, b)
-	{
-		return a === b;
 	};
 
 	// Signum function
@@ -45,6 +40,12 @@
 		{
 			return 0;
 		}
+	};
+
+	// Default equality
+	var equality = function(a, b)
+	{
+		return a === b ? 0 : signum(a, b);
 	};
 
 	// Flatten the hierarchical array
@@ -516,44 +517,39 @@
 	}
 	CogroupOp.prototype = new Operator();
 
-	function DistinctOp(eq)
+	function DistinctOp(cmp)
 	{
-		eq = eq != null ? eq : equality;
+		cmp = cmp != null ? cmp : equality;
 
 		function DistinctPond()
 		{
 		}
 		DistinctPond.prototype = new Heaper();
-		DistinctPond.prototype.accept = function(d)
-		{
-			var found = false;
-			var settle = this.settle();
-			for ( var i in settle)
-			{
-				if (eq(d, settle[i]))
-				{
-					found = true;
-					break;
-				}
-			}
-			if (!found)
-			{
-				settle.push(d);
-			}
-			return true;
-		};
 		DistinctPond.prototype.done = function()
 		{
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				for ( var i in settle)
+				settle.sort(cmp);
+
+				var last = endOfData, next = null;
+				for (var i = 0; i < settle.length; i++)
 				{
-					if (!this.downstream.accept(settle[i]))
+					next = settle[i];
+
+					if (last !== endOfData && cmp(last, next) === 0)
+					{
+						continue;
+					}
+
+					if (!this.downstream.accept(next))
 					{
 						break;
 					}
+
+					last = next;
 				}
+
 				this.downstream.done();
 			}
 		};
@@ -731,9 +727,9 @@
 	}
 	FullJoinOp.prototype = new Operator();
 
-	function IntersectionOp(that, eq)
+	function IntersectionOp(that, cmp)
 	{
-		eq = eq != null ? eq : equality;
+		cmp = cmp != null ? cmp : equality;
 
 		function IntersectionPond()
 		{
@@ -749,7 +745,7 @@
 
 			for ( var i in branch)
 			{
-				if (eq(d, branch[i]))
+				if (cmp(d, branch[i]) === 0)
 				{
 					return this.downstream.accept(d);
 				}
@@ -1217,9 +1213,9 @@
 	}
 	StratifyOp.prototype = new Operator();
 
-	function SubtractOp(that, eq)
+	function SubtractOp(that, cmp)
 	{
-		eq = eq != null ? eq : equality;
+		cmp = cmp != null ? cmp : equality;
 
 		function SubtractPond()
 		{
@@ -1235,7 +1231,7 @@
 			var branch = this.branch;
 			for ( var i in branch)
 			{
-				if (eq(d, branch[i]))
+				if (cmp(d, branch[i]) === 0)
 				{
 					found = true;
 					break;
@@ -1639,6 +1635,38 @@
 
 		// General Intermediate Operations
 
+		var accum = function(c, agg, partWith, orderWith)
+		{
+			return c.stratifyWith(partWith) //
+			.flatMap(function(part)
+			{
+				var ordered = Canal.of(part).stratifyWith(orderWith).collect();
+
+				var partData = [];
+
+				var layer = null;
+				var res = null;
+				for (var l = 0; l < ordered.length; l++)
+				{
+					layer = ordered[l];
+
+					for (var k = 0; k < layer.length; k++)
+					{
+						partData.push(layer[k][0]);
+					}
+
+					res = agg(partData);
+
+					for (var k = 0; k < layer.length; k++)
+					{
+						layer[k].push(res);
+					}
+				}
+
+				return flatten(ordered, 1);
+			});
+		};
+
 		this.actest = function(item)
 		{
 			var c = this.map(function(d)
@@ -1646,39 +1674,18 @@
 				return [ d ];
 			});
 
-			var init = item["init"];
-			var folder = item["folder"];
-			var partBy = generateRowHeadComparator(item["part"]);
-			var orderBy = generateRowHeadComparator(item["order"]);
-
-			return c.stratifyWith(partBy) //
-			.flatMap(function(part)
+			for (var i = 0; i < arguments.length; i++)
 			{
-				var ordered = Canal.of(part).stratifyBy(orderBy).collect();
+				var item = arguments[i];
 
-				var parts = [];
+				var agg = item["agg"];
+				var partWith = generateRowHeadComparator(item["part"]);
+				var orderWith = generateRowHeadComparator(item["order"]);
 
-				var layer = null;
-				var res = null;
-				for (var i = 0; i < ordered.length; i++)
-				{
-					layer = ordered[i];
+				c = accum(c, agg, partWith, orderWith);
+			}
 
-					for (var l = 0; l < layer.length; l++)
-					{
-						parts.push(layer[l][0]);
-					}
-
-					res = Canal.of(parts).fold(init(), folder);
-
-					for (var l = 0; l < layer.length; l++)
-					{
-						layer[l].push(res);
-					}
-				}
-
-				return flatten(ordered, 1);
-			});
+			return c;
 		};
 
 		this.cartesian = function(that)
