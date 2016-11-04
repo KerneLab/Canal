@@ -208,6 +208,38 @@
 		}
 	};
 
+	var addWindowItem = function(c, merger, partWith, orderWith)
+	{
+		return c.stratifyWith(partWith) //
+		.flatMap(function(part)
+		{
+			var ordered = Canal.of(part).stratifyWith(orderWith).collect();
+
+			var partData = [];
+
+			var layer = null;
+			var res = null;
+			for (var l = 0; l < ordered.length; l++)
+			{
+				layer = ordered[l];
+
+				for (var k = 0; k < layer.length; k++)
+				{
+					partData.push(layer[k][0]);
+				}
+
+				res = merger(partData);
+
+				for (var k = 0; k < layer.length; k++)
+				{
+					layer[k].push(res);
+				}
+			}
+
+			return flatten(ordered, 1);
+		});
+	};
+
 	function Pond()
 	{
 		this.downstream = null;
@@ -1635,59 +1667,6 @@
 
 		// General Intermediate Operations
 
-		var accum = function(c, agg, partWith, orderWith)
-		{
-			return c.stratifyWith(partWith) //
-			.flatMap(function(part)
-			{
-				var ordered = Canal.of(part).stratifyWith(orderWith).collect();
-
-				var partData = [];
-
-				var layer = null;
-				var res = null;
-				for (var l = 0; l < ordered.length; l++)
-				{
-					layer = ordered[l];
-
-					for (var k = 0; k < layer.length; k++)
-					{
-						partData.push(layer[k][0]);
-					}
-
-					res = agg(partData);
-
-					for (var k = 0; k < layer.length; k++)
-					{
-						layer[k].push(res);
-					}
-				}
-
-				return flatten(ordered, 1);
-			});
-		};
-
-		this.actest = function(item)
-		{
-			var c = this.map(function(d)
-			{
-				return [ d ];
-			});
-
-			for (var i = 0; i < arguments.length; i++)
-			{
-				var item = arguments[i];
-
-				var agg = item["agg"];
-				var partWith = generateRowHeadComparator(item["part"]);
-				var orderWith = generateRowHeadComparator(item["order"]);
-
-				c = accum(c, agg, partWith, orderWith);
-			}
-
-			return c;
-		};
-
 		this.cartesian = function(that)
 		{
 			return this.add(new CartesianOp(that));
@@ -1786,6 +1765,27 @@
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
+		};
+
+		this.window = function()
+		{
+			var c = this.map(function(d)
+			{
+				return [ d ];
+			});
+
+			for (var i = 0; i < arguments.length; i++)
+			{
+				var item = arguments[i];
+
+				var merger = item["merger"];
+				var partWith = generateRowHeadComparator(item["part"]);
+				var orderWith = generateRowHeadComparator(item["order"]);
+
+				c = addWindowItem(c, merger, partWith, orderWith);
+			}
+
+			return c;
 		};
 
 		this.zip = function(that)
@@ -2177,6 +2177,54 @@
 	Canal.None = function()
 	{
 		return new None();
+	};
+
+	function Item()
+	{
+		this.merger = null;
+		this.part = null;
+		this.order = null;
+	}
+	Item.prototype.merge = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.merger = arguments[0];
+			return this;
+		}
+		else
+		{
+			return this.merger;
+		}
+	};
+	Item.prototype.partBy = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.part = arguments;
+			return this;
+		}
+		else
+		{
+			return this.part;
+		}
+	};
+	Item.prototype.orderBy = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.order = arguments;
+			return this;
+		}
+		else
+		{
+			return this.order;
+		}
+	};
+
+	Canal.item = function(merger)
+	{
+		return new Item().merge(merger);
 	};
 
 	ROOT.Canal = Canal;
