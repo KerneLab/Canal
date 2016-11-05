@@ -13,6 +13,12 @@
 	// data.
 	var endOfData = {};
 
+	// Default value of a data which returns data itself.
+	var valOfData = function(d)
+	{
+		return d;
+	};
+
 	// Default key of a pair is the 1st element of Array[2]
 	var keyOfPair = function(p)
 	{
@@ -1762,30 +1768,18 @@
 					arguments[1]));
 		};
 
+		this.toRows = function()
+		{
+			var vod = arguments[0] != null ? arguments[0] : valOfData;
+			return this.map(function(d)
+			{
+				return [ vod(d) ];
+			});
+		};
+
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
-		};
-
-		this.window = function()
-		{
-			var c = this.map(function(d)
-			{
-				return [ d ];
-			});
-
-			for (var i = 0; i < arguments.length; i++)
-			{
-				var item = arguments[i];
-
-				var merger = item["merger"];
-				var partWith = generateRowHeadComparator(item["part"]);
-				var orderWith = generateRowHeadComparator(item["order"]);
-
-				c = addWindowItem(c, merger, partWith, orderWith);
-			}
-
-			return c;
 		};
 
 		this.zip = function(that)
@@ -1891,6 +1885,24 @@
 		this.unpack = function(unpacker)
 		{
 			return this.add(new UnpackOp(unpacker));
+		};
+
+		this.window = function()
+		{
+			var c = this;
+
+			for (var i = 0; i < arguments.length; i++)
+			{
+				var item = arguments[i];
+
+				var merger = item["merger"];
+				var partWith = generateRowHeadComparator(item["part"]);
+				var orderWith = generateRowHeadComparator(item["order"]);
+
+				c = addWindowItem(c, merger, partWith, orderWith);
+			}
+
+			return c;
 		};
 
 		// General Terminate Operations

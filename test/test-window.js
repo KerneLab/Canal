@@ -17,7 +17,7 @@ QUnit.test("window()", function(assert)
 		{"id":2,"sex":1,"grp":1,"sal":2153},
 		{"id":3,"sex":2,"grp":0,"sal":2545},
 		{"id":4,"sex":1,"grp":1,"sal":1894}
-	]).window(
+	]).toRows().window(
 		Canal.item(sum(function(d){return d.id;}))
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.sex;}),
