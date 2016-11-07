@@ -9,12 +9,14 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 .filter(function(d)
 {
   return d > 2;
-}).distinct()
+})
+.distinct()
 .sortWith()
 .map(function(d)
 {
   return [ d % 2, d ];
-}).collect()
+})
+.collect()
 ```
 ```js
 [1,3]
@@ -29,7 +31,8 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 .filter(function(d)
 {
   return d > 2;
-}).distinct()
+})
+.distinct()
 .sortWith()
 .map(function(d)
 {
@@ -50,14 +53,16 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 .filter(function(d)
 {
   return d > 2;
-}).distinct()
+})
+.distinct()
 .sortWith()
 .map(function(d)
 {
   return [ d % 2, d ];
 })
 .groupBy()
-.join(Canal.of([ 0, 1, 2 ]).map(function(d)
+.join(Canal.of([ 0, 1, 2 ])
+.map(function(d)
 {
   return [ d, d ];
 }))
