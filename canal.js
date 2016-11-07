@@ -143,8 +143,8 @@
 		}
 	};
 
-	// Generate the row-head comparator according to the orders array
-	var generateRowHeadComparator = function(orders)
+	// Generate the row comparator according to the orders array
+	var generateRowComparator = function(orders)
 	{
 		if (orders != null)
 		{
@@ -154,13 +154,11 @@
 
 			return function(a, b)
 			{
-				a = a[0]; // Compare row-head
-				b = b[0];
 				var cmp = 0;
 				for (var i = 0; i < kops.length; i++)
 				{
 					var kop = kops[i];
-					cmp = signum(kop(a), kop(b));
+					cmp = signum(kop.apply(null, a), kop.apply(null, b));
 					if (cmp != 0)
 					{
 						if (!ascs[i])
@@ -1896,8 +1894,8 @@
 				var item = arguments[i];
 
 				var merger = item["merger"];
-				var partWith = generateRowHeadComparator(item["part"]);
-				var orderWith = generateRowHeadComparator(item["order"]);
+				var partWith = generateRowComparator(item["part"]);
+				var orderWith = generateRowComparator(item["order"]);
 
 				c = addWindowItem(c, merger, partWith, orderWith);
 			}
