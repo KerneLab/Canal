@@ -1,10 +1,11 @@
 QUnit.test("window()", function(assert)
 {
-	function sum(mapper)
+	function sum(unpacker)
 	{
-		return function(part)
+		return function(rows)
 		{
-			return Canal.of(part).map(mapper) //
+			return Canal.of(rows) //
+			.unpack(unpacker) //
 			.reduce(function(a, b)
 			{
 				return a + b;

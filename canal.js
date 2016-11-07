@@ -219,7 +219,7 @@
 		{
 			var ordered = Canal.of(part).stratifyWith(orderWith).collect();
 
-			var partData = [];
+			var partRows = [];
 
 			var layer = null;
 			var res = null;
@@ -229,10 +229,10 @@
 
 				for (var k = 0; k < layer.length; k++)
 				{
-					partData.push(layer[k][0]);
+					partRows.push(layer[k]);
 				}
 
-				res = merger(partData);
+				res = merger(partRows);
 
 				for (var k = 0; k < layer.length; k++)
 				{
