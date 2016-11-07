@@ -6,15 +6,15 @@ Functional Programming Framework of Data Processing in Javascript.
 
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
-  .filter(function(d)
-  {
-    return d > 2;
-  }).distinct()
-  .sortWith()
-  .map(function(d)
-  {
-    return [ d % 2, d ];
-  }).collect()
+.filter(function(d)
+{
+  return d > 2;
+}).distinct()
+.sortWith()
+.map(function(d)
+{
+  return [ d % 2, d ];
+}).collect()
 ```
 ```js
 [1,3]
@@ -26,17 +26,17 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
-  .filter(function(d)
-  {
-    return d > 2;
-  }).distinct()
-  .sortWith()
-  .map(function(d)
-  {
-    return [ d % 2, d ];
-  })
-  .groupBy()
-  .collect()
+.filter(function(d)
+{
+  return d > 2;
+}).distinct()
+.sortWith()
+.map(function(d)
+{
+  return [ d % 2, d ];
+})
+.groupBy()
+.collect()
 ```
 ```js
 [0,[4]]
@@ -47,23 +47,27 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 
 ```js
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
-  .filter(function(d)
-  {
-    return d > 2;
-  }).distinct()
-  .sortWith()
-  .map(function(d)
-  {
-    return [ d % 2, d ];
-  })
-  .groupBy()
-  .join(Canal.of([ 0, 1, 2 ]).map(function(d)
-  {
-	  return [ d, d ];
-  }))
-  .collect()
+.filter(function(d)
+{
+  return d > 2;
+}).distinct()
+.sortWith()
+.map(function(d)
+{
+  return [ d % 2, d ];
+})
+.groupBy()
+.join(Canal.of([ 0, 1, 2 ]).map(function(d)
+{
+  return [ d, d ];
+}))
+.collect()
 ```
 ```js
 [0, [[4],0]]
 [1, [[3,5],1]]
 ```
+
+> More
+
+[API 指引](https://github.com/KerneLab/Canal/wiki/API_Reference_CN)
