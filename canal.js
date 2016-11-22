@@ -2041,29 +2041,36 @@
 		return undefined;
 	};
 
-	function Source(array)
+	function Source(array, begin, end)
 	{
-		function SourceIterator()
+		begin = Math.max(begin == null ? 0 : begin, 0);
+		end = Math.min(end == null ? array.length : end, array.length);
+
+		function SourceIterator(array, begin, end)
 		{
-			this.index = 0;
+			this.array = array;
+			this.index = begin;
+			this.end = end;
 		}
 		SourceIterator.prototype = new Iterator();
 		SourceIterator.prototype.close = function()
 		{
+			this.array = null;
 			this.index = null;
+			this.end = null;
 		};
 		SourceIterator.prototype.hasNext = function()
 		{
-			return this.index < array.length;
+			return this.index < this.end;
 		};
 		SourceIterator.prototype.next = function()
 		{
-			return array[this.index++];
+			return this.array[this.index++];
 		};
 
 		this.iterator = function()
 		{
-			return new SourceIterator();
+			return new SourceIterator(array, begin, end);
 		};
 	}
 	Source.prototype = new Iterable();
@@ -2106,7 +2113,8 @@
 	{
 		if (data instanceof Array)
 		{
-			return new Canal().source(new Source(data));
+			return new Canal().source(new Source(data, arguments[1],
+					arguments[2]));
 		}
 		else if (data instanceof Function)
 		{
