@@ -2,9 +2,9 @@ QUnit.test("window()", function(assert)
 {
 	function sum(unpacker)
 	{
-		return function(rows)
+		return function(rows, begin, end, current)
 		{
-			return Canal.of(rows) //
+			return Canal.of(rows, begin, end) //
 			.unpack(unpacker) //
 			.reduce(function(a, b)
 			{
