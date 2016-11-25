@@ -2,7 +2,7 @@ Canal.js [![Travic CI](https://travis-ci.org/KerneLab/Canal.svg?branch=master)](
 =========================
 Functional Programming Framework of Data Processing in Javascript.
 
-<a href="https://github.com/KerneLab/Canal/wiki/API_Reference_CN" target="_blank">API 指引</a>
+[API 指引](https://github.com/KerneLab/Canal/wiki/API_Reference_CN)
 
 > Common Transform
 
