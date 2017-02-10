@@ -314,7 +314,7 @@
 		this.sediment = undefined;
 	}
 	Desilter.prototype = new Pond();
-	Desilter.prototype.settling = null; // () -> new Sediment
+	Desilter.prototype.settling = null; // () => new Sediment
 	Desilter.prototype.begin = function()
 	{
 		if (this.settle() === undefined && this.settling != null)
@@ -461,7 +461,7 @@
 	function Operator()
 	{
 	}
-	Operator.prototype.newPond = function() // () -> Pond
+	Operator.prototype.newPond = function() // () => Pond
 	{
 		return new Pond();
 	};
@@ -823,7 +823,7 @@
 	}
 	IntersectionOp.prototype = new Operator();
 
-	function GroupOp(key, val) // (data) -> key, [(data) -> val]
+	function GroupOp(key, val) // (data) => key, [(data) => val]
 	{
 		key = key != null ? key : keyOfPair;
 		val = val != null ? val : valOfPair;
@@ -971,7 +971,7 @@
 	}
 	LeftJoinOp.prototype = new Operator();
 
-	function MapOp(fn) // (data [, index]) -> Value
+	function MapOp(fn) // (data [, index]) => Value
 	{
 		function MapPond()
 		{
@@ -989,7 +989,7 @@
 	}
 	MapOp.prototype = new Operator();
 
-	function MapJointOp(fn) // (left,right,key) -> Value
+	function MapJointOp(fn) // (left,right,key) => Value
 	{
 		function MapJointPond()
 		{
@@ -1008,10 +1008,10 @@
 	}
 	MapJointOp.prototype = new Operator();
 
-	function MapValuesOp(fn, key, val) // ([val..]) -> Value
+	function MapValuesOp(fn, val, key) // ([val..]) => Value
 	{
-		key = key != null ? key : keyOfPair;
 		val = val != null ? val : valOfPair;
+		key = key != null ? key : keyOfPair;
 
 		function MapValuesPond()
 		{
@@ -1030,7 +1030,7 @@
 	}
 	MapValuesOp.prototype = new Operator();
 
-	function PeekOp(action) // (data[,index]) -> Void
+	function PeekOp(action) // (data[,index]) => Void
 	{
 		function PeekPond()
 		{
@@ -1181,7 +1181,7 @@
 	}
 	SkipOp.prototype = new Operator();
 
-	function SortOp(cmp, asc) // cmp: (a,b) -> 0(=) -1(<) 1(>)
+	function SortOp(cmp, asc) // cmp: (a,b) => 0(=) -1(<) 1(>)
 	{
 		asc = asc != null ? asc : true;
 
@@ -1425,7 +1425,7 @@
 	}
 	CollectAsMapOp.prototype = new Operator();
 
-	function FoldOp(init, folder) // (res,data) -> res
+	function FoldOp(init, folder) // (res,data) => res
 	{
 		function FoldPond()
 		{
@@ -1452,7 +1452,7 @@
 	}
 	FoldOp.prototype = new Operator();
 
-	function ForeachOp(action) // (data[,index]) -> Void
+	function ForeachOp(action) // (data[,index]) => Void
 	{
 		function ForeachPond()
 		{
@@ -1475,7 +1475,7 @@
 	}
 	ForeachOp.prototype = new Operator();
 
-	function ReduceOp(reducer) // (dat1,dat2) -> dat3
+	function ReduceOp(reducer) // (dat1,dat2) => dat3
 	{
 		function ReducePond()
 		{
@@ -1683,7 +1683,7 @@
 			}
 		};
 
-		this.evaluate = function(op) // T -> Value
+		this.evaluate = function(op) // T => Value
 		{
 			if (op != null)
 			{
