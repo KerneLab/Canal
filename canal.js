@@ -2285,13 +2285,13 @@
 		return new Item().merge(merger);
 	};
 
-	if (typeof exports !== 'undefined')
+	if (typeof exports !== "undefined")
 	{
-		if (typeof module !== 'undefined' && module.exports)
+		if (typeof module !== "undefined" && module.exports)
 		{
 			exports = module.exports;
 		}
-		exports.Canal = Canal;
+		exports = Canal;
 	}
 	else
 	{
