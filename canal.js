@@ -2289,9 +2289,12 @@
 	{
 		if (typeof module !== "undefined" && module.exports)
 		{
-			exports = module.exports;
+			module.exports = Canal;
 		}
-		exports = Canal;
+		else
+		{
+			exports = Canal;
+		}
 	}
 	else
 	{
