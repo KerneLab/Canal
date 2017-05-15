@@ -2285,6 +2285,17 @@
 		return new Item().merge(merger);
 	};
 
-	ROOT.Canal = Canal;
+	if (typeof exports !== 'undefined')
+	{
+		if (typeof module !== 'undefined' && module.exports)
+		{
+			exports = module.exports;
+		}
+		exports.Canal = Canal;
+	}
+	else
+	{
+		ROOT.Canal = Canal;
+	}
 
 }.call(this));
