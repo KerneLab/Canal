@@ -178,30 +178,43 @@
 	};
 
 	// Sort the data and collect the "same" data into each array
-	var sortCollect = function(data, comp)
+	var sortCollect = function(data, cmp, asc)
 	{
-		if (comp != null)
+		if (cmp != null)
 		{
-			data.sort(comp);
+			data.sort(cmp);
 
 			var last = null, next = null;
 			var collect = null;
 			var result = [];
 
-			for (var i = 0; i < data.length; i++)
+			if (asc)
 			{
-				next = data[i];
-				if (collect == null || comp(last, next) != 0)
+				for (var i = 0; i < data.length; i++)
 				{
-					collect = [];
-					result.push(collect);
+					next = data[i];
+					if (collect == null || cmp(last, next) != 0)
+					{
+						collect = [];
+						result.push(collect);
+					}
 					collect.push(next);
+					last = next;
 				}
-				else
+			}
+			else
+			{
+				for (var i = data.length - 1; i >= 0; i--)
 				{
+					next = data[i];
+					if (collect == null || cmp(last, next) != 0)
+					{
+						collect = [];
+						result.push(collect);
+					}
 					collect.push(next);
+					last = next;
 				}
-				last = next;
 			}
 
 			return result;
@@ -384,7 +397,8 @@
 
 			for ( var group in settle)
 			{
-				if (!this.downstream.accept([ group, settle[group] ]))
+				if (settle.hasOwnProperty(group)
+						&& !this.downstream.accept([ group, settle[group] ]))
 				{
 					break;
 				}
@@ -446,7 +460,8 @@
 
 			for ( var k in base)
 			{
-				if (!this.join(down, k, left[k], right[k]))
+				if (base.hasOwnProperty(k)
+						&& !this.join(down, k, left[k], right[k]))
 				{
 					break;
 				}
@@ -481,7 +496,7 @@
 		CartesianPond.prototype.accept = function(d)
 		{
 			var branch = this.branch;
-			for ( var i in branch)
+			for (var i = 0; i < branch.length; i++)
 			{
 				if (!this.downstream.accept([ d, branch[i] ]))
 				{
@@ -527,7 +542,6 @@
 	{
 		function CogroupPond()
 		{
-
 		}
 		CogroupPond.prototype = new Grouper();
 		CogroupPond.prototype.done = function()
@@ -539,32 +553,41 @@
 				var keys = {};
 				for ( var k in settle)
 				{
-					keys[k] = null;
+					if (settle.hasOwnProperty(k))
+					{
+						keys[k] = null;
+					}
 				}
 
-				for ( var i in those)
+				for (var i = 0; i < those.length; i++)
 				{
 					settle = those[i].groupBy().collectAsMap();
 					for ( var k in settle)
 					{
-						keys[k] = null;
+						if (settle.hasOwnProperty(k))
+						{
+							keys[k] = null;
+						}
 					}
 					groups.push(settle);
 				}
 
 				for ( var key in keys)
 				{
-					var comb = [];
-
-					for ( var g in groups)
+					if (keys.hasOwnProperty(key))
 					{
-						var group = groups[g][key];
-						comb.push(group != null ? group : []);
-					}
+						var comb = [];
 
-					if (!this.downstream.accept([ key, comb ]))
-					{
-						break;
+						for (var g = 0; g < groups.length; g++)
+						{
+							var group = groups[g][key];
+							comb.push(group != null ? group : []);
+						}
+
+						if (!this.downstream.accept([ key, comb ]))
+						{
+							break;
+						}
 					}
 				}
 
@@ -659,7 +682,7 @@
 			var data = fn(d, this.index++);
 			if (data instanceof Array)
 			{
-				for ( var i in data)
+				for (var i = 0; i < data.length; i++)
 				{
 					if (!this.downstream.accept(data[i]))
 					{
@@ -728,12 +751,18 @@
 
 			for ( var i in left)
 			{
-				base[i] = null;
+				if (left.hasOwnProperty(i))
+				{
+					base[i] = null;
+				}
 			}
 
 			for ( var i in right)
 			{
-				base[i] = null;
+				if (right.hasOwnProperty(i))
+				{
+					base[i] = null;
+				}
 			}
 
 			return base;
@@ -742,9 +771,9 @@
 		{
 			if (lefts != null && rights != null)
 			{
-				for ( var l in lefts)
+				for (var l = 0; l < lefts.length; l++)
 				{
-					for ( var r in rights)
+					for (var r = 0; r < rights.length; r++)
 					{
 						if (!down.accept([ key, //
 						[ Canal.Some(lefts[l]), Canal.Some(rights[r]) ] ]))
@@ -756,7 +785,7 @@
 			}
 			else if (lefts != null)
 			{
-				for ( var l in lefts)
+				for (var l = 0; l < lefts.length; l++)
 				{
 					if (!down.accept([ key, //
 					[ Canal.Some(lefts[l]), Canal.None() ] ]))
@@ -767,7 +796,7 @@
 			}
 			else if (rights != null)
 			{
-				for ( var r in rights)
+				for (var r = 0; r < rights.length; r++)
 				{
 					if (!down.accept([ key, //
 					[ Canal.None(), Canal.Some(rights[r]) ] ]))
@@ -805,7 +834,7 @@
 		{
 			var branch = this.branch;
 
-			for ( var i in branch)
+			for (var i = 0; i < branch.length; i++)
 			{
 				if (cmp(d, branch[i]) === 0)
 				{
@@ -878,9 +907,9 @@
 		{
 			if (lefts != null && rights != null)
 			{
-				for ( var l in lefts)
+				for (var l = 0; l < lefts.length; l++)
 				{
-					for ( var r in rights)
+					for (var r = 0; r < rights.length; r++)
 					{
 						if (!down.accept([ key, [ lefts[l], rights[r] ] ]))
 						{
@@ -935,9 +964,9 @@
 			{
 				if (rights != null)
 				{
-					for ( var l in lefts)
+					for (var l = 0; l < lefts.length; l++)
 					{
-						for ( var r in rights)
+						for (var r = 0; r < rights.length; r++)
 						{
 							if (!down.accept([ key,
 									[ lefts[l], Canal.Some(rights[r]) ] ]))
@@ -949,7 +978,7 @@
 				}
 				else
 				{
-					for ( var l in lefts)
+					for (var l = 0; l < lefts.length; l++)
 					{
 						if (!down.accept([ key, [ lefts[l], Canal.None() ] ]))
 						{
@@ -1067,8 +1096,7 @@
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				settle.reverse();
-				for ( var i in settle)
+				for (var i = settle.length - 1; i >= 0; i--)
 				{
 					if (!this.downstream.accept(settle[i]))
 					{
@@ -1119,9 +1147,9 @@
 			{
 				if (lefts != null)
 				{
-					for ( var r in rights)
+					for (var r = 0; r < rights.length; r++)
 					{
-						for ( var l in lefts)
+						for (var l = 0; l < lefts.length; l++)
 						{
 							if (!down.accept([ key,
 									[ Canal.Some(lefts[l]), rights[r] ] ]))
@@ -1133,7 +1161,7 @@
 				}
 				else
 				{
-					for ( var r in rights)
+					for (var r = 0; r < rights.length; r++)
 					{
 						if (!down.accept([ key, [ Canal.None(), rights[r] ] ]))
 						{
@@ -1185,15 +1213,6 @@
 	{
 		asc = asc != null ? asc : true;
 
-		var comp = cmp;
-		if (cmp != null && !asc)
-		{
-			comp = function(a, b)
-			{
-				return cmp(b, a);
-			}
-		}
-
 		function SortPond()
 		{
 		}
@@ -1203,23 +1222,33 @@
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				if (comp != null)
+				if (cmp != null)
 				{
-					settle.sort(comp);
+					settle.sort(cmp);
 				}
 				else
 				{
 					settle.sort();
-					if (!asc)
+				}
+
+				if (asc)
+				{
+					for (var i = 0; i < settle.length; i++)
 					{
-						settle.reverse();
+						if (!this.downstream.accept(settle[i]))
+						{
+							break;
+						}
 					}
 				}
-				for ( var i in settle)
+				else
 				{
-					if (!this.downstream.accept(settle[i]))
+					for (var i = settle.length - 1; i >= 0; i--)
 					{
-						break;
+						if (!this.downstream.accept(settle[i]))
+						{
+							break;
+						}
 					}
 				}
 				this.downstream.done();
@@ -1237,15 +1266,6 @@
 	{
 		asc = asc != null ? asc : true;
 
-		var comp = cmp;
-		if (cmp != null && !asc)
-		{
-			comp = function(a, b)
-			{
-				return cmp(b, a);
-			}
-		}
-
 		function StratifyPond()
 		{
 		}
@@ -1254,9 +1274,9 @@
 		{
 			if (this.downstream != null)
 			{
-				var collect = sortCollect(this.settle(), comp);
+				var collect = sortCollect(this.settle(), cmp, asc);
 
-				for ( var i in collect)
+				for (var i = 0; i < collect.length; i++)
 				{
 					if (!this.downstream.accept(collect[i]))
 					{
@@ -1291,7 +1311,7 @@
 		{
 			var found = false;
 			var branch = this.branch;
-			for ( var i in branch)
+			for (var i = 0; i < branch.length; i++)
 			{
 				if (cmp(d, branch[i]) === 0)
 				{
@@ -2024,7 +2044,7 @@
 	{
 		var map = {};
 
-		for ( var i in pairs)
+		for (var i = 0; i < pairs.length; i++)
 		{
 			var pair = pairs[i];
 			map[pair[0]] = pair[1];
@@ -2037,9 +2057,12 @@
 	{
 		var pairs = [];
 
-		for ( var i in map)
+		for ( var k in map)
 		{
-			pairs.push([ i, map[i] ]);
+			if (map.hasOwnProperty(k))
+			{
+				pairs.push([ k, map[k] ]);
+			}
 		}
 
 		return pairs;
