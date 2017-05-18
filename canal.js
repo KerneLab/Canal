@@ -1732,16 +1732,6 @@
 			return this.add(new FilterOp(pred));
 		};
 
-		this.first = function()
-		{
-			var num = arguments.length > 0 ? arguments[0] : 1;
-
-			return this.filter(function(d, i)
-			{
-				return i < num;
-			});
-		};
-
 		this.flatMap = function(mapper)
 		{
 			return this.add(new FlatMapOp(mapper));
@@ -1763,6 +1753,14 @@
 			return this.map(function(d, i)
 			{
 				return [ kop(d, i), d ];
+			});
+		};
+
+		this.limit = function(num)
+		{
+			return this.filter(function(d, i)
+			{
+				return i < num;
 			});
 		};
 
