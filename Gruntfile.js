@@ -23,6 +23,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['qunit']);
 
-  grunt.registerTask('default', ['qunit', 'uglify']);
+  grunt.registerTask('default', ['qunit'/*, 'uglify'*/]);
 
 };
