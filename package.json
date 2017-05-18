@@ -20,8 +20,12 @@
   },
   "keywords": [
     "canal",
-    "stream",
-    "FP"
+    "javascript",
+    "data-processing",
+    "functional-programming",
+    "java-stream",
+    "fp",
+    "js"
   ],
   "author": "kernelforce",
   "license": "Apache-2.0",
