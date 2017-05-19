@@ -1,7 +1,7 @@
 {
   "name": "canal.js",
-  "version": "1.0.6",
-  "description": "Functional Programming Framework of Data Processing in Javascript.",
+  "version": "1.0.7",
+  "description": "Streams Style API of Data Processing Framework in Javascript",
   "homepage": "https://github.com/KerneLab/Canal",
   "repository": {
     "type": "git",
@@ -22,8 +22,8 @@
     "canal",
     "javascript",
     "data-processing",
+    "streams-api",
     "functional-programming",
-    "java-stream",
     "spark-style",
     "fp",
     "js"
