@@ -4,18 +4,18 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    //uglify: {
-    //  options: {
-    //    banner: '/*! <%= pkg.name %> v<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */\n',
-    //    sourceMap: true,
-    //    sourceMapName: 'canal.min.map'
-    //  },
-    //  build: {
-    //    files: {
-    //      'canal.min.js': ['canal.js']
-    //    }
-    //  }
-    //},
+    uglify: {
+      options: {
+        banner: '/*! canal.kernelab.org v<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */',
+        sourceMap: true,
+        sourceMapName: 'canal.min.map'
+      },
+      build: {
+        files: {
+          'canal.min.js': ['canal.js']
+        }
+      }
+    },
     qunit: {
       files: ['test/index.html']
     }
@@ -23,6 +23,6 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', ['qunit']);
 
-  grunt.registerTask('default', ['qunit'/*, 'uglify'*/]);
+  grunt.registerTask('default', ['qunit', 'uglify']);
 
 };
