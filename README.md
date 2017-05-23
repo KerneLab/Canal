@@ -18,7 +18,31 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 {
   return [ d % 2, d ];
 })
-.collect()
+.collect();
+```
+```js
+[1, 3]
+[0, 4]
+[1, 5]
+```
+
+> Attach to Array
+
+```js
+Canal.on(Array);
+[ 4, 0, 3, 5, 2, 4 ]
+.canal()
+.filter(function(d)
+{
+  return d > 2;
+})
+.distinct()
+.sortWith()
+.map(function(d)
+{
+  return [ d % 2, d ];
+})
+.collect();
 ```
 ```js
 [1, 3]
@@ -41,7 +65,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
   return [ d % 2, d ];
 })
 .groupBy()
-.collect()
+.collect();
 ```
 ```js
 [0, [4  ]]
@@ -68,7 +92,7 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 {
   return [ d, d ];
 }))
-.collect()
+.collect();
 ```
 ```js
 [0, [[4  ], 0]]
