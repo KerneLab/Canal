@@ -2306,6 +2306,21 @@
 		return new Item().merge(merger);
 	};
 
+	Canal.on = function(cls)
+	{
+		var key = arguments.length > 1 ? arguments[1] : "canal";
+		cls.prototype[key] = function()
+		{
+			return Canal.of(this);
+		};
+	};
+
+	Canal.off = function(cls)
+	{
+		var key = arguments.length > 1 ? arguments[1] : "canal";
+		delete cls.prototype[key];
+	};
+
 	if (typeof exports !== "undefined")
 	{
 		if (typeof module !== "undefined" && module.exports)
