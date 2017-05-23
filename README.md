@@ -30,6 +30,8 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 
 ```js
 Canal.on(Array);
+```
+```js
 [ 4, 0, 3, 5, 2, 4 ]
 .canal()
 .filter(function(d)
