@@ -397,7 +397,7 @@
 
 			for ( var group in settle)
 			{
-				if (settle.hasOwnProperty(group)
+				if (settle.hasOwnProperty(group) //
 						&& !this.downstream.accept([ group, settle[group] ]))
 				{
 					break;
@@ -452,16 +452,14 @@
 		if (this.downstream != null)
 		{
 			var left = this.settle();
-			var right = this.that().groupBy(this.keyR, this.valR)
-					.collectAsMap();
+			var right = this.that().groupBy(this.keyR, this.valR).collectAsMap();
 
 			var base = this.base(left, right);
 			var down = this.downstream;
 
 			for ( var k in base)
 			{
-				if (base.hasOwnProperty(k)
-						&& !this.join(down, k, left[k], right[k]))
+				if (base.hasOwnProperty(k) && !this.join(down, k, left[k], right[k]))
 				{
 					break;
 				}
@@ -818,6 +816,30 @@
 	}
 	FullJoinOp.prototype = new Operator();
 
+	function GroupOp(key, val) // (data) => key, [(data) => val]
+	{
+		key = key != null ? key : keyOfPair;
+		val = val != null ? val : valOfPair;
+		function GroupPond()
+		{
+		}
+		GroupPond.prototype = new Grouper();
+		GroupPond.prototype.keyOf = function(d)
+		{
+			return key(d);
+		};
+		GroupPond.prototype.valOf = function(d)
+		{
+			return val(d);
+		};
+
+		this.newPond = function()
+		{
+			return new GroupPond();
+		};
+	}
+	GroupOp.prototype = new Operator();
+
 	function IntersectionOp(that, cmp)
 	{
 		cmp = cmp != null ? cmp : equality;
@@ -851,30 +873,6 @@
 		};
 	}
 	IntersectionOp.prototype = new Operator();
-
-	function GroupOp(key, val) // (data) => key, [(data) => val]
-	{
-		key = key != null ? key : keyOfPair;
-		val = val != null ? val : valOfPair;
-		function GroupPond()
-		{
-		}
-		GroupPond.prototype = new Grouper();
-		GroupPond.prototype.keyOf = function(d)
-		{
-			return key(d);
-		};
-		GroupPond.prototype.valOf = function(d)
-		{
-			return val(d);
-		};
-
-		this.newPond = function()
-		{
-			return new GroupPond();
-		};
-	}
-	GroupOp.prototype = new Operator();
 
 	function JoinOp(that, keyL, keyR, valL, valR)
 	{
@@ -968,8 +966,7 @@
 					{
 						for (var r = 0; r < rights.length; r++)
 						{
-							if (!down.accept([ key,
-									[ lefts[l], Canal.Some(rights[r]) ] ]))
+							if (!down.accept([ key, [ lefts[l], Canal.Some(rights[r]) ] ]))
 							{
 								return false;
 							}
@@ -1151,8 +1148,7 @@
 					{
 						for (var l = 0; l < lefts.length; l++)
 						{
-							if (!down.accept([ key,
-									[ Canal.Some(lefts[l]), rights[r] ] ]))
+							if (!down.accept([ key, [ Canal.Some(lefts[l]), rights[r] ] ]))
 							{
 								return false;
 							}
@@ -1652,8 +1648,7 @@
 		{
 			if (op != null)
 			{
-				return new Canal().operator(op).upstream(self).source(
-						this.source());
+				return new Canal().operator(op).upstream(self).source(this.source());
 			}
 			else
 			{
@@ -1806,8 +1801,7 @@
 
 		this.subtract = function(that)
 		{
-			return this.add(new SubtractOp(that.distinct(arguments[1]),
-					arguments[1]));
+			return this.add(new SubtractOp(that.distinct(arguments[1]), arguments[1]));
 		};
 
 		this.toRows = function()
@@ -1861,14 +1855,12 @@
 
 		this.fullJoin = function(that)
 		{
-			return this.add(new FullJoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
+			return this.add(new FullJoinOp(that, arguments[1], arguments[2], arguments[3], arguments[4]));
 		};
 
 		this.join = function(that)
 		{
-			return this.add(new JoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
+			return this.add(new JoinOp(that, arguments[1], arguments[2], arguments[3], arguments[4]));
 		};
 
 		this.keys = function()
@@ -1878,8 +1870,7 @@
 
 		this.leftJoin = function(that)
 		{
-			return this.add(new LeftJoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
+			return this.add(new LeftJoinOp(that, arguments[1], arguments[2], arguments[3], arguments[4]));
 		};
 
 		this.mapJoint = function(fn)
@@ -1903,8 +1894,7 @@
 
 		this.rightJoin = function(that)
 		{
-			return this.add(new RightJoinOp(that, arguments[1], arguments[2],
-					arguments[3], arguments[4]));
+			return this.add(new RightJoinOp(that, arguments[1], arguments[2], arguments[3], arguments[4]));
 		};
 
 		this.values = function()
@@ -1984,6 +1974,22 @@
 			}).collectAsMap();
 		};
 
+		this.first = function()
+		{
+			var pred = arguments[0];
+
+			var c = this;
+
+			if (pred !== undefined)
+			{
+				c = c.filter(pred);
+			}
+
+			var arr = c.take(1);
+
+			return arr.length > 0 ? Canal.Some(arr[0]) : Canal.None();
+		};
+
 		this.fold = function(init, folder)
 		{
 			return this.evaluate(new FoldOp(init, folder));
@@ -1992,12 +1998,6 @@
 		this.foreach = function(action)
 		{
 			this.evaluate(new ForeachOp(action));
-		};
-
-		this.head = function()
-		{
-			var arr = this.take(1);
-			return arr.length > 0 ? Canal.Some(arr[0]) : Canal.None();
 		};
 
 		this.reduce = function(reducer)
@@ -2014,8 +2014,7 @@
 
 		this.collectAsMap = function()
 		{
-			return this
-					.evaluate(new CollectAsMapOp(arguments[0], arguments[1]));
+			return this.evaluate(new CollectAsMapOp(arguments[0], arguments[1]));
 		};
 
 		this.countByKey = function()
@@ -2161,8 +2160,7 @@
 	{
 		if (data instanceof Array)
 		{
-			return new Canal().source(new Source(data, arguments[1],
-					arguments[2]));
+			return new Canal().source(new Source(data, arguments[1], arguments[2]));
 		}
 		else if (data instanceof Function)
 		{
@@ -2311,7 +2309,12 @@
 		var key = arguments.length > 1 ? arguments[1] : "canal";
 		cls.prototype[key] = function()
 		{
-			return Canal.of(this);
+			var args = [ this ];
+			for (var i = 0; i < arguments.length; i++)
+			{
+				args.push(arguments[i]);
+			}
+			return Canal.of.apply(this, args);
 		};
 	};
 
