@@ -1805,15 +1805,6 @@
 			return this.add(new SubtractOp(that.distinct(arguments[1]), arguments[1]));
 		};
 
-		this.toRows = function()
-		{
-			var vod = arguments[0] != null ? arguments[0] : valOfData;
-			return this.map(function(d)
-			{
-				return [ vod(d) ];
-			});
-		};
-
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
