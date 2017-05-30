@@ -225,7 +225,7 @@
 		}
 	};
 
-	var addWindowItem = function(c, merger, partWith, orderWith, between)
+	var addWindowItem = function(c, merger, alias, partBy, orderBy, between)
 	{
 		var rowsBetween = between != null;
 		var preced = null, follow = null;
@@ -235,10 +235,12 @@
 			follow = between[1];
 		}
 
-		return c.stratifyWith(partWith) //
+		return c.stratifyBy.apply(c, partBy) //
 		.flatMap(function(part)
 		{
-			var ordered = Canal.of(part).stratifyWith(orderWith).collect();
+			var partCanal = Canal.of(part);
+
+			var ordered = partCanal.stratifyBy.apply(partCanal, orderBy).collect();
 
 			var partRows = [];
 
@@ -259,7 +261,7 @@
 
 					for (var k = 0; k < layer.length; k++)
 					{
-						layer[k].push(res);
+						layer[k][alias] = res;
 					}
 				}
 			}
@@ -273,9 +275,8 @@
 				for (var i = 0; i < length; i++)
 				{
 					begin = Math.max(preced == null ? 0 : i - preced, 0);
-					end = Math.min(follow == null ? length //
-					: i + follow + 1, length);
-					partRows[i].push(merger(partRows, begin, end, i));
+					end = Math.min(follow == null ? length : i + follow + 1, length);
+					partRows[i][alias] = merger(partRows, begin, end, i);
 				}
 			}
 
@@ -1928,11 +1929,12 @@
 				var item = arguments[i];
 
 				var merger = item["merger"];
-				var partWith = generateRowComparator(item["part"]);
-				var orderWith = generateRowComparator(item["order"]);
+				var alias = item["alias"];
+				var partBy = item["part"];
+				var orderBy = item["order"];
 				var between = item["scope"];
 
-				c = addWindowItem(c, merger, partWith, orderWith, between);
+				c = addWindowItem(c, merger, alias, partBy, orderBy, between);
 			}
 
 			return c;
@@ -2246,6 +2248,7 @@
 	function Item()
 	{
 		this.merger = null;
+		this.alias = null;
 		this.part = null;
 		this.order = null;
 		this.scope = null;
@@ -2260,6 +2263,18 @@
 		else
 		{
 			return this.merger;
+		}
+	};
+	Item.prototype.as = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.alias = arguments[0];
+			return this;
+		}
+		else
+		{
+			return this.alias;
 		}
 	};
 	Item.prototype.partBy = function()
