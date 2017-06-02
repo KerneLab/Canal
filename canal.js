@@ -88,16 +88,23 @@
 		{
 			var arg = orders[i];
 
-			if (typeof arg === "string")
+			if (arg == null)
+			{
+				arg = function()
+				{
+					return null;
+				};
+			}
+			else if (typeof arg === "string")
 			{
 				var key = arg;
 				arg = function(d)
 				{
 					return d[key];
-				}
+				};
 			}
 
-			if (arg instanceof Function)
+			if (typeof arg === "function")
 			{
 				kops.push(arg);
 				if (asc != null)
@@ -271,6 +278,99 @@
 			return a >= b;
 		};
 
+		var kops = [], ascs = [], kop = null, asc = null;
+		if (orderBy != null && orderBy.length > 0)
+		{
+			collectOrders(kops, ascs, orderBy);
+			kop = kops[0];
+			asc = ascs[0];
+		}
+
+		var makeRangeBeginSeeker = function(preced, kop, asc)
+		{
+			var dir = preced < 0 ? -1 : 1;
+			var lst = preced < 0 ? last : first;
+			var cmp = asc ? ge : le;
+
+			return function(rows, current, preced, levelBegin, levelEnd)
+			{
+				var begin = null;
+
+				if (preced == null)
+				{
+					begin = 0;
+				}
+				else if (preced == 0)
+				{
+					begin = levelBegin;
+				}
+				else
+				{
+					var from = preced < 0 ? levelBegin : (levelEnd - 1);
+					var far = current + (asc ? 1 : -1) * preced;
+					begin = seekIndexWhen(rows, kop, from, dir, lst, cmp, far);
+				}
+
+				return begin;
+			};
+		};
+
+		var makeRangeEndSeeker = function(follow, kop, asc)
+		{
+			var dir = follow > 0 ? 1 : -1;
+			var lst = follow > 0 ? last : first;
+			var cmp = asc ? le : ge;
+
+			return function(rows, current, follow, levelBegin, levelEnd)
+			{
+				var end = null;
+
+				if (follow == null)
+				{
+					end = rows.length - 1;
+				}
+				else if (follow == 0)
+				{
+					end = levelEnd - 1;
+				}
+				else
+				{
+					var from = follow > 0 ? (levelEnd - 1) : levelBegin;
+					var far = current + (asc ? 1 : -1) * follow;
+					end = seekIndexWhen(rows, kop, from, dir, lst, cmp, far);
+				}
+
+				if (end != null)
+				{
+					end++;
+				}
+
+				return end;
+			};
+		};
+
+		var seeker = null;
+
+		if (between != null)
+		{
+			if (byRows)
+			{
+				seeker = [ //
+				function(rows, current, preced, levelBegin, levelEnd)
+				{
+					return Math.max(preced == null ? 0 : (current + preced), 0);
+				}, //
+				function(rows, current, follow, levelBegin, levelEnd)
+				{
+					return Math.min(follow == null ? rows.length : (current + follow + 1), rows.length);
+				} ];
+			}
+			else
+			{
+				seeker = [ makeRangeBeginSeeker(preced, kop, asc), makeRangeEndSeeker(follow, kop, asc) ];
+			}
+		}
+
 		return c.stratifyBy.apply(c, partBy) //
 		.flatMap(function(part)
 		{
@@ -281,6 +381,7 @@
 			var partRows = [], levelLength = [];
 
 			var layer = null, res = undefined, length = null, last = null;
+
 			for (var l = 0; l < ordered.length; l++)
 			{
 				layer = ordered[l];
@@ -311,19 +412,21 @@
 			if (between != null)
 			{
 				var begin = null, end = null;
+
 				length = partRows.length;
 
 				if (byRows)
 				{
 					var levelBegin = 0, levelEnd = 0;
+
 					for (var i = 0; i < levelLength.length; i++)
 					{
 						levelEnd += levelLength[i];
 
 						for (var j = levelBegin; j < levelEnd; j++)
 						{
-							begin = Math.max(preced == null ? 0 : j + preced, 0);
-							end = Math.min(follow == null ? length : j + follow + 1, length);
+							begin = seeker[0](partRows, j, preced, levelBegin, levelEnd);
+							end = seeker[1](partRows, j, follow, levelBegin, levelEnd);
 							res = aggr(partRows, begin, end, levelBegin, levelEnd);
 							partRows[j][alias] = expr(res, partRows, j, begin, end, levelBegin, levelEnd);
 						}
@@ -333,64 +436,23 @@
 				}
 				else
 				{
-					var kops = [], ascs = [];
-					collectOrders(kops, ascs, orderBy);
-					var kop = kops[0], asc = ascs[0];
-
 					var levelBegin = 0, levelEnd = 0, val = undefined;
+
 					for (var i = 0; i < levelLength.length; i++)
 					{
 						levelEnd += levelLength[i];
 
 						val = kop(partRows[levelBegin]); // Level Value
 
-						if (preced == null)
-						{
-							begin = 0;
-						}
-						else if (preced == 0)
-						{
-							begin = levelBegin;
-						}
-						else
-						{
-							var from = preced < 0 ? levelBegin : (levelEnd - 1);
-							var dir = preced < 0 ? -1 : 1;
-							var lst = preced < 0 ? last : first;
-							var cmp = asc ? ge : le;
-							var far = val + (asc ? 1 : -1) * preced;
-							begin = seekIndexWhen(partRows, kop, from, dir, lst, cmp, far);
-						}
-
-						if (follow == null)
-						{
-							end = length - 1;
-						}
-						else if (follow == 0)
-						{
-							end = levelEnd - 1;
-						}
-						else
-						{
-							var from = follow > 0 ? (levelEnd - 1) : levelBegin;
-							var dir = follow > 0 ? 1 : -1;
-							var lst = follow > 0 ? last : first;
-							var cmp = asc ? le : ge;
-							var far = val + (asc ? 1 : -1) * follow;
-							end = seekIndexWhen(partRows, kop, from, dir, lst, cmp, far);
-						}
-
-						if (end != null)
-						{
-							end++;
-						}
+						begin = seeker[0](partRows, val, preced, levelBegin, levelEnd);
+						end = seeker[1](partRows, val, follow, levelBegin, levelEnd);
 
 						if (begin != null && end != null)
 						{
 							res = aggr(partRows, begin, end, levelBegin, levelEnd);
 						}
 						else
-						{
+						{ // Window does not exist
 							res = undefined;
 						}
 

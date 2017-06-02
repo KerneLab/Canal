@@ -41,6 +41,135 @@ QUnit.test("window()", function(assert)
 	]);
 });
 
+QUnit.test("window() partBy(null)", function(assert)
+{
+	function sum(mapper)
+	{
+		return [function(rows, begin, end)
+		{
+			return Canal.of(rows, begin, end) //
+			.map(mapper) //
+			.reduce(function(a, b)
+			{
+				return a + b;
+			}).get();
+		}];
+	}
+
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.item(sum(function(d){return d.sal;}))
+			.partBy(null)
+			.orderBy(function(d){return d.rnk;})
+			.as("sum_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":5200.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":5200.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":5200.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":5200.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":9400.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":9400.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":9400.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":10800.00}
+	]);
+});
+
+QUnit.test("window() orderBy(null)", function(assert)
+{
+	function sum(mapper)
+	{
+		return [function(rows, begin, end)
+		{
+			return Canal.of(rows, begin, end) //
+			.map(mapper) //
+			.reduce(function(a, b)
+			{
+				return a + b;
+			}).get();
+		}];
+	}
+
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.item(sum(function(d){return d.sal;}))
+			.partBy(function(d){return d.grp;})
+			.orderBy(null)
+			.as("sum_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+	]);
+});
+
+QUnit.test("window() partBy(null) orderBy(null)", function(assert)
+{
+	function sum(mapper)
+	{
+		return [function(rows, begin, end)
+		{
+			return Canal.of(rows, begin, end) //
+			.map(mapper) //
+			.reduce(function(a, b)
+			{
+				return a + b;
+			}).get();
+		}];
+	}
+
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.item(sum(function(d){return d.sal;}))
+			.partBy(function(){return null;})
+			.orderBy(function(){return null;})
+			.as("sum_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":10800.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":10800.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":10800.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":10800.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":10800.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":10800.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":10800.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":10800.00}
+	]);
+});
+
 QUnit.test("window() rows(-1,1)", function(assert)
 {
 	function sum(mapper)
