@@ -88,6 +88,15 @@
 		{
 			var arg = orders[i];
 
+			if (typeof arg === "string")
+			{
+				var key = arg;
+				arg = function(d)
+				{
+					return d[key];
+				}
+			}
+
 			if (arg instanceof Function)
 			{
 				kops.push(arg);
@@ -97,7 +106,7 @@
 				}
 				asc = true;
 			}
-			else if (typeof (arg) === "boolean")
+			else if (typeof arg === "boolean")
 			{
 				asc = arg;
 			}

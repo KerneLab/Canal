@@ -67,8 +67,8 @@ QUnit.test("window() rows(-1,1)", function(assert)
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
 	]).window(
 		Canal.item(sum(function(d){return d.sal;}))
-			.partBy(function(d){return d.grp;})
-			.orderBy(function(d){return d.rnk;})
+			.partBy("grp")
+			.orderBy("rnk")
 			.rows().between(-1, 1)
 			.as("sum_sal")
 	).collect();
