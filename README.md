@@ -130,7 +130,7 @@ Canal.of([
   Canal.item(sum(d=>d.sal))
     .partBy(d=>d.grp)
     .orderBy(d=>d.rnk)
-    .rows().between(-1, 1)	// From the last row to the next row
+    .rows().between(-1, 1)  // From the last row to the next row
     .as("sum_sal")
 ).collect();
 ```
