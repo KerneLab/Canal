@@ -106,10 +106,10 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 ```js
 function sum(mapper)
 {
-  return function(rows, begin, end, current)
+  return function(rows, begin, end)
   {
-    return Canal.of(rows, begin, end) //
-    .map(mapper) //
+    return Canal.of(rows, begin, end)
+    .map(mapper)
     .reduce(function(a, b)
     {
       return a + b;
@@ -117,31 +117,32 @@ function sum(mapper)
   };
 }
 
-var result = Canal.of([
-  {"id":1,"sex":1,"grp":0,"sal":3032},
-  {"id":2,"sex":1,"grp":1,"sal":2153},
-  {"id":3,"sex":2,"grp":0,"sal":2545},
-  {"id":4,"sex":1,"grp":1,"sal":1894}
+Canal.of([
+  {"id":"1","grp":"1","rnk":1,"sal":1000.00},
+  {"id":"2","grp":"1","rnk":1,"sal":1100.00},
+  {"id":"3","grp":"1","rnk":2,"sal":1200.00},
+  {"id":"4","grp":"1","rnk":2,"sal":1300.00},
+  {"id":"5","grp":"1","rnk":3,"sal":1400.00},
+  {"id":"6","grp":"2","rnk":1,"sal":1500.00},
+  {"id":"7","grp":"2","rnk":1,"sal":1600.00},
+  {"id":"8","grp":"2","rnk":2,"sal":1700.00}
 ]).window(
-  Canal.item(sum(d=>d.id))
-    .partBy(d=>d.grp)
-    .orderBy(d=>d.sex)
-    .as("sum_id"),
-  Canal.item(sum(d=>d.sal))
-    .partBy(d=>d.grp, d=>d.sex)
-    .as("sum_sal"),
   Canal.item(sum(d=>d.sal))
     .partBy(d=>d.grp)
-    .orderBy(d=>d.sal)
-    .between(null,0)  // From the very first row to current row
-    .as("sum_grp")
+    .orderBy(d=>d.rnk)
+    .rows().between(-1, 1)	// From the last row to the next row
+    .as("sum_sal")
 ).collect();
 ```
 ```js
 [
-  {"id":3,"sex":2,"grp":0,"sal":2545,"sum_id":4,"sum_sal":2545,"sum_grp":2545},
-  {"id":1,"sex":1,"grp":0,"sal":3032,"sum_id":1,"sum_sal":3032,"sum_grp":5577},
-  {"id":4,"sex":1,"grp":1,"sal":1894,"sum_id":6,"sum_sal":4047,"sum_grp":1894},
-  {"id":2,"sex":1,"grp":1,"sal":2153,"sum_id":6,"sum_sal":4047,"sum_grp":4047}
+  {"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
+  {"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
+  {"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3600.00},
+  {"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
+  {"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2700.00},
+  {"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
+  {"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+  {"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3300.00}
 ]
 ```
