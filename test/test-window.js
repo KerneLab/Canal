@@ -2,7 +2,7 @@ QUnit.test("window()", function(assert)
 {
 	function sum(mapper)
 	{
-		return [function(rows, begin, end)
+		return function(rows, begin, end)
 		{
 			return Canal.of(rows, begin, end) //
 			.map(mapper) //
@@ -10,7 +10,7 @@ QUnit.test("window()", function(assert)
 			{
 				return a + b;
 			}).get();
-		}];
+		};
 	}
 
 	var result = Canal.of([
@@ -196,7 +196,7 @@ QUnit.test("window() rows(-1,1)", function(assert)
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
 	]).window(
 		Canal.item(sum(function(d){return d.sal;}))
-			.partBy("grp")
+			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
 			.rows().between(-1, 1)
 			.as("sum_sal")

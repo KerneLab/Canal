@@ -2524,6 +2524,10 @@
 
 	Canal.item = function(pair)
 	{
+		if (typeof pair === "function")
+		{
+			pair = [ pair, null ];
+		}
 		return new Item().aggregator(pair[0]).expressor(pair[1]);
 	};
 
