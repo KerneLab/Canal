@@ -174,7 +174,7 @@ QUnit.test("window() rows(-1,1)", function(assert)
 {
 	function sum(mapper)
 	{
-		return [function(rows, begin, end)
+		return function(rows, begin, end)
 		{
 			return Canal.of(rows, begin, end) //
 			.map(mapper) //
@@ -182,7 +182,7 @@ QUnit.test("window() rows(-1,1)", function(assert)
 			{
 				return a + b;
 			}).get();
-		}];
+		};
 	}
 
 	var result = Canal.of([
