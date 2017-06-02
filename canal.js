@@ -143,40 +143,6 @@
 		}
 	};
 
-	// Generate the row comparator according to the orders array
-	var generateRowComparator = function(orders)
-	{
-		if (orders != null)
-		{
-			var kops = [];
-			var ascs = [];
-			collectOrders(kops, ascs, orders);
-
-			return function(a, b)
-			{
-				var cmp = 0;
-				for (var i = 0; i < kops.length; i++)
-				{
-					var kop = kops[i];
-					cmp = signum(kop.apply(null, a), kop.apply(null, b));
-					if (cmp != 0)
-					{
-						if (!ascs[i])
-						{
-							cmp *= -1;
-						}
-						break;
-					}
-				}
-				return cmp;
-			};
-		}
-		else
-		{
-			return null;
-		}
-	};
-
 	// Sort the data and collect the "same" data into each array
 	var sortCollect = function(data, cmp, asc)
 	{
@@ -225,15 +191,76 @@
 		}
 	};
 
-	var addWindowItem = function(c, merger, alias, partBy, orderBy, between)
+	// Seek an index when the condition is satisfied
+	var seekIndexWhen = function(rows, kop, from, direct, last, cmp, val)
 	{
-		var rowsBetween = between != null;
+		if (direct == 0)
+		{
+			return from;
+		}
+
+		var toTail = direct > 0 ? true : false;
+		var length = rows.length;
+
+		var index = null, cur = null;
+		for (var i = from; toTail && i < length || !toTail && i >= 0; i += direct)
+		{
+			cur = kop(rows[i]);
+
+			if (last)
+			{
+				if (!cmp(cur, val))
+				{
+					break;
+				}
+				index = i;
+			}
+			else
+			{
+				if (cmp(cur, val))
+				{
+					index = i;
+					break;
+				}
+			}
+		}
+
+		return index;
+	};
+
+	var addWindowItem = function(c, aggr, expr, alias, partBy, orderBy, between, byRows)
+	{
+		aggr = aggr != null ? aggr : function()
+		{
+			return undefined;
+		};
+
+		expr = expr != null ? expr : function(agg)
+		{
+			return agg;
+		};
+
 		var preced = null, follow = null;
-		if (rowsBetween)
+		if (between != null)
 		{
 			preced = between[0];
 			follow = between[1];
+			byRows = byRows == null ? true : byRows;
 		}
+		else
+		{
+			byRows = null;
+		}
+
+		var last = true, first = false;
+
+		var le = function(a, b)
+		{
+			return a <= b;
+		}, ge = function(a, b)
+		{
+			return a >= b;
+		};
 
 		return c.stratifyBy.apply(c, partBy) //
 		.flatMap(function(part)
@@ -242,41 +269,129 @@
 
 			var ordered = partCanal.stratifyBy.apply(partCanal, orderBy).collect();
 
-			var partRows = [];
+			var partRows = [], levelLength = [];
 
-			var layer = null, res = null, length = null;
+			var layer = null, res = undefined, length = null, last = null;
 			for (var l = 0; l < ordered.length; l++)
 			{
 				layer = ordered[l];
 
-				for (var k = 0; k < layer.length; k++)
-				{
-					partRows.push(layer[k]);
-				}
+				levelLength.push(layer.length);
 
-				if (!rowsBetween)
+				last = partRows.length;
+
+				partRows.push.apply(partRows, layer);
+
+				if (between == null)
 				{
 					length = partRows.length;
-					res = merger(partRows, 0, length, length - 1);
+
+					// partRows,windowBegin,windowEnd,levelBegin,levelEnd
+					res = aggr(partRows, 0, length, length - layer.length, length);
 
 					for (var k = 0; k < layer.length; k++)
 					{
-						layer[k][alias] = res;
+						// aggrRes,partRows,currentRow,windowBegin,windowEnd,levelBegin,levelEnd
+						layer[k][alias] = expr(res, partRows, last + k, 0, length, length - layer.length, length);
 					}
 				}
 			}
 
 			ordered = null;
 
-			if (rowsBetween)
+			if (between != null)
 			{
 				var begin = null, end = null;
 				length = partRows.length;
-				for (var i = 0; i < length; i++)
+
+				if (byRows)
 				{
-					begin = Math.max(preced == null ? 0 : i - preced, 0);
-					end = Math.min(follow == null ? length : i + follow + 1, length);
-					partRows[i][alias] = merger(partRows, begin, end, i);
+					var levelBegin = 0, levelEnd = 0;
+					for (var i = 0; i < levelLength.length; i++)
+					{
+						levelEnd += levelLength[i];
+
+						for (var j = levelBegin; j < levelEnd; j++)
+						{
+							begin = Math.max(preced == null ? 0 : j + preced, 0);
+							end = Math.min(follow == null ? length : j + follow + 1, length);
+							res = aggr(partRows, begin, end, levelBegin, levelEnd);
+							partRows[j][alias] = expr(res, partRows, j, begin, end, levelBegin, levelEnd);
+						}
+
+						levelBegin = levelEnd;
+					}
+				}
+				else
+				{
+					var kops = [], ascs = [];
+					collectOrders(kops, ascs, orderBy);
+					var kop = kops[0], asc = ascs[0];
+
+					var levelBegin = 0, levelEnd = 0, val = undefined;
+					for (var i = 0; i < levelLength.length; i++)
+					{
+						levelEnd += levelLength[i];
+
+						val = kop(partRows[levelBegin]); // Level Value
+
+						if (preced == null)
+						{
+							begin = 0;
+						}
+						else if (preced == 0)
+						{
+							begin = levelBegin;
+						}
+						else
+						{
+							var from = preced < 0 ? levelBegin : (levelEnd - 1);
+							var dir = preced < 0 ? -1 : 1;
+							var lst = preced < 0 ? last : first;
+							var cmp = asc ? ge : le;
+							var far = val + (asc ? 1 : -1) * preced;
+							begin = seekIndexWhen(partRows, kop, from, dir, lst, cmp, far);
+						}
+
+						if (follow == null)
+						{
+							end = length - 1;
+						}
+						else if (follow == 0)
+						{
+							end = levelEnd - 1;
+						}
+						else
+						{
+							var from = follow > 0 ? (levelEnd - 1) : levelBegin;
+							var dir = follow > 0 ? 1 : -1;
+							var lst = follow > 0 ? last : first;
+							var cmp = asc ? le : ge;
+							var far = val + (asc ? 1 : -1) * follow;
+							end = seekIndexWhen(partRows, kop, from, dir, lst, cmp, far);
+						}
+
+						if (end != null)
+						{
+							end++;
+						}
+
+						if (begin != null && end != null)
+						{
+							res = aggr(partRows, begin, end, levelBegin, levelEnd);
+						}
+						else
+						{
+							res = undefined;
+						}
+
+						for (var j = levelBegin; j < levelEnd; j++)
+						{
+							partRows[j][alias] = expr(res, partRows, j, begin, end, levelBegin, levelEnd);
+						}
+
+						levelBegin = levelEnd;
+					}
 				}
 			}
 
@@ -1810,6 +1925,28 @@
 			return this.add(new UnionOp(that));
 		};
 
+		this.window = function()
+		{
+			var c = this;
+
+			for (var i = 0; i < arguments.length; i++)
+			{
+				var item = arguments[i];
+
+				var aggr = item["aggr"];
+				var expr = item["expr"];
+				var alias = item["alias"];
+				var partBy = item["part"];
+				var orderBy = item["order"];
+				var between = item["scope"];
+				var byRows = item["byRows"];
+
+				c = addWindowItem(c, aggr, expr, alias, partBy, orderBy, between, byRows);
+			}
+
+			return c;
+		};
+
 		this.zip = function(that)
 		{
 			return this.map(function(d, i)
@@ -1909,26 +2046,6 @@
 		this.unpack = function(unpacker)
 		{
 			return this.add(new UnpackOp(unpacker));
-		};
-
-		this.window = function()
-		{
-			var c = this;
-
-			for (var i = 0; i < arguments.length; i++)
-			{
-				var item = arguments[i];
-
-				var merger = item["merger"];
-				var alias = item["alias"];
-				var partBy = item["part"];
-				var orderBy = item["order"];
-				var between = item["scope"];
-
-				c = addWindowItem(c, merger, alias, partBy, orderBy, between);
-			}
-
-			return c;
 		};
 
 		// General Terminate Operations
@@ -2238,22 +2355,36 @@
 
 	function Item()
 	{
-		this.merger = null;
+		this.aggr = null;
+		this.expr = null;
 		this.alias = null;
 		this.part = null;
 		this.order = null;
+		this.byRows = null;
 		this.scope = null;
 	}
-	Item.prototype.merge = function()
+	Item.prototype.aggregator = function()
 	{
 		if (arguments.length > 0)
 		{
-			this.merger = arguments[0];
+			this.aggr = arguments[0];
 			return this;
 		}
 		else
 		{
-			return this.merger;
+			return this.aggr;
+		}
+	};
+	Item.prototype.expressor = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.expr = arguments[0];
+			return this;
+		}
+		else
+		{
+			return this.expr;
 		}
 	};
 	Item.prototype.as = function()
@@ -2292,11 +2423,26 @@
 			return this.order;
 		}
 	};
-	Item.prototype.between = function(preceding, following)
+	Item.prototype.rows = function()
 	{
-		if (arguments.length > 0)
+		this.byRows = true;
+		return this;
+	};
+	Item.prototype.range = function()
+	{
+		this.byRows = false;
+		return this;
+	};
+	Item.prototype.between = function()
+	{
+		if (arguments.length > 1)
 		{
-			this.scope = [ preceding, following ];
+			this.scope = [ arguments[0], arguments[1] ];
+			return this;
+		}
+		else if (arguments.length == 1)
+		{
+			this.scope = arguments[0];
 			return this;
 		}
 		else
@@ -2305,9 +2451,9 @@
 		}
 	};
 
-	Canal.item = function(merger)
+	Canal.item = function(pair)
 	{
-		return new Item().merge(merger);
+		return new Item().aggregator(pair[0]).expressor(pair[1]);
 	};
 
 	Canal.on = function(cls)
