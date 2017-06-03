@@ -104,19 +104,6 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 > Window Operation
 
 ```js
-function sum(mapper)
-{
-  return function(rows, begin, end)
-  {
-    return Canal.of(rows, begin, end)
-    .map(mapper)
-    .reduce(function(a, b)
-    {
-      return a + b;
-    }).get();
-  };
-}
-
 Canal.of([
   {"id":"1","grp":"1","rnk":1,"sal":1000.00},
   {"id":"2","grp":"1","rnk":1,"sal":1100.00},
@@ -127,7 +114,7 @@ Canal.of([
   {"id":"7","grp":"2","rnk":1,"sal":1600.00},
   {"id":"8","grp":"2","rnk":2,"sal":1700.00}
 ]).window(
-  Canal.item(sum(d=>d.sal))
+  Canal.wf.sum(d=>d.sal)
     .partBy(d=>d.grp)
     .orderBy(d=>d.rnk)
     .rows().between(-1, 1)  // From the last row to the next row
