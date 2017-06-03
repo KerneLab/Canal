@@ -79,6 +79,30 @@
 		return res;
 	};
 
+	// Wrap the value recognizer as a function
+	var wrapVop = function(vop)
+	{
+		var wrap = vop;
+
+		if (vop == null)
+		{
+			wrap = function()
+			{
+				return null;
+			};
+		}
+		else if (typeof vop === "string")
+		{ // Extract the attribute from object by the key
+			var key = vop;
+			wrap = function(d)
+			{
+				return d[key];
+			};
+		}
+
+		return wrap;
+	};
+
 	// Collect the orders array
 	var collectOrders = function(kops, ascs, orders)
 	{
@@ -88,34 +112,23 @@
 		{
 			var arg = orders[i];
 
-			if (arg == null)
-			{
-				arg = function()
-				{
-					return null;
-				};
-			}
-			else if (typeof arg === "string")
-			{
-				var key = arg;
-				arg = function(d)
-				{
-					return d[key];
-				};
-			}
-
-			if (typeof arg === "function")
-			{
-				kops.push(arg);
-				if (asc != null)
-				{
-					ascs.push(asc);
-				}
-				asc = true;
-			}
-			else if (typeof arg === "boolean")
+			if (typeof arg === "boolean")
 			{
 				asc = arg;
+			}
+			else
+			{
+				arg = wrapVop(arg);
+
+				if (typeof arg === "function")
+				{
+					kops.push(arg);
+					if (asc != null)
+					{
+						ascs.push(asc);
+					}
+					asc = true;
+				}
 			}
 		}
 
@@ -396,12 +409,12 @@
 				{
 					length = partRows.length;
 
-					// partRows,windowBegin,windowEnd,levelBegin,levelEnd
+					// partRows,winBegin,winEnd,lvlBegin,lvlEnd
 					res = aggr(partRows, 0, length, length - layer.length, length);
 
 					for (var k = 0; k < layer.length; k++)
 					{
-						// aggrRes,partRows,currentRow,windowBegin,windowEnd,levelBegin,levelEnd
+						// aggRes,partRows,curntPos,winBegin,winEnd,lvlBegin,lvlEnd
 						layer[k][alias] = expr(res, partRows, last + k, 0, length, length - layer.length, length);
 					}
 				}
@@ -2529,6 +2542,48 @@
 			pair = [ pair, null ];
 		}
 		return new Item().aggregator(pair[0]).expressor(pair[1]);
+	};
+
+	Canal.wf = {
+		"row_number" : function()
+		{
+			return Canal.item([ null, function(aggRes, partRows, curntPos)
+			{
+				return curntPos + 1;
+			} ]);
+		},
+		"count" : function(vop)	// vop[,distinct[,cmp]]
+		{
+			vop = wrapVop(vop);
+			var distinct = arguments.length > 1 && arguments[1] === true;
+			var cmp = null;
+			if (distinct)
+			{
+				cmp = arguments[2];
+			}
+			return Canal.item(function(rows, begin, end)
+			{
+				var c = Canal.of(rows, begin, end).map(vop);
+				if (distinct)
+				{
+					c = c.distinct(cmp);
+				}
+				return c.count();
+			});
+		},
+		"sum" : function(vop)
+		{
+			vop = wrapVop(vop);
+			return Canal.item(function(rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.reduce(function(a, b)
+				{
+					return a + b;
+				}).get();
+			});
+		}
 	};
 
 	Canal.on = function(cls)
