@@ -264,7 +264,7 @@
 			return undefined;
 		};
 
-		expr = expr != null ? expr : function(agg)
+		expr = expr != null ? expr : function(pos, agg)
 		{
 			return agg;
 		};
@@ -414,8 +414,8 @@
 
 					for (var k = 0; k < layer.length; k++)
 					{
-						// aggRes,partRows,curntPos,winBegin,winEnd,lvlBegin,lvlEnd
-						layer[k][alias] = expr(res, partRows, last + k, 0, length, length - layer.length, length);
+						// curntPos,aggRes,partRows,winBegin,winEnd,lvlBegin,lvlEnd
+						layer[k][alias] = expr(last + k, res, partRows, 0, length, length - layer.length, length);
 					}
 				}
 			}
@@ -441,7 +441,7 @@
 							begin = seeker[0](partRows, j, preced, levelBegin, levelEnd);
 							end = seeker[1](partRows, j, follow, levelBegin, levelEnd);
 							res = aggr(partRows, begin, end, levelBegin, levelEnd);
-							partRows[j][alias] = expr(res, partRows, j, begin, end, levelBegin, levelEnd);
+							partRows[j][alias] = expr(j, res, partRows, begin, end, levelBegin, levelEnd);
 						}
 
 						levelBegin = levelEnd;
@@ -471,7 +471,7 @@
 
 						for (var j = levelBegin; j < levelEnd; j++)
 						{
-							partRows[j][alias] = expr(res, partRows, j, begin, end, levelBegin, levelEnd);
+							partRows[j][alias] = expr(j, res, partRows, begin, end, levelBegin, levelEnd);
 						}
 
 						levelBegin = levelEnd;
@@ -2547,12 +2547,12 @@
 	Canal.wf = {
 		"row_number" : function()
 		{
-			return Canal.item([ null, function(aggRes, partRows, curntPos)
+			return Canal.item([ null, function(curntPos)
 			{
 				return curntPos + 1;
 			} ]);
 		},
-		"count" : function(vop)	// vop[,distinct[,cmp]]
+		"count" : function(vop) // vop[,distinct[,cmp]]
 		{
 			vop = wrapVop(vop);
 			var distinct = arguments.length > 1 && arguments[1] === true;
