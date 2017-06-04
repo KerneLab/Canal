@@ -231,16 +231,21 @@
 		return index;
 	};
 
-	var addWindowItem = function(c, aggr, expr, alias, partBy, orderBy, between, byRows)
+	var addWindowItem = function(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows)
 	{
 		aggr = aggr != null ? aggr : function()
 		{
 			return undefined;
 		};
 
-		expr = expr != null ? expr : function(pos, agg)
+		updt = updt != null ? updt : function(agg)
 		{
 			return agg;
+		};
+
+		expr = expr != null ? expr : function(pos, upd)
+		{
+			return upd;
 		};
 
 		var preced = null, follow = null;
@@ -365,6 +370,8 @@
 
 			var ordered = partCanal.stratifyBy.apply(partCanal, orderBy).collect();
 
+			var aggRes = aggr(ordered);
+
 			var partRows = [], levelLength = [];
 
 			var layer = null, res = undefined, length = null, last = null;
@@ -383,12 +390,12 @@
 				{
 					length = partRows.length;
 
-					// partRows,winBegin,winEnd,lvlBegin,lvlEnd
-					res = aggr(partRows, 0, length, length - layer.length, length);
+					// aggRes,partRows,winBegin,winEnd,lvlBegin,lvlEnd
+					res = updt(aggRes, partRows, 0, length, length - layer.length, length);
 
 					for (var k = 0; k < layer.length; k++)
 					{
-						// curntPos,aggRes,partRows,winBegin,winEnd,lvlBegin,lvlEnd
+						// curntPos,updRes,partRows,winBegin,winEnd,lvlBegin,lvlEnd
 						layer[k][alias] = expr(last + k, res, partRows, 0, length, length - layer.length, length);
 					}
 				}
@@ -414,7 +421,7 @@
 						{
 							begin = seeker[0](partRows, j, preced, levelBegin, levelEnd);
 							end = seeker[1](partRows, j, follow, levelBegin, levelEnd);
-							res = aggr(partRows, begin, end, levelBegin, levelEnd);
+							res = updt(aggRes, partRows, begin, end, levelBegin, levelEnd);
 							partRows[j][alias] = expr(j, res, partRows, begin, end, levelBegin, levelEnd);
 						}
 
@@ -436,7 +443,7 @@
 
 						if (begin != null && end != null)
 						{
-							res = aggr(partRows, begin, end, levelBegin, levelEnd);
+							res = updt(aggRes, partRows, begin, end, levelBegin, levelEnd);
 						}
 						else
 						{ // Window does not exist
@@ -1992,6 +1999,7 @@
 				var item = arguments[i];
 
 				var aggr = item["aggr"];
+				var updt = item["updt"];
 				var expr = item["expr"];
 				var alias = item["alias"];
 				var partBy = item["part"];
@@ -1999,7 +2007,7 @@
 				var between = item["scope"];
 				var byRows = item["byRows"];
 
-				c = addWindowItem(c, aggr, expr, alias, partBy, orderBy, between, byRows);
+				c = addWindowItem(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows);
 			}
 
 			return c;
@@ -2451,6 +2459,7 @@
 	function Item()
 	{
 		this.aggr = null;
+		this.updt = null;
 		this.expr = null;
 		this.alias = null;
 		this.part = null;
@@ -2468,6 +2477,18 @@
 		else
 		{
 			return this.aggr;
+		}
+	};
+	Item.prototype.updater = function()
+	{
+		if (arguments.length > 0)
+		{
+			this.updt = arguments[0];
+			return this;
+		}
+		else
+		{
+			return this.updt;
 		}
 	};
 	Item.prototype.expressor = function()
@@ -2546,22 +2567,31 @@
 		}
 	};
 
-	Canal.item = function(pair)
+	Canal.item = function(oprs)
 	{
-		if (typeof pair === "function")
+		var i = new Item();
+		if (typeof oprs === "function")
 		{
-			pair = [ pair, null ];
+			i.updater(oprs);
 		}
-		return new Item().aggregator(pair[0]).expressor(pair[1]);
+		else if (oprs != null)
+		{
+			i.aggregator(oprs["aggr"]);
+			i.updater(oprs["updt"]);
+			i.expressor(oprs["expr"]);
+		}
+		return i;
 	};
 
 	Canal.wf = {
 		"row_number" : function()
 		{
-			return Canal.item([ null, function(curntPos)
-			{
-				return curntPos + 1;
-			} ]);
+			return Canal.item({
+				"expr" : function(curntPos)
+				{
+					return curntPos + 1;
+				}
+			});
 		},
 		"count" : function(vop) // vop[,distinct[,cmp]]
 		{
@@ -2571,7 +2601,7 @@
 			{
 				cmp = arguments[2];
 			}
-			return Canal.item(function(rows, begin, end)
+			return Canal.item(function(agg, rows, begin, end)
 			{
 				var c = Canal.of(rows, begin, end).map(vop);
 				if (distinct)
@@ -2583,7 +2613,7 @@
 		},
 		"sum" : function(vop)
 		{
-			return Canal.item(function(rows, begin, end)
+			return Canal.item(function(agg, rows, begin, end)
 			{
 				return Canal.of(rows, begin, end) //
 				.map(vop) //
