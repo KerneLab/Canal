@@ -30,6 +30,8 @@ QUnit.test("window() row_number", function(assert)
 
 QUnit.test("window() count", function(assert)
 {
+	var f = Canal.field;
+	
 	var result = Canal.of([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
@@ -40,7 +42,7 @@ QUnit.test("window() count", function(assert)
 		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
 	]).window(
-		Canal.wf.count(Canal.field(null))
+		Canal.wf.count(f("id"))
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
 			.as("count")
