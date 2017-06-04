@@ -1174,3 +1174,92 @@ QUnit.test("window() sum desc range(-2,-1)", function(assert)
 		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1700.00}
 	]);
 });
+
+QUnit.test("window() min part(grp) order(rnk)", function(assert)
+{
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.wf.min(function(d){return d.sal;})
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk})
+			.as("min_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1000.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"min_sal":1000.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"min_sal":1000.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"min_sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"min_sal":1500.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1500.00}
+	]);
+});
+
+QUnit.test("window() min part(grp,rnk)", function(assert)
+{
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.wf.min(function(d){return d.sal;})
+			.partBy(function(d){return d.grp;}, function(d){return d.rnk})
+			.as("min_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"min_sal":1200.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"min_sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"min_sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"min_sal":1500.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1700.00}
+	]);
+});
+
+QUnit.test("window() rank", function(assert)
+{
+	var result = Canal.of([
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	]).window(
+		Canal.wf.rank()
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk;})
+			.as("rank")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"rank":1},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"rank":1},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"rank":3},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"rank":3},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"rank":5},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"rank":1},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"rank":1},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":3}
+	]);
+});

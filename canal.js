@@ -2593,6 +2593,45 @@
 				}
 			});
 		},
+		"rank" : function()
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(level, group)
+					{
+						return Canal.of(level).map(function(d, row)
+						{
+							return {
+								"grp" : group
+							};
+						}).collect();
+					}) //
+					.window( //
+					Canal.wf.row_number() //
+					.partBy(function(d)
+					{
+						return null;
+					}).as("seq"), //
+					Canal.wf.min(function(d)
+					{
+						return d["seq"];
+					}).partBy(function(d)
+					{
+						return d["grp"];
+					}).as("min") //
+					) //
+					.map(function(d)
+					{
+						return [ d["seq"] - 1, d["min"] ];
+					}).collectAsMap();
+				},
+				"expr" : function(pos, agg)
+				{
+					return agg[pos];
+				}
+			});
+		},
 		"count" : function(vop) // vop[,distinct[,cmp]]
 		{
 			var distinct = arguments.length > 1 && arguments[1] === true;
@@ -2620,6 +2659,48 @@
 				.reduce(function(a, b)
 				{
 					return a + b;
+				}).get();
+			});
+		},
+		"min" : function(vop)
+		{
+			var cmp = arguments.length > 1 ? arguments[1] : signum;
+
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.reduce(function(a, b)
+				{
+					if (cmp(a, b) > 0)
+					{
+						return b;
+					}
+					else
+					{
+						return a;
+					}
+				}).get();
+			});
+		},
+		"max" : function(vop)
+		{
+			var cmp = arguments.length > 1 ? arguments[1] : signum;
+
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.reduce(function(a, b)
+				{
+					if (cmp(a, b) < 0)
+					{
+						return b;
+					}
+					else
+					{
+						return a;
+					}
 				}).get();
 			});
 		}
