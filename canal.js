@@ -79,30 +79,6 @@
 		return res;
 	};
 
-	// Wrap the value recognizer as a function
-	var wrapVop = function(vop)
-	{
-		var wrap = vop;
-
-		if (vop == null)
-		{
-			wrap = function()
-			{
-				return null;
-			};
-		}
-		else if (typeof vop === "string")
-		{ // Extract the attribute from object by the key
-			var key = vop;
-			wrap = function(d)
-			{
-				return d[key];
-			};
-		}
-
-		return wrap;
-	};
-
 	// Collect the orders array
 	var collectOrders = function(kops, ascs, orders)
 	{
@@ -118,8 +94,6 @@
 			}
 			else
 			{
-				arg = wrapVop(arg);
-
 				if (typeof arg === "function")
 				{
 					kops.push(arg);
@@ -2326,7 +2300,7 @@
 		SpringIterator.prototype = new Iterator();
 		SpringIterator.prototype.close = function()
 		{
-			if (end instanceof Function)
+			if (typeof end === "function")
 			{
 				end(this.index - 1);
 			}
@@ -2356,7 +2330,7 @@
 		{
 			return new Canal().source(new Source(data, arguments[1], arguments[2]));
 		}
-		else if (data instanceof Function)
+		else if (typeof data === "function")
 		{
 			return new Canal().source(new Spring(data, arguments[1]));
 		}
@@ -2435,6 +2409,43 @@
 	Canal.None = function()
 	{
 		return new None();
+	};
+
+	Canal.wrapPicker = function(picker)
+	{
+		var wrap = picker;
+
+		if (picker == null)
+		{
+			wrap = function()
+			{
+				return null;
+			};
+		}
+		else if (typeof picker !== "function")
+		{ // Extract the attribute from data by the key
+			var key = picker.toString();
+			wrap = function(data)
+			{
+				return data[key];
+			};
+		}
+
+		return wrap;
+	};
+
+	Canal.field = function(picker, alias)
+	{
+		picker = Canal.wrapPicker(picker);
+
+		if (alias == null && picker != null && typeof picker !== "function")
+		{
+			alias = picker.toString();
+		}
+
+		picker.alias = alias;
+
+		return picker;
 	};
 
 	function Item()
@@ -2554,7 +2565,6 @@
 		},
 		"count" : function(vop) // vop[,distinct[,cmp]]
 		{
-			vop = wrapVop(vop);
 			var distinct = arguments.length > 1 && arguments[1] === true;
 			var cmp = null;
 			if (distinct)
@@ -2573,7 +2583,6 @@
 		},
 		"sum" : function(vop)
 		{
-			vop = wrapVop(vop);
 			return Canal.item(function(rows, begin, end)
 			{
 				return Canal.of(rows, begin, end) //
