@@ -54,6 +54,18 @@
 		return a === b ? 0 : signum(a, b);
 	};
 
+	// Decide whether the value is a plain object or not
+	var isObject = function(val)
+	{
+		return val != null && val.constructor == Object;
+	};
+
+	// Decide whether the value is a plain array or not
+	var isArray = function(val)
+	{
+		return val != null && val.constructor == Array;
+	};
+
 	// Flatten the hierarchical array
 	var flatten = function(arr, lev, res)
 	{
@@ -1955,6 +1967,64 @@
 			return this.add(new ReverseOp());
 		};
 
+		this.select = function()
+		{
+			if (arguments.length > 0)
+			{
+				var arg = arguments[0], map = null;
+				if (isObject(arg))
+				{
+					map = arg;
+				}
+				else
+				{
+					map = {};
+					var list = isArray(arg) ? arg : arguments;
+					var item = null;
+					for (var i = 0; i < list.length; i++)
+					{
+						item = list[i];
+						if (typeof item === "string")
+						{
+							map[item] = item;
+						}
+						else if (typeof item === "function" && item.alias != null)
+						{
+							map[item.alias] = item;
+						}
+					}
+				}
+
+				var fields = {}, field = null;
+				for ( var k in map)
+				{
+					if (map.hasOwnProperty(k))
+					{
+						fields[k] = Canal.field(map[k], k);
+					}
+				}
+
+				return this.map(function(d)
+				{
+					var r = {};
+
+					for ( var k in fields)
+					{
+						if (fields.hasOwnProperty(k))
+						{
+							r[k] = fields[k](d);
+						}
+					}
+
+					return r;
+				});
+			}
+			else
+			{
+				return this;
+			}
+		};
+
 		this.skip = function(num)
 		{
 			return this.add(new SkipOp(num));
@@ -2444,12 +2514,12 @@
 
 	Canal.field = function(picker, alias)
 	{
-		picker = Canal.wrapPicker(picker);
-
 		if (alias == null && picker != null && typeof picker !== "function")
 		{
 			alias = picker.toString();
 		}
+
+		picker = Canal.wrapPicker(picker);
 
 		picker.alias = alias;
 
