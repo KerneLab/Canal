@@ -1967,77 +1967,6 @@
 			return this.add(new ReverseOp());
 		};
 
-		this.select = function()
-		{
-			if (arguments.length > 0)
-			{
-				var arg = arguments[0], map = null;
-				if (isObject(arg))
-				{
-					map = arg;
-				}
-				else
-				{
-					map = {};
-					var list = isArray(arg) ? arg : arguments;
-					var item = null;
-					for (var i = 0; i < list.length; i++)
-					{
-						item = list[i];
-						if (typeof item === "string")
-						{
-							map[item] = item;
-						}
-						else if (typeof item === "function" && item.alias != null)
-						{
-							map[item.alias] = item;
-						}
-					}
-				}
-
-				var fields = {}, field = null;
-				for ( var k in map)
-				{
-					if (map.hasOwnProperty(k))
-					{
-						fields[k] = Canal.field(map[k], k);
-					}
-				}
-
-				return this.map(function(d)
-				{
-					var r = {};
-
-					for ( var k in fields)
-					{
-						if (fields.hasOwnProperty(k))
-						{
-							r[k] = fields[k](d);
-						}
-					}
-
-					return r;
-				});
-			}
-			else
-			{
-				return this.map(function(d)
-				{
-					var r = {};
-
-					for ( var k in d)
-					{
-						if (d.hasOwnProperty(k))
-						{
-							r[k] = d[k];
-						}
-					}
-
-					return r;
-				});
-			}
-		};
-
 		this.skip = function(num)
 		{
 			return this.add(new SkipOp(num));
@@ -2071,29 +2000,6 @@
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
-		};
-
-		this.window = function()
-		{
-			var c = this;
-
-			for (var i = 0; i < arguments.length; i++)
-			{
-				var item = arguments[i];
-
-				var aggr = item["aggr"];
-				var updt = item["updt"];
-				var expr = item["expr"];
-				var alias = item["alias"];
-				var partBy = item["part"];
-				var orderBy = item["order"];
-				var between = item["scope"];
-				var byRows = item["byRows"];
-
-				c = addWindowItem(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows);
-			}
-
-			return c;
 		};
 
 		this.zip = function(that)
@@ -2195,6 +2101,102 @@
 		this.unpack = function(unpacker)
 		{
 			return this.add(new UnpackOp(unpacker));
+		};
+
+		// Object Intermediate Operations
+
+		this.select = function()
+		{
+			if (arguments.length > 0)
+			{
+				var arg = arguments[0], map = null;
+				if (isObject(arg))
+				{
+					map = arg;
+				}
+				else
+				{
+					map = {};
+					var list = isArray(arg) ? arg : arguments;
+					var item = null;
+					for (var i = 0; i < list.length; i++)
+					{
+						item = list[i];
+						if (typeof item === "string")
+						{
+							map[item] = item;
+						}
+						else if (typeof item === "function" && item.alias != null)
+						{
+							map[item.alias] = item;
+						}
+					}
+				}
+
+				var fields = {}, field = null;
+				for ( var k in map)
+				{
+					if (map.hasOwnProperty(k))
+					{
+						fields[k] = Canal.field(map[k], k);
+					}
+				}
+
+				return this.map(function(d)
+				{
+					var r = {};
+
+					for ( var k in fields)
+					{
+						if (fields.hasOwnProperty(k))
+						{
+							r[k] = fields[k](d);
+						}
+					}
+
+					return r;
+				});
+			}
+			else
+			{
+				return this.map(function(d)
+				{
+					var r = {};
+
+					for ( var k in d)
+					{
+						if (d.hasOwnProperty(k))
+						{
+							r[k] = d[k];
+						}
+					}
+
+					return r;
+				});
+			}
+		};
+
+		this.window = function()
+		{
+			var c = this;
+
+			for (var i = 0; i < arguments.length; i++)
+			{
+				var item = arguments[i];
+
+				var aggr = item["aggr"];
+				var updt = item["updt"];
+				var expr = item["expr"];
+				var alias = item["alias"];
+				var partBy = item["part"];
+				var orderBy = item["order"];
+				var between = item["scope"];
+				var byRows = item["byRows"];
+
+				c = addWindowItem(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows);
+			}
+
+			return c;
 		};
 
 		// General Terminate Operations
