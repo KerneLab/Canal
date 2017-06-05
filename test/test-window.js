@@ -1,15 +1,18 @@
+var dataSource = [
+	{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+	{"id":"2","grp":"1","rnk":1,"sal":1100.00},
+	{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+	{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+	{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+	{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+	{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+	{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+];
+
 QUnit.test("window() row_number", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.row_number()
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -32,16 +35,8 @@ QUnit.test("window() count", function(assert)
 {
 	var f = Canal.field;
 	
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.count(f("id"))
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -64,16 +59,8 @@ QUnit.test("window() count distinct", function(assert)
 {
 	var f = Canal.field;
 	
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.count(f("rnk"), true)
 			.partBy(function(d){return d.grp;})
 			.as("count")
@@ -94,16 +81,8 @@ QUnit.test("window() count distinct", function(assert)
 
 QUnit.test("window() sum", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -124,16 +103,8 @@ QUnit.test("window() sum", function(assert)
 
 QUnit.test("window() sum partBy(null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(null)
 			.orderBy(function(d){return d.rnk;})
@@ -154,16 +125,8 @@ QUnit.test("window() sum partBy(null)", function(assert)
 
 QUnit.test("window() sum orderBy(null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(null)
@@ -184,16 +147,8 @@ QUnit.test("window() sum orderBy(null)", function(assert)
 
 QUnit.test("window() sum partBy(null) orderBy(null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(){return null;})
 			.orderBy(function(){return null;})
@@ -214,16 +169,8 @@ QUnit.test("window() sum partBy(null) orderBy(null)", function(assert)
 
 QUnit.test("window() sum rows(-1,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -247,16 +194,8 @@ QUnit.test("window() sum desc rows(-1,1)", function(assert)
 {
 	var f = Canal.field;
 	
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(f("grp"))
 			.orderBy(f("rnk"), false, function(d){return parseInt(d.id);}, true)
@@ -278,16 +217,8 @@ QUnit.test("window() sum desc rows(-1,1)", function(assert)
 
 QUnit.test("window() sum rows(0,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy("rnk")
@@ -309,16 +240,8 @@ QUnit.test("window() sum rows(0,1)", function(assert)
 
 QUnit.test("window() sum rows(0,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -340,16 +263,8 @@ QUnit.test("window() sum rows(0,null)", function(assert)
 
 QUnit.test("window() sum desc rows(0,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
@@ -371,16 +286,8 @@ QUnit.test("window() sum desc rows(0,null)", function(assert)
 
 QUnit.test("window() sum rows(-2,-1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -402,16 +309,8 @@ QUnit.test("window() sum rows(-2,-1)", function(assert)
 
 QUnit.test("window() sum desc rows(-2,-1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
@@ -433,16 +332,8 @@ QUnit.test("window() sum desc rows(-2,-1)", function(assert)
 
 QUnit.test("window() sum rows(-1,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -464,16 +355,8 @@ QUnit.test("window() sum rows(-1,0)", function(assert)
 
 QUnit.test("window() sum desc rows(-1,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
@@ -495,16 +378,8 @@ QUnit.test("window() sum desc rows(-1,0)", function(assert)
 
 QUnit.test("window() sum rows(null,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -526,16 +401,8 @@ QUnit.test("window() sum rows(null,0)", function(assert)
 
 QUnit.test("window() sum desc rows(null,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
@@ -557,16 +424,8 @@ QUnit.test("window() sum desc rows(null,0)", function(assert)
 
 QUnit.test("window() sum rows(1,2)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -588,16 +447,8 @@ QUnit.test("window() sum rows(1,2)", function(assert)
 
 QUnit.test("window() sum desc rows(1,2)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
@@ -619,16 +470,8 @@ QUnit.test("window() sum desc rows(1,2)", function(assert)
 
 QUnit.test("window() sum range(-1,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -650,16 +493,8 @@ QUnit.test("window() sum range(-1,1)", function(assert)
 
 QUnit.test("window() sum desc range(-1,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -681,16 +516,8 @@ QUnit.test("window() sum desc range(-1,1)", function(assert)
 
 QUnit.test("window() sum range(-1,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -712,16 +539,8 @@ QUnit.test("window() sum range(-1,0)", function(assert)
 
 QUnit.test("window() sum desc range(-1,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -743,16 +562,8 @@ QUnit.test("window() sum desc range(-1,0)", function(assert)
 
 QUnit.test("window() sum range(0,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -774,16 +585,8 @@ QUnit.test("window() sum range(0,1)", function(assert)
 
 QUnit.test("window() sum desc range(0,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -805,16 +608,8 @@ QUnit.test("window() sum desc range(0,1)", function(assert)
 
 QUnit.test("window() sum range(0,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -836,16 +631,8 @@ QUnit.test("window() sum range(0,null)", function(assert)
 
 QUnit.test("window() sum desc range(0,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -867,16 +654,8 @@ QUnit.test("window() sum desc range(0,null)", function(assert)
 
 QUnit.test("window() sum range(-1,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -898,16 +677,8 @@ QUnit.test("window() sum range(-1,null)", function(assert)
 
 QUnit.test("window() sum desc range(-1,null)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -929,16 +700,8 @@ QUnit.test("window() sum desc range(-1,null)", function(assert)
 
 QUnit.test("window() sum range(null,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -960,16 +723,8 @@ QUnit.test("window() sum range(null,0)", function(assert)
 
 QUnit.test("window() sum desc range(null,0)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -991,16 +746,8 @@ QUnit.test("window() sum desc range(null,0)", function(assert)
 
 QUnit.test("window() sum range(null,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -1022,16 +769,8 @@ QUnit.test("window() sum range(null,1)", function(assert)
 
 QUnit.test("window() sum desc range(null,1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -1053,16 +792,8 @@ QUnit.test("window() sum desc range(null,1)", function(assert)
 
 QUnit.test("window() sum range(1,2)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -1084,16 +815,8 @@ QUnit.test("window() sum range(1,2)", function(assert)
 
 QUnit.test("window() sum desc range(1,2)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -1115,16 +838,8 @@ QUnit.test("window() sum desc range(1,2)", function(assert)
 
 QUnit.test("window() sum range(-2,-1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
@@ -1146,16 +861,8 @@ QUnit.test("window() sum range(-2,-1)", function(assert)
 
 QUnit.test("window() sum desc range(-2,-1)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.sum(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;}, false)
@@ -1177,16 +884,8 @@ QUnit.test("window() sum desc range(-2,-1)", function(assert)
 
 QUnit.test("window() min part(grp) order(rnk)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.min(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk})
@@ -1207,16 +906,8 @@ QUnit.test("window() min part(grp) order(rnk)", function(assert)
 
 QUnit.test("window() min part(grp,rnk)", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.min(function(d){return d.sal;})
 			.partBy(function(d){return d.grp;}, function(d){return d.rnk})
 			.as("min_sal")
@@ -1236,16 +927,8 @@ QUnit.test("window() min part(grp,rnk)", function(assert)
 
 QUnit.test("window() rank", function(assert)
 {
-	var result = Canal.of([
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
-		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
-	]).window(
+	var result = Canal.of(dataSource).select()
+	.window(
 		Canal.wf.rank()
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
