@@ -2021,7 +2021,20 @@
 			}
 			else
 			{
-				return this;
+				return this.map(function(d)
+				{
+					var r = {};
+
+					for ( var k in d)
+					{
+						if (d.hasOwnProperty(k))
+						{
+							r[k] = d[k];
+						}
+					}
+
+					return r;
+				});
 			}
 		};
 
