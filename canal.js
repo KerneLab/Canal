@@ -2529,9 +2529,16 @@
 
 	Canal.field = function(picker, alias)
 	{
-		if (alias == null && picker != null && typeof picker !== "function")
+		if (alias == null && picker != null)
 		{
-			alias = picker.toString();
+			if (typeof picker !== "function")
+			{
+				alias = picker.toString();
+			}
+			else
+			{
+				alias = picker.alias;
+			}
 		}
 
 		picker = Canal.wrapPicker(picker);
@@ -2669,13 +2676,96 @@
 	};
 
 	Canal.wf = {
-		"row_number" : function()
+		"count" : function(vop) // vop[,distinct[,cmp]]
+		{
+			var distinct = arguments.length > 1 && arguments[1] === true;
+			var cmp = null;
+			if (distinct)
+			{
+				cmp = arguments[2];
+			}
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				var c = Canal.of(rows, begin, end).map(vop);
+				if (distinct)
+				{
+					c = c.distinct(cmp);
+				}
+				return c.count();
+			});
+		},
+		"dense_rank" : function()
 		{
 			return Canal.item({
-				"expr" : function(curntPos)
+				"aggr" : function(levels)
 				{
-					return curntPos + 1;
+					return Canal.of(levels).flatMap(function(level, group)
+					{
+						return Canal.of(level).map(function(d, row)
+						{
+							return {
+								"grp" : group
+							};
+						}).collect();
+					}) //
+					.window( //
+					Canal.wf.row_number() //
+					.partBy(function(d)
+					{
+						return null;
+					}).as("seq") //
+					) //
+					.map(function(d)
+					{
+						return [ d["seq"] - 1, d["grp"] + 1 ];
+					}).collectAsMap();
+				},
+				"expr" : function(pos, agg)
+				{
+					return agg[pos];
 				}
+			});
+		},
+		"max" : function(vop)
+		{
+			var cmp = arguments.length > 1 ? arguments[1] : signum;
+
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.reduce(function(a, b)
+				{
+					if (cmp(a, b) < 0)
+					{
+						return b;
+					}
+					else
+					{
+						return a;
+					}
+				}).get();
+			});
+		},
+		"min" : function(vop)
+		{
+			var cmp = arguments.length > 1 ? arguments[1] : signum;
+
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.reduce(function(a, b)
+				{
+					if (cmp(a, b) > 0)
+					{
+						return b;
+					}
+					else
+					{
+						return a;
+					}
+				}).get();
 			});
 		},
 		"rank" : function()
@@ -2717,22 +2807,13 @@
 				}
 			});
 		},
-		"count" : function(vop) // vop[,distinct[,cmp]]
+		"row_number" : function()
 		{
-			var distinct = arguments.length > 1 && arguments[1] === true;
-			var cmp = null;
-			if (distinct)
-			{
-				cmp = arguments[2];
-			}
-			return Canal.item(function(agg, rows, begin, end)
-			{
-				var c = Canal.of(rows, begin, end).map(vop);
-				if (distinct)
+			return Canal.item({
+				"expr" : function(curntPos)
 				{
-					c = c.distinct(cmp);
+					return curntPos + 1;
 				}
-				return c.count();
 			});
 		},
 		"sum" : function(vop)
@@ -2744,48 +2825,6 @@
 				.reduce(function(a, b)
 				{
 					return a + b;
-				}).get();
-			});
-		},
-		"min" : function(vop)
-		{
-			var cmp = arguments.length > 1 ? arguments[1] : signum;
-
-			return Canal.item(function(agg, rows, begin, end)
-			{
-				return Canal.of(rows, begin, end) //
-				.map(vop) //
-				.reduce(function(a, b)
-				{
-					if (cmp(a, b) > 0)
-					{
-						return b;
-					}
-					else
-					{
-						return a;
-					}
-				}).get();
-			});
-		},
-		"max" : function(vop)
-		{
-			var cmp = arguments.length > 1 ? arguments[1] : signum;
-
-			return Canal.item(function(agg, rows, begin, end)
-			{
-				return Canal.of(rows, begin, end) //
-				.map(vop) //
-				.reduce(function(a, b)
-				{
-					if (cmp(a, b) < 0)
-					{
-						return b;
-					}
-					else
-					{
-						return a;
-					}
 				}).get();
 			});
 		}
