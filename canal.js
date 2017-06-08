@@ -2703,22 +2703,21 @@
 					{
 						return Canal.of(level).map(function(d, row)
 						{
-							return {
-								"grp" : group
-							};
+							return group + 1;
 						}).collect();
 					}) //
-					.window( //
-					Canal.wf.row_number() //
-					.partBy(function(d)
+					.map(function(d, i)
 					{
-						return null;
-					}).as("seq") //
-					) //
+						return [ i, d ];
+					}) //
+					.sortBy(function(d)
+					{
+						return d[0];
+					}) //
 					.map(function(d)
 					{
-						return [ d["seq"] - 1, d["grp"] + 1 ];
-					}).collectAsMap();
+						return d[1];
+					}).collect();
 				},
 				"expr" : function(pos, agg)
 				{
@@ -2768,6 +2767,38 @@
 				}).get();
 			});
 		},
+		"percent_rank" : function()
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					var len = levels.length - 1;
+					return Canal.of(levels).flatMap(function(level, group)
+					{
+						return Canal.of(level).map(function(d, row)
+						{
+							return group;
+						}).collect();
+					}) //
+					.map(function(d, i)
+					{
+						return [ i, d ];
+					}) //
+					.sortBy(function(d)
+					{
+						return d[0];
+					}) //
+					.map(function(d)
+					{
+						return len == 0 ? 0 : d[1] / len;
+					}).collect();
+				},
+				"expr" : function(pos, agg)
+				{
+					return agg[pos];
+				}
+			});
+		},
 		"rank" : function()
 		{
 			return Canal.item({
@@ -2777,29 +2808,37 @@
 					{
 						return Canal.of(level).map(function(d, row)
 						{
-							return {
-								"grp" : group
-							};
+							return group;
 						}).collect();
 					}) //
-					.window( //
-					Canal.wf.row_number() //
-					.partBy(function(d)
+					.map(function(d, i)
 					{
-						return null;
-					}).as("seq"), //
-					Canal.wf.min(function(d)
+						return [ d, i + 1 ];
+					}) //
+					.groupBy() //
+					.map(function(p)
 					{
-						return d["seq"];
-					}).partBy(function(d)
+						return p[1];
+					}) //
+					.flatMap(function(arr)
 					{
-						return d["grp"];
-					}).as("min") //
-					) //
+						var min = Canal.of(arr).reduce(function(a, b)
+						{
+							return Math.min(a, b);
+						}).get();
+						return Canal.of(arr).map(function(d)
+						{
+							return [ d, min ];
+						}).collect();
+					}) //
+					.sortBy(function(d)
+					{
+						return d[0];
+					}) //
 					.map(function(d)
 					{
-						return [ d["seq"] - 1, d["min"] ];
-					}).collectAsMap();
+						return d[1];
+					}).collect();
 				},
 				"expr" : function(pos, agg)
 				{
@@ -2810,9 +2849,9 @@
 		"row_number" : function()
 		{
 			return Canal.item({
-				"expr" : function(curntPos)
+				"expr" : function(pos)
 				{
-					return curntPos + 1;
+					return pos + 1;
 				}
 			});
 		},

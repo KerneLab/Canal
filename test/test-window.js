@@ -968,3 +968,25 @@ QUnit.test("window() dense_rank", function(assert)
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":2}
 	]);
 });
+
+QUnit.test("window() percent_rank", function(assert)
+{
+	var result = Canal.of(dataSource).select()
+	.window(
+		Canal.wf.percent_rank()
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk;})
+			.as("pct_rnk")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"pct_rnk":0},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"pct_rnk":0},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"pct_rnk":0.5},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"pct_rnk":0.5},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"pct_rnk":1},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"pct_rnk":0},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"pct_rnk":0},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"pct_rnk":1}
+	]);
+});
