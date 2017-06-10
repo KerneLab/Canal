@@ -990,3 +990,47 @@ QUnit.test("window() percent_rank", function(assert)
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"pct_rnk":1}
 	]);
 });
+
+QUnit.test("window() ntile(4)", function(assert)
+{
+	var result = Canal.of(dataSource).select()
+	.window(
+		Canal.wf.ntile(4)
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk;})
+			.as("ntle")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ntle":3},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ntle":4},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ntle":1},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ntle":2},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":3}
+	]);
+});
+
+QUnit.test("window() ntile(3)", function(assert)
+{
+	var result = Canal.of(dataSource).select()
+	.window(
+		Canal.wf.ntile(3)
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk;})
+			.as("ntle")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ntle":2},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ntle":3},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ntle":1},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ntle":2},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":3}
+	]);
+});

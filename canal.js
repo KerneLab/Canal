@@ -2767,12 +2767,45 @@
 				}).get();
 			});
 		},
+		"ntile" : function(num)
+		{
+			num = Math.max(num, 1);
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					var rows = Canal.of(levels).flatMap(function(level)
+					{
+						return level;
+					});
+					var totalRows = rows.count();
+					var eachRows = Math.max(Math.floor(totalRows / num), 1);
+					var restRows = totalRows <= num ? 0 : totalRows % num;
+					var res = [];
+					for (var i = 1; i <= num; i++)
+					{
+						for (var j = 0; j < eachRows; j++)
+						{
+							res.push(i);
+						}
+						if (i <= restRows)
+						{
+							res.push(i);
+						}
+					}
+					return res;
+				},
+				"expr" : function(pos, agg)
+				{
+					return agg[pos];
+				}
+			});
+		},
 		"percent_rank" : function()
 		{
 			return Canal.item({
 				"aggr" : function(levels)
 				{
-					var len = levels.length - 1;
+					var lvs = levels.length - 1;
 					return Canal.of(levels).flatMap(function(level, group)
 					{
 						return Canal.of(level).map(function(d, row)
@@ -2790,7 +2823,7 @@
 					}) //
 					.map(function(d)
 					{
-						return len == 0 ? 0 : d[1] / len;
+						return lvs == 0 ? 0 : d[1] / lvs;
 					}).collect();
 				},
 				"expr" : function(pos, agg)
