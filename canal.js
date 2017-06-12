@@ -2725,6 +2725,33 @@
 				}
 			});
 		},
+		"lag" : function(vop)
+		{
+			var off = Math.max(arguments.length > 1 ? arguments[1] : 1, 0);
+			return Canal.item({
+				"expr" : function(pos, res, rows)
+				{
+					return pos - off < 0 ? undefined : vop(rows[pos - off]);
+				}
+			});
+		},
+		"lead" : function(vop)
+		{
+			var off = Math.max(arguments.length > 1 ? arguments[1] : 1, 0);
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(lvl)
+					{
+						return lvl;
+					}).collect();
+				},
+				"expr" : function(pos, res)
+				{
+					return pos + off >= res.length ? undefined : vop(res[pos + off]);
+				}
+			});
+		},
 		"max" : function(vop)
 		{
 			var cmp = arguments.length > 1 ? arguments[1] : signum;
