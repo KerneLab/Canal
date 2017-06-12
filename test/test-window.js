@@ -1085,20 +1085,20 @@ QUnit.test("window() lag()", function(assert)
 {
 	var result = Canal.of(dataSource).select()
 	.window(
-		Canal.wf.lag(function(d){return d.sal;}, 2)
+		Canal.wf.lag(function(d){return d.sal;}, 2, "N/A")
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
 			.as("lg")
 	).collect();
 
 	assert.propEqual(result, [
-		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"lg":undefined},
-		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"lg":undefined},
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"lg":"N/A"},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"lg":"N/A"},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"lg":1000.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"lg":1100.00},
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"lg":1200.00},
-		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"lg":undefined},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"lg":undefined},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"lg":"N/A"},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"lg":"N/A"},
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"lg":1500.00}
 	]);
 });
@@ -1107,7 +1107,7 @@ QUnit.test("window() lead()", function(assert)
 {
 	var result = Canal.of(dataSource).select()
 	.window(
-		Canal.wf.lead(function(d){return d.sal;}, 2)
+		Canal.wf.lead(function(d){return d.sal;}, 2, "N/A")
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
 			.as("ld")
@@ -1117,10 +1117,10 @@ QUnit.test("window() lead()", function(assert)
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ld":1200.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ld":1300.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ld":1400.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ld":undefined},
-		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ld":undefined},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ld":"N/A"},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ld":"N/A"},
 		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ld":1700.00},
-		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ld":undefined},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ld":undefined}
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ld":"N/A"},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ld":"N/A"}
 	]);
 });

@@ -2728,16 +2728,18 @@
 		"lag" : function(vop)
 		{
 			var off = Math.max(arguments.length > 1 ? arguments[1] : 1, 0);
+			var def = arguments.length > 2 ? arguments[2] : undefined;
 			return Canal.item({
 				"expr" : function(pos, res, rows)
 				{
-					return pos - off < 0 ? undefined : vop(rows[pos - off]);
+					return pos - off < 0 ? def : vop(rows[pos - off]);
 				}
 			});
 		},
 		"lead" : function(vop)
 		{
 			var off = Math.max(arguments.length > 1 ? arguments[1] : 1, 0);
+			var def = arguments.length > 2 ? arguments[2] : undefined;
 			return Canal.item({
 				"aggr" : function(levels)
 				{
@@ -2748,7 +2750,7 @@
 				},
 				"expr" : function(pos, res)
 				{
-					return pos + off >= res.length ? undefined : vop(res[pos + off]);
+					return pos + off >= res.length ? def : vop(res[pos + off]);
 				}
 			});
 		},
