@@ -2694,6 +2694,22 @@
 				return c.count();
 			});
 		},
+		"cume_dist" : function()
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(lvl)
+					{
+						return lvl;
+					}).count();
+				},
+				"updt" : function(agg, rows, begin, end)
+				{
+					return rows.length / agg;
+				}
+			});
+		},
 		"dense_rank" : function()
 		{
 			return Canal.item({
