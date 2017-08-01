@@ -645,7 +645,7 @@
 		if (this.downstream != null)
 		{
 			var left = this.settle();
-			var right = this.that().groupBy(this.keyR, this.valR).collectAsMap();
+			var right = this.that().groupByKey(this.keyR, this.valR).collectAsMap();
 
 			var base = this.base(left, right);
 			var down = this.downstream;
@@ -752,7 +752,7 @@
 
 				for (var i = 0; i < those.length; i++)
 				{
-					settle = those[i].groupBy().collectAsMap();
+					settle = those[i].groupByKey().collectAsMap();
 					for ( var k in settle)
 					{
 						if (settle.hasOwnProperty(k))
@@ -1925,9 +1925,13 @@
 			return this.add(new FlatMapOp(mapper));
 		};
 
-		this.groupBy = function()
+		this.groupBy = function(kop)
 		{
-			return this.add(new GroupOp(arguments[0], arguments[1]));
+			var vop = arguments.length > 1 ? arguments[1] : function(obj)
+			{
+				return obj;
+			}
+			return this.add(new GroupOp(kop, vop));
 		};
 
 		this.intersection = function(that)
@@ -2030,7 +2034,7 @@
 
 		this.foldByKey = function(zero, folder)
 		{
-			return this.groupBy(arguments[2], arguments[3]) //
+			return this.groupByKey(arguments[2], arguments[3]) //
 			.mapValues(function(arr, key)
 			{
 				return Canal.of(arr).fold(zero(key), folder);
@@ -2040,6 +2044,11 @@
 		this.fullJoin = function(that)
 		{
 			return this.add(new FullJoinOp(that, arguments[1], arguments[2], arguments[3], arguments[4]));
+		};
+
+		this.groupByKey = function()
+		{
+			return this.add(new GroupOp(arguments[0], arguments[1]));
 		};
 
 		this.join = function(that)
@@ -2069,7 +2078,7 @@
 
 		this.reduceByKey = function(reducer)
 		{
-			return this.groupBy(arguments[1], arguments[2]) //
+			return this.groupByKey(arguments[1], arguments[2]) //
 			.mapValues(function(arr, key)
 			{
 				return Canal.of(arr).reduce(reducer).get();
@@ -2226,7 +2235,7 @@
 			return this.map(function(d)
 			{
 				return [ val(d), 1 ];
-			}).groupBy().mapValues(function(arr)
+			}).groupByKey().mapValues(function(arr)
 			{
 				return Canal.of(arr).fold(0, function(a, b)
 				{
@@ -2893,7 +2902,7 @@
 					{
 						return [ d, i + 1 ];
 					}) //
-					.groupBy() //
+					.groupByKey() //
 					.map(function(p)
 					{
 						return p[1];

@@ -7,7 +7,7 @@ module.exports = function(grunt) {
     uglify: {
       options: {
         banner: '/*! canal.kernelab.org v<%= pkg.version %> <%= grunt.template.today("yyyy-mm-dd") %> */',
-        sourceMap: true,
+        sourceMap: false,
         sourceMapName: 'canal.min.map'
       },
       build: {
