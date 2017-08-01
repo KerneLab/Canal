@@ -1,4 +1,4 @@
-QUnit.test("groupBy() 1:1 0:2 1:3", function(assert)
+QUnit.test("groupBy() 0:2 1:3 0:4", function(assert)
 {
 	var result = Canal.of([ 2, 3, 4 ]) //
 	.groupBy(function(d)
