@@ -58,15 +58,14 @@ Canal.on(Array);
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
 .filter(function(d)
 {
-  return d > 2;
+	return d > 2;
 })
 .distinct()
 .sortWith()
-.map(function(d)
+.groupBy(function(d)
 {
-  return [ d % 2, d ];
+	return d % 2;
 })
-.groupBy()
 .collect();
 ```
 ```js
@@ -84,11 +83,10 @@ Canal.of([ 4, 0, 3, 5, 2, 4 ])
 })
 .distinct()
 .sortWith()
-.map(function(d)
+.groupBy(function(d)
 {
-  return [ d % 2, d ];
+  return d % 2;
 })
-.groupBy()
 .join(Canal.of([ 0, 1, 2 ])
 .map(function(d)
 {
