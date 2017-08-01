@@ -58,13 +58,13 @@ Canal.on(Array);
 Canal.of([ 4, 0, 3, 5, 2, 4 ])
 .filter(function(d)
 {
-	return d > 2;
+  return d > 2;
 })
 .distinct()
 .sortWith()
 .groupBy(function(d)
 {
-	return d % 2;
+  return d % 2;
 })
 .collect();
 ```
