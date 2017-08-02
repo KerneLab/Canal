@@ -78,6 +78,56 @@ QUnit.test("window() count distinct", function(assert)
 	]);
 });
 
+QUnit.test("window() fold part order", function(assert)
+{
+	var result = Canal.of(dataSource).select()
+	.window(
+		Canal.wf.fold(function(){return [];},
+					  function(last,data){
+						last.push(data.sal);
+						return last;
+					  })
+			.partBy(function(d){return d.grp;})
+			.orderBy(function(d){return d.rnk;})
+			.as("fold_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00]},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00]},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00]},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00]},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1500.00,1600.00]},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1500.00,1600.00]},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00]}
+	]);
+});
+
+QUnit.test("window() fold part", function(assert)
+{
+	var result = Canal.of(dataSource).select()
+	.window(
+		Canal.wf.fold(function(){return [];},
+					  function(last,data){
+						last.push(data.sal);
+						return last;
+					  })
+			.partBy(function(d){return d.grp;})
+			.as("fold_sal")
+	).collect();
+
+	assert.propEqual(result, [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1500.00,1600.00,1700.00]},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1500.00,1600.00,1700.00]},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00]}
+	]);
+});
 
 QUnit.test("window() sum", function(assert)
 {

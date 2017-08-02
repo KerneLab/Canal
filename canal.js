@@ -245,16 +245,19 @@
 
 	var addWindowItem = function(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows)
 	{
+		// Aggregation on each partition
 		aggr = aggr != null ? aggr : function()
 		{
 			return undefined;
 		};
 
+		// Updater for each level
 		updt = updt != null ? updt : function(agg)
 		{
 			return agg;
 		};
 
+		// Expression for each row
 		expr = expr != null ? expr : function(pos, upd)
 		{
 			return upd;
@@ -2748,6 +2751,14 @@
 				{
 					return agg[pos];
 				}
+			});
+		},
+		"fold" : function(init, folder)
+		{
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.fold(init(), folder);
 			});
 		},
 		"lag" : function(vop)
