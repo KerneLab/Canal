@@ -2755,10 +2755,14 @@
 		},
 		"fold" : function(init, folder)
 		{
+			var vop = arguments[2] != null ? arguments[2] : function(d)
+			{
+				return d;
+			};
 			return Canal.item(function(agg, rows, begin, end)
 			{
 				return Canal.of(rows, begin, end) //
-				.fold(init(), folder);
+				.map(vop).fold(init(), folder);
 			});
 		},
 		"lag" : function(vop)

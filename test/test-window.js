@@ -84,8 +84,11 @@ QUnit.test("window() fold part order", function(assert)
 	.window(
 		Canal.wf.fold(function(){return [];},
 					  function(last,data){
-						last.push(data.sal);
+						last.push(data);
 						return last;
+					  },
+					  function(d){
+						return d.sal;
 					  })
 			.partBy(function(d){return d.grp;})
 			.orderBy(function(d){return d.rnk;})
