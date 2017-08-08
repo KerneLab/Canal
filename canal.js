@@ -867,6 +867,11 @@
 
 	function FlatMapOp(fn)
 	{
+		fn = fn != null ? fn : function(d)
+		{
+			return d;
+		};
+
 		function FlatMapPond()
 		{
 		}
@@ -2052,6 +2057,17 @@
 		this.groupByKey = function()
 		{
 			return this.add(new GroupOp(arguments[0], arguments[1]));
+		};
+
+		this.having = function(pred)
+		{
+			var val = arguments[1] != null ? arguments[1] : valOfPair;
+			var key = arguments[2] != null ? arguments[2] : keyOfPair;
+
+			return this.filter(function(data)
+			{
+				return pred(val(data), key(data));
+			});
 		};
 
 		this.join = function(that)
