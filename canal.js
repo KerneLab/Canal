@@ -1986,7 +1986,8 @@
 
 		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
 		{
-			return this.sortWith(generateComparator(arguments), true);
+			var orders = isArray(arguments[0]) ? arguments[0] : arguments;
+			return this.sortWith(generateComparator(orders), true);
 		};
 
 		this.sortWith = function() // [cmp[,asc]]
@@ -1996,7 +1997,8 @@
 
 		this.stratifyBy = function()
 		{
-			return this.stratifyWith(generateComparator(arguments), true);
+			var orders = isArray(arguments[0]) ? arguments[0] : arguments;
+			return this.stratifyWith(generateComparator(orders), true);
 		};
 
 		this.stratifyWith = function() // [cmp[,asc]]
