@@ -1986,7 +1986,7 @@
 
 		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
 		{
-			var orders = isArray(arguments[0]) ? arguments[0] : arguments;
+			var orders = arguments.length > 0 && isArray(arguments[0]) ? arguments[0] : arguments;
 			return this.sortWith(generateComparator(orders), true);
 		};
 
@@ -1997,7 +1997,7 @@
 
 		this.stratifyBy = function()
 		{
-			var orders = isArray(arguments[0]) ? arguments[0] : arguments;
+			var orders = arguments.length > 0 && isArray(arguments[0]) ? arguments[0] : arguments;
 			return this.stratifyWith(generateComparator(orders), true);
 		};
 
@@ -2222,6 +2222,10 @@
 				var orderBy = item["order"];
 				var between = item["scope"];
 				var byRows = item["byRows"];
+
+				partBy = partBy != null && partBy.length > 0 && isArray(partBy[0]) ? partBy[0] : partBy;
+				orderBy = orderBy != null && orderBy.length > 0 && isArray(orderBy[0]) ? orderBy[0] : orderBy;
+				between = between != null && between.length > 0 && isArray(between[0]) ? between[0] : between;
 
 				c = addWindowItem(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows);
 			}
