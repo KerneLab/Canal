@@ -3013,6 +3013,12 @@
 		delete cls.prototype[key];
 	};
 
+	Canal.unit = valOfData;
+
+	Canal.kop = keyOfPair;
+
+	Canal.vop = valOfPair;
+
 	if (typeof exports !== "undefined")
 	{
 		if (typeof module !== "undefined" && module.exports)
