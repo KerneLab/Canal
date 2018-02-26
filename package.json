@@ -29,7 +29,7 @@
     "js"
   ],
   "author": "kernelforce",
-  "license": "Apache-2.0",
+  "license": "MIT",
   "engines": {
     "node": ">=0.12"
   },
