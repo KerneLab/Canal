@@ -210,11 +210,6 @@
 	// Seek an index when the condition is satisfied
 	var seekIndexWhen = function(rows, kop, from, direct, last, cmp, val)
 	{
-		if (direct == 0)
-		{
-			return from;
-		}
-
 		var toTail = direct > 0 ? true : false;
 		var length = rows.length;
 
