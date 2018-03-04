@@ -1,3 +1,4 @@
+/*! canal.kernelab.org v1.0.30 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -911,7 +912,7 @@
 		FlattenPond.prototype = new Pond();
 		FlattenPond.prototype.accept = function(arr)
 		{
-			return this.downstream.accept(flatten(arr, level, []));
+			return this.downstream.accept(flatten(arr, level));
 		};
 
 		this.newPond = function()
