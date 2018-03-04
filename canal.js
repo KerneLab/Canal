@@ -128,35 +128,28 @@
 	// Generate the comparator according to the orders array
 	var generateComparator = function(orders)
 	{
-		if (orders != null)
-		{
-			var kops = [];
-			var ascs = [];
-			collectOrders(kops, ascs, orders);
+		var kops = [];
+		var ascs = [];
+		collectOrders(kops, ascs, orders);
 
-			return function(a, b)
-			{
-				var cmp = 0;
-				for (var i = 0; i < kops.length; i++)
-				{
-					var kop = kops[i];
-					cmp = signum(kop(a), kop(b));
-					if (cmp != 0)
-					{
-						if (!ascs[i])
-						{
-							cmp *= -1;
-						}
-						break;
-					}
-				}
-				return cmp;
-			};
-		}
-		else
+		return function(a, b)
 		{
-			return null;
-		}
+			var cmp = 0;
+			for (var i = 0; i < kops.length; i++)
+			{
+				var kop = kops[i];
+				cmp = signum(kop(a), kop(b));
+				if (cmp != 0)
+				{
+					if (!ascs[i])
+					{
+						cmp *= -1;
+					}
+					break;
+				}
+			}
+			return cmp;
+		};
 	};
 
 	// Sort the data and collect the "same" data into each array
