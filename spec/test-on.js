@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test on", function(){
 
@@ -8,7 +9,7 @@ it("on() Array", function()
 
 	var result = [ 1, 2, 3 ].canal().count();
 
-	expect(result).toEqual(3);
+	expect(result).to.eql(3);
 });
 
 it("on() Array key", function()
@@ -17,7 +18,7 @@ it("on() Array key", function()
 
 	var result = [ 1, 2, 3 ].$().count();
 
-	expect(result).toEqual(3);
+	expect(result).to.eql(3);
 });
 
 it("on() Array .canal(args)", function()
@@ -26,7 +27,7 @@ it("on() Array .canal(args)", function()
 
 	var result = [ 1, 2, 3, 4, 5 ].canal(1, 4).collect();
 
-	expect(result).toEqual([ 2, 3, 4 ]);
+	expect(result).to.eql([ 2, 3, 4 ]);
 });
 
 });

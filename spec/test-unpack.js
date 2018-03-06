@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test unpack", function(){
 
@@ -9,7 +10,7 @@ it("unpack() 3", function()
 	{
 		return a + b;
 	}).collect();
-	expect(result).toEqual([ 3, 5, 7 ]);
+	expect(result).to.eql([ 3, 5, 7 ]);
 });
 
 it("unpack() 1", function()
@@ -19,7 +20,7 @@ it("unpack() 1", function()
 	{
 		return a * b;
 	}).collect();
-	expect(result).toEqual([ 2 ]);
+	expect(result).to.eql([ 2 ]);
 });
 
 it("unpack() empty", function()
@@ -29,7 +30,7 @@ it("unpack() empty", function()
 	{
 		return a + b;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

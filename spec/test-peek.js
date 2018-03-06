@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test peek", function(){
 
@@ -9,8 +10,8 @@ it("peek() 1 2 3", function()
 	{
 		buffer.push(d + 0.5);
 	}).collect();
-	expect(result).toEqual([ 1, 2, 3 ]);
-	expect(buffer).toEqual([ 1.5, 2.5, 3.5 ]);
+	expect(result).to.eql([ 1, 2, 3 ]);
+	expect(buffer).to.eql([ 1.5, 2.5, 3.5 ]);
 });
 
 it("peek() 1 2 3 take(2)", function()
@@ -20,8 +21,8 @@ it("peek() 1 2 3 take(2)", function()
 	{
 		buffer.push(d + 0.5);
 	}).take(2);
-	expect(result).toEqual([ 1, 2 ]);
-	expect(buffer).toEqual([ 1.5, 2.5 ]);
+	expect(result).to.eql([ 1, 2 ]);
+	expect(buffer).to.eql([ 1.5, 2.5 ]);
 });
 
 it("peek() 1", function()
@@ -31,8 +32,8 @@ it("peek() 1", function()
 	{
 		buffer.push(d + 0.2);
 	}).collect();
-	expect(result).toEqual([ 1 ]);
-	expect(buffer).toEqual([ 1.2 ]);
+	expect(result).to.eql([ 1 ]);
+	expect(buffer).to.eql([ 1.2 ]);
 });
 
 it("peek() empty", function()
@@ -42,8 +43,8 @@ it("peek() empty", function()
 	{
 		buffer.push(d + 0.5);
 	}).collect();
-	expect(result).toEqual([]);
-	expect(buffer).toEqual([]);
+	expect(result).to.eql([]);
+	expect(buffer).to.eql([]);
 });
 
 });

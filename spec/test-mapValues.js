@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test mapValues", function()
 {
@@ -15,6 +16,6 @@ describe("Test mapValues", function()
 			return sum;
 		}).collect();
 
-		expect(result).toEqual([ [ "K1", 3 ], [ "K2", 4 ] ]);
+		expect(result).to.eql([ [ "K1", 3 ], [ "K2", 4 ] ]);
 	});
 });

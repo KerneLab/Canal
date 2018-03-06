@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test select", function(){
 
@@ -21,7 +22,7 @@ it("select()", function()
 			f(function(d){return d.sal+1000;},"salplus")
 	).collect();
 	
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rank":1,"salplus":2000.00},
 		{"id":"2","grp":"1","rank":1,"salplus":2100.00},
 		{"id":"3","grp":"1","rank":2,"salplus":2200.00},

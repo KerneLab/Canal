@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test keyBy", function(){
 
@@ -9,7 +10,7 @@ it("keyBy() 1 2 3", function()
 	{
 		return d + ".";
 	}).collect();
-	expect(result).toEqual([ [ "1.", 1 ], [ "2.", 2 ], [ "3.", 3 ] ]);
+	expect(result).to.eql([ [ "1.", 1 ], [ "2.", 2 ], [ "3.", 3 ] ]);
 });
 
 it("keyBy() 1", function()
@@ -19,7 +20,7 @@ it("keyBy() 1", function()
 	{
 		return d + ".";
 	}).collect();
-	expect(result).toEqual([ [ "1.", 1 ] ]);
+	expect(result).to.eql([ [ "1.", 1 ] ]);
 });
 
 it("keyBy() empty", function()
@@ -29,7 +30,7 @@ it("keyBy() empty", function()
 	{
 		return d + ".";
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

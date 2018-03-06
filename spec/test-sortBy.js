@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test sortBy", function(){
 
@@ -22,7 +23,7 @@ it("sortBy() desc", function()
 		return d.id;
 	}, false).collect();
 
-	expect(result).toEqual([ {
+	expect(result).to.eql([ {
 		"id" : 3,
 		"score" : 32
 	}, {
@@ -60,7 +61,7 @@ it("sortBy() asc desc", function()
 		return d.score;
 	}, false).collect();
 
-	expect(result).toEqual([ {
+	expect(result).to.eql([ {
 		"id" : 1,
 		"score" : 22
 	}, {
@@ -98,7 +99,7 @@ it("sortBy([asc desc])", function()
 		return d.score;
 	}, false]).collect();
 
-	expect(result).toEqual([ {
+	expect(result).to.eql([ {
 		"id" : 1,
 		"score" : 22
 	}, {

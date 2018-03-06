@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test Option", function(){
 
@@ -9,14 +10,14 @@ it("Some()", function()
 		return d + 1;
 	}).collect();
 
-	expect(result).toEqual([ 2 ]);
+	expect(result).to.eql([ 2 ]);
 });
 
 it("None()", function()
 {
 	var result = Canal.None().collect();
 
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

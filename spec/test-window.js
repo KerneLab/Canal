@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test window", function(){
 
@@ -23,7 +24,7 @@ it("window() row_number", function()
 			.as("row_num")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"row_num":1},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"row_num":2},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"row_num":3},
@@ -47,7 +48,7 @@ it("window() count", function()
 			.as("count")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":2},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":2},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":4},
@@ -70,7 +71,7 @@ it("window() count distinct", function()
 			.as("count")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":3},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":3},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":3},
@@ -99,7 +100,7 @@ it("window() fold part order", function()
 			.as("fold_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00]},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00]},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00]},
@@ -124,7 +125,7 @@ it("window() fold part", function()
 			.as("fold_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
@@ -146,7 +147,7 @@ it("window() sum", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
@@ -168,7 +169,7 @@ it("window() sum partBy(null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":5200.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":5200.00},
 		{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":5200.00},
@@ -190,7 +191,7 @@ it("window() sum orderBy(null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
@@ -212,7 +213,7 @@ it("window() sum partBy(null) orderBy(null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":10800.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":10800.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":10800.00},
@@ -235,7 +236,7 @@ it("window() sum rows(-1,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3600.00},
@@ -258,7 +259,7 @@ it("window() sum rows(-1,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3600.00},
@@ -283,7 +284,7 @@ it("window() sum desc rows(-1,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3500.00},
@@ -306,7 +307,7 @@ it("window() sum rows(0,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2300.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2500.00},
@@ -329,7 +330,7 @@ it("window() sum rows(0,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":5000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
@@ -352,7 +353,7 @@ it("window() sum desc rows(0,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3400.00},
@@ -375,7 +376,7 @@ it("window() sum rows(-2,-1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":undefined},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":1000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
@@ -398,7 +399,7 @@ it("window() sum desc rows(-2,-1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2600.00},
@@ -421,7 +422,7 @@ it("window() sum rows(-1,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
@@ -444,7 +445,7 @@ it("window() sum desc rows(-1,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2500.00},
@@ -467,7 +468,7 @@ it("window() sum rows(null,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
@@ -490,7 +491,7 @@ it("window() sum desc rows(null,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
@@ -513,7 +514,7 @@ it("window() sum rows(1,2)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2300.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2500.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2700.00},
@@ -536,7 +537,7 @@ it("window() sum desc rows(1,2)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2500.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2100.00},
@@ -559,7 +560,7 @@ it("window() sum range(-1,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
@@ -582,7 +583,7 @@ it("window() sum desc range(-1,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
@@ -605,7 +606,7 @@ it("window() sum range(-1,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
@@ -628,7 +629,7 @@ it("window() sum desc range(-1,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
@@ -651,7 +652,7 @@ it("window() sum range(0,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
@@ -674,7 +675,7 @@ it("window() sum desc range(0,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
@@ -697,7 +698,7 @@ it("window() sum range(0,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
@@ -720,7 +721,7 @@ it("window() sum desc range(0,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
@@ -743,7 +744,7 @@ it("window() sum range(-1,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
@@ -766,7 +767,7 @@ it("window() sum desc range(-1,null)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
@@ -789,7 +790,7 @@ it("window() sum range(null,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
@@ -812,7 +813,7 @@ it("window() sum desc range(null,0)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
@@ -835,7 +836,7 @@ it("window() sum range(null,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
@@ -858,7 +859,7 @@ it("window() sum desc range(null,1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
@@ -881,7 +882,7 @@ it("window() sum range(1,2)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3900.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3900.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
@@ -904,7 +905,7 @@ it("window() sum desc range(1,2)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4600.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2100.00},
@@ -927,7 +928,7 @@ it("window() sum range(-2,-1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":undefined},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":undefined},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
@@ -950,7 +951,7 @@ it("window() sum desc range(-2,-1)", function()
 			.as("sum_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
 		{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":1400.00},
@@ -973,7 +974,7 @@ it("window() max part(grp) order(rnk)", function()
 			.as("max_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"max_sal":1100.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"max_sal":1200.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"max_sal":1300.00},
@@ -995,7 +996,7 @@ it("window() min part(grp) order(rnk)", function()
 			.as("min_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1000.00},
@@ -1018,7 +1019,7 @@ it("window() min part(grp) order(rnk) between(-1,0)", function()
 			.as("min_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1100.00},
@@ -1039,7 +1040,7 @@ it("window() min part(grp,rnk)", function()
 			.as("min_sal")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1200.00},
@@ -1061,7 +1062,7 @@ it("window() rank", function()
 			.as("rank")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"rank":1},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"rank":1},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"rank":3},
@@ -1083,7 +1084,7 @@ it("window() dense_rank", function()
 			.as("rank")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"rank":1},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"rank":1},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"rank":2},
@@ -1105,7 +1106,7 @@ it("window() percent_rank", function()
 			.as("pct_rnk")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"pct_rnk":0},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"pct_rnk":0},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"pct_rnk":0.5},
@@ -1127,7 +1128,7 @@ it("window() ntile(4)", function()
 			.as("ntle")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
@@ -1149,7 +1150,7 @@ it("window() ntile(3)", function()
 			.as("ntle")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
@@ -1171,7 +1172,7 @@ it("window() lag()", function()
 			.as("lg")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"lg":"N/A"},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"lg":"N/A"},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"lg":1000.00},
@@ -1193,7 +1194,7 @@ it("window() lead()", function()
 			.as("ld")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ld":1200.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ld":1300.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ld":1400.00},
@@ -1215,7 +1216,7 @@ it("window() cume_dist()", function()
 			.as("cum_dst")
 	).collect();
 
-	expect(result).toEqual([
+	expect(result).to.eql([
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00,"cum_dst":0.4},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00,"cum_dst":0.4},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00,"cum_dst":0.8},

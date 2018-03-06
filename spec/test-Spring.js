@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test Spring", function(){
 
@@ -15,7 +16,7 @@ it("Spring", function()
 			return Canal.eod();
 		}
 	}).collect();
-	expect(result).toEqual([ 0, 1, 2 ]);
+	expect(result).to.eql([ 0, 1, 2 ]);
 });
 
 it("Spring close", function()
@@ -37,9 +38,9 @@ it("Spring close", function()
 		closed = true;
 		number = n;
 	}).take(2);
-	expect(result).toEqual([ 0, 1 ]);
-	expect(closed).toBe(true);
-	expect(number).toBe(2);
+	expect(result).to.eql([ 0, 1 ]);
+	expect(closed).to.be(true);
+	expect(number).to.be(2);
 });
 
 });

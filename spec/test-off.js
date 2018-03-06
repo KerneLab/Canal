@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test off", function(){
 
@@ -8,7 +9,7 @@ it("off() Array", function()
 
 	var result = [ 1, 2, 3 ].canal().count();
 
-	expect(result).toEqual(3);
+	expect(result).to.eql(3);
 
 	Canal.off(Array);
 
@@ -23,7 +24,7 @@ it("off() Array", function()
 		other = 2;
 	}
 
-	expect(other).toEqual(2);
+	expect(other).to.eql(2);
 });
 
 it("off() Array key", function()
@@ -32,7 +33,7 @@ it("off() Array key", function()
 
 	var result = [ 1, 2, 3 ].$().count();
 
-	expect(result).toEqual(3);
+	expect(result).to.eql(3);
 
 	Canal.off(Array, "$");
 
@@ -47,7 +48,7 @@ it("off() Array key", function()
 		other = 2;
 	}
 
-	expect(other).toEqual(2);
+	expect(other).to.eql(2);
 });
 
 });

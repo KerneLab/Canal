@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test stratifyWith", function(){
 
@@ -17,7 +18,7 @@ it("stratifyWith()", function()
 		return a.id - b.id;
 	}, false).collect();
 
-	expect(result).toEqual(
+	expect(result).to.eql(
 	[ 
 	    [ {
 			"id" : 4
@@ -45,7 +46,7 @@ it("stratifyWith(null)", function()
 		"id" : 3
 	} ]).stratifyWith(null).collect();
 
-	expect(result).toEqual(
+	expect(result).to.eql(
 	[ 
 	    [ {
 		"id" : 4

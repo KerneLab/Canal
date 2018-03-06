@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test filter", function(){
 
@@ -8,7 +9,7 @@ it("filter() 1 2 3", function()
 	{
 		return d > 2;
 	}).collect();
-	expect(result).toEqual([ 3 ]);
+	expect(result).to.eql([ 3 ]);
 });
 
 it("filter() 1 2", function()
@@ -17,7 +18,7 @@ it("filter() 1 2", function()
 	{
 		return d > 2;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 it("filter() empty", function()
@@ -26,7 +27,7 @@ it("filter() empty", function()
 	{
 		return d > 2;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

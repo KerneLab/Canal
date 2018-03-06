@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test mapJoint", function(){
 
@@ -8,7 +9,7 @@ it("mapJoint()", function()
 	{
 		return k + ":" + "(" + l + "," + r + ")";
 	}).collect();
-	expect(result).toEqual([ "key:(L,0)" ]);
+	expect(result).to.eql([ "key:(L,0)" ]);
 });
 
 });

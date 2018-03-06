@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test flatMap", function(){
 
@@ -8,7 +9,7 @@ it("flatMap() 1->2", function()
 	{
 		return [ d, d + 0.5 ];
 	}).collect();
-	expect(result).toEqual([ 1, 1.5, 2, 2.5, 3, 3.5 ]);
+	expect(result).to.eql([ 1, 1.5, 2, 2.5, 3, 3.5 ]);
 });
 
 it("flatMap() 1->1", function()
@@ -17,7 +18,7 @@ it("flatMap() 1->1", function()
 	{
 		return [ d + 0.5 ];
 	}).collect();
-	expect(result).toEqual([ 1.5, 2.5, 3.5 ]);
+	expect(result).to.eql([ 1.5, 2.5, 3.5 ]);
 });
 
 it("flatMap() 1->0", function()
@@ -26,7 +27,7 @@ it("flatMap() 1->0", function()
 	{
 		return [];
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 it("flatMap() empty", function()
@@ -35,7 +36,7 @@ it("flatMap() empty", function()
 	{
 		return [ d, d + 0.5 ];
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

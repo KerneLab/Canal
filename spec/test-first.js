@@ -1,17 +1,18 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test first", function(){
 
 it("first()", function()
 {
 	var result = Canal.of([ 1, 2, 3 ]).first().or("_");
-	expect(result).toBe(1);
+	expect(result).to.be(1);
 });
 
 it("first() empty", function()
 {
 	var result = Canal.of([]).first().or("_");
-	expect(result).toBe("_");
+	expect(result).to.be("_");
 });
 
 it("first(pred)", function()
@@ -20,7 +21,7 @@ it("first(pred)", function()
 	{
 		return d > 2;
 	}).or("_");
-	expect(result).toBe(3);
+	expect(result).to.be(3);
 });
 
 it("first(pred) empty", function()
@@ -29,7 +30,7 @@ it("first(pred) empty", function()
 	{
 		return d > 2;
 	}).or("_");
-	expect(result).toBe("_");
+	expect(result).to.be("_");
 });
 
 });

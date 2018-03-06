@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test choose", function(){
 
@@ -9,7 +10,7 @@ it("choose() 1 2 3", function()
 	{
 		return a > b;
 	}).collect();
-	expect(result).toEqual([ [ 3, 2 ], [ 3, 1 ] ]);
+	expect(result).to.eql([ [ 3, 2 ], [ 3, 1 ] ]);
 });
 
 it("choose() 1", function()
@@ -19,7 +20,7 @@ it("choose() 1", function()
 	{
 		return a > b;
 	}).collect();
-	expect(result).toEqual([ [ 3, 2 ] ]);
+	expect(result).to.eql([ [ 3, 2 ] ]);
 });
 
 it("choose() 0", function()
@@ -29,7 +30,7 @@ it("choose() 0", function()
 	{
 		return a > b;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 it("choose() empty", function()
@@ -39,7 +40,7 @@ it("choose() empty", function()
 	{
 		return a > b;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

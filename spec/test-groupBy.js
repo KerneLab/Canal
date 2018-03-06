@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test groupBy", function(){
 
@@ -9,7 +10,7 @@ it("groupBy() 0:2 1:3 0:4", function()
 	{
 		return d % 2;
 	}).collect();
-	expect(result).toEqual([ [ "0", [ 2, 4 ] ], [ "1", [ 3 ] ] ]);
+	expect(result).to.eql([ [ "0", [ 2, 4 ] ], [ "1", [ 3 ] ] ]);
 });
 
 it("groupBy() 0:1", function()
@@ -22,14 +23,14 @@ it("groupBy() 0:1", function()
 	{
 		return d + 1;
 	}).collect();
-	expect(result).toEqual([ [ "0", [ 2 ] ] ]);
+	expect(result).to.eql([ [ "0", [ 2 ] ] ]);
 });
 
 it("groupBy() empty", function()
 {
 	var result = Canal.of([]) //
 	.groupBy().collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

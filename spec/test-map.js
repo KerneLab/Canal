@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test map", function(){
 
@@ -9,7 +10,7 @@ it("map() 1 2 3", function()
 	{
 		return d / 2;
 	}).collect();
-	expect(result).toEqual([ 0.5, 1, 1.5 ]);
+	expect(result).to.eql([ 0.5, 1, 1.5 ]);
 });
 
 it("map() 1", function()
@@ -19,7 +20,7 @@ it("map() 1", function()
 	{
 		return d / 2;
 	}).collect();
-	expect(result).toEqual([ 0.5 ]);
+	expect(result).to.eql([ 0.5 ]);
 });
 
 it("map() empty", function()
@@ -29,7 +30,7 @@ it("map() empty", function()
 	{
 		return d / 2;
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

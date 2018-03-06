@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test foreach", function(){
 
@@ -9,7 +10,7 @@ it("foreach()", function()
 	{
 		result.push(d + "-" + i);
 	});
-	expect(result).toEqual([ "1-0", "2-1", "3-2" ]);
+	expect(result).to.eql([ "1-0", "2-1", "3-2" ]);
 });
 
 it("foreach() 1", function()
@@ -19,7 +20,7 @@ it("foreach() 1", function()
 	{
 		result.push(d + "-" + i);
 	});
-	expect(result).toEqual([ "1-0" ]);
+	expect(result).to.eql([ "1-0" ]);
 });
 
 it("foreach() empty", function()
@@ -29,7 +30,7 @@ it("foreach() empty", function()
 	{
 		result.push(d + "-" + i);
 	});
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

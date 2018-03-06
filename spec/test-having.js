@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test having", function(){
 
@@ -11,7 +12,7 @@ it("having() 1 2 3", function()
 	{
 		return grp.length > 1;
 	}).values().flatMap().collect();
-	expect(result).toEqual([ 1, 3 ]);
+	expect(result).to.eql([ 1, 3 ]);
 });
 
 });

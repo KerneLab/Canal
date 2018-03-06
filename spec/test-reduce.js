@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test reduce", function(){
 
@@ -8,7 +9,7 @@ it("reduce()", function()
 	{
 		return a * b;
 	}).or("_");
-	expect(result).toEqual(24);
+	expect(result).to.eql(24);
 });
 
 it("reduce() 1 2", function()
@@ -17,7 +18,7 @@ it("reduce() 1 2", function()
 	{
 		return a * b;
 	}).or("_");
-	expect(result).toEqual(2);
+	expect(result).to.eql(2);
 });
 
 it("reduce() 1", function()
@@ -26,7 +27,7 @@ it("reduce() 1", function()
 	{
 		return a * b;
 	}).or("_");
-	expect(result).toEqual(1);
+	expect(result).to.eql(1);
 });
 
 it("reduce() empty", function()
@@ -35,7 +36,7 @@ it("reduce() empty", function()
 	{
 		return a * b;
 	}).or("_");
-	expect(result).toEqual("_");
+	expect(result).to.eql("_");
 });
 
 });

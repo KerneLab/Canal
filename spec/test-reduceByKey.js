@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test reduceByKey", function(){
 
@@ -9,7 +10,7 @@ it("reduceByKey()", function()
 	{
 		return a + b;
 	}).collect();
-	expect(result).toEqual([ [ "a", 3 ], [ "b", 4 ] ]);
+	expect(result).to.eql([ [ "a", 3 ], [ "b", 4 ] ]);
 });
 
 });

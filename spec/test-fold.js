@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test fold", function(){
 
@@ -9,7 +10,7 @@ it("fold()", function()
 		res[dat + "."] = dat;
 		return res;
 	});
-	expect(result).toEqual({
+	expect(result).to.eql({
 		"1." : 1,
 		"2." : 2,
 		"3." : 3
@@ -23,7 +24,7 @@ it("fold() 1", function()
 		res[dat + "."] = dat;
 		return res;
 	});
-	expect(result).toEqual({
+	expect(result).to.eql({
 		"1." : 1
 	});
 });
@@ -35,7 +36,7 @@ it("fold() empty", function()
 		res[dat + "."] = dat;
 		return res;
 	});
-	expect(result).toEqual({});
+	expect(result).to.eql({});
 });
 
 });

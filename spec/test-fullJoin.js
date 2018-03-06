@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test fullJoin", function(){
 
@@ -9,7 +10,7 @@ it("fullJoin()", function()
 	{
 		return [ l.or("_"), r.or("_") ];
 	}).collect();
-	expect(result).toEqual([ [ 1, "_" ], [ 2, 1 ], [ 3, 1 ], [ "_", 2 ] ]);
+	expect(result).to.eql([ [ 1, "_" ], [ 2, 1 ], [ 3, 1 ], [ "_", 2 ] ]);
 });
 
 it("fullJoin() 1 vs empty", function()
@@ -19,7 +20,7 @@ it("fullJoin() 1 vs empty", function()
 			{
 				return [ l.or("_"), r.or("_") ];
 			}).collect();
-	expect(result).toEqual([ [ 1, "_" ] ]);
+	expect(result).to.eql([ [ 1, "_" ] ]);
 });
 
 it("fullJoin() empty vs 1", function()
@@ -29,7 +30,7 @@ it("fullJoin() empty vs 1", function()
 			{
 				return [ l.or("_"), r.or("_") ];
 			}).collect();
-	expect(result).toEqual([ [ "_", 1 ] ]);
+	expect(result).to.eql([ [ "_", 1 ] ]);
 });
 
 it("fullJoin() empty vs empty", function()
@@ -38,7 +39,7 @@ it("fullJoin() empty vs empty", function()
 	{
 		return [ l.or("_"), r.or("_") ];
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });

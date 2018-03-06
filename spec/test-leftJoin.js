@@ -1,4 +1,5 @@
-var Canal = require('../canal');
+var Canal = require('../canal.js');
+var expect = require("expect.js");
 
 describe("Test leftJoin", function(){
 
@@ -10,7 +11,7 @@ it("leftJoin()", function()
 			{
 				return [ l, r.or("_") ];
 			}).collect();
-	expect(result).toEqual([ [ 1, "_" ], [ 2, 1 ], [ 3, 1 ], [ 4, 2 ] ]);
+	expect(result).to.eql([ [ 1, "_" ], [ 2, 1 ], [ 3, 1 ], [ 4, 2 ] ]);
 });
 
 it("leftJoin() 1 vs empty", function()
@@ -20,7 +21,7 @@ it("leftJoin() 1 vs empty", function()
 			{
 				return [ l, r.or("_") ];
 			}).collect();
-	expect(result).toEqual([ [ 1, "_" ] ]);
+	expect(result).to.eql([ [ 1, "_" ] ]);
 });
 
 it("leftJoin() empty vs 1", function()
@@ -30,7 +31,7 @@ it("leftJoin() empty vs 1", function()
 			{
 				return [ l, r.or("_") ];
 			}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 it("leftJoin() empty vs empty", function()
@@ -39,7 +40,7 @@ it("leftJoin() empty vs empty", function()
 	{
 		return [ l, r.or("_") ];
 	}).collect();
-	expect(result).toEqual([]);
+	expect(result).to.eql([]);
 });
 
 });
