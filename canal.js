@@ -479,9 +479,7 @@
 			this.downstream.begin();
 		}
 	};
-	Pond.prototype.accept = function(data) // Boolean
-	{
-	};
+	Pond.prototype.accept = undefined; // (data) => accept or not
 	Pond.prototype.done = function() // Void
 	{
 		if (this.downstream != null)
@@ -598,10 +596,7 @@
 		this.branch = undefined;
 	}
 	Dam.prototype = new Pond();
-	Dam.prototype.that = function()
-	{
-		return undefined;
-	};
+	Dam.prototype.that = undefined; // () => that data
 	Dam.prototype.begin = function()
 	{
 		if (this.branch === undefined)
@@ -620,18 +615,11 @@
 		this.valR = valOfPair;
 	}
 	Joiner.prototype = new Grouper();
-	Joiner.prototype.that = function()
-	{
-		return undefined;
-	};
-	Joiner.prototype.base = function(left, right)
-	{
-		return undefined;
-	};
-	Joiner.prototype.join = function(down, key, lefts, rights)
-	{
-		return false; // Do not join any more
-	};
+	// () => that data
+	Joiner.prototype.that = undefined; // () => that data
+	Joiner.prototype.base = undefined; // (left,right) => base data
+	// (down,key,lefts,rights) => continue or not
+	Joiner.prototype.join = undefined;
 	Joiner.prototype.done = function()
 	{
 		if (this.downstream != null)
@@ -659,10 +647,7 @@
 	function Operator()
 	{
 	}
-	Operator.prototype.newPond = function() // () => Pond
-	{
-		return new Pond();
-	};
+	Operator.prototype.newPond = undefined; // () => Pond
 
 	// Intermediate Operators
 
