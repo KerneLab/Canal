@@ -853,21 +853,14 @@
 		FlatMapPond.prototype.accept = function(d)
 		{
 			var data = fn(d, this.index++);
-			if (data instanceof Array)
+			for (var i = 0; i < data.length; i++)
 			{
-				for (var i = 0; i < data.length; i++)
+				if (!this.downstream.accept(data[i]))
 				{
-					if (!this.downstream.accept(data[i]))
-					{
-						return false;
-					}
+					return false;
 				}
-				return true;
 			}
-			else
-			{
-				return this.downstream.accept(data);
-			}
+			return true;
 		};
 
 		this.newPond = function()
