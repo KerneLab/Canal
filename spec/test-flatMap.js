@@ -1,42 +1,50 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test flatMap", function(){
-
-it("flatMap() 1->2", function()
+describe("Test flatMap", function()
 {
-	var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+	it("flatMap() 1->2", function()
 	{
-		return [ d, d + 0.5 ];
-	}).collect();
-	expect(result).to.eql([ 1, 1.5, 2, 2.5, 3, 3.5 ]);
-});
+		var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+		{
+			return [ d, d + 0.5 ];
+		}).collect();
+		expect(result).to.eql([ 1, 1.5, 2, 2.5, 3, 3.5 ]);
+	});
 
-it("flatMap() 1->1", function()
-{
-	var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+	it("flatMap() 1->2 partially", function()
 	{
-		return [ d + 0.5 ];
-	}).collect();
-	expect(result).to.eql([ 1.5, 2.5, 3.5 ]);
-});
+		var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+		{
+			return [ d, d + 0.5 ];
+		}).take(3);
+		expect(result).to.eql([ 1, 1.5, 2 ]);
+	});
 
-it("flatMap() 1->0", function()
-{
-	var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+	it("flatMap() 1->1", function()
 	{
-		return [];
-	}).collect();
-	expect(result).to.eql([]);
-});
+		var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+		{
+			return [ d + 0.5 ];
+		}).collect();
+		expect(result).to.eql([ 1.5, 2.5, 3.5 ]);
+	});
 
-it("flatMap() empty", function()
-{
-	var result = Canal.of([]).flatMap(function(d)
+	it("flatMap() 1->0", function()
 	{
-		return [ d, d + 0.5 ];
-	}).collect();
-	expect(result).to.eql([]);
-});
+		var result = Canal.of([ 1, 2, 3 ]).flatMap(function(d)
+		{
+			return [];
+		}).collect();
+		expect(result).to.eql([]);
+	});
 
+	it("flatMap() empty", function()
+	{
+		var result = Canal.of([]).flatMap(function(d)
+		{
+			return [ d, d + 0.5 ];
+		}).collect();
+		expect(result).to.eql([]);
+	});
 });
