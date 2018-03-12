@@ -5,8 +5,8 @@ describe("Test leftJoin", function()
 {
 	it("leftJoin()", function()
 	{
-		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "b", 3 ], [ "c", 4 ] ]).leftJoin(
-				Canal.of([ [ "b", 1 ], [ "c", 2 ], [ "d", 3 ] ])).mapJoint(function(l, r)
+		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "b", 3 ], [ "c", 4 ] ]) //
+		.leftJoin(Canal.of([ [ "b", 1 ], [ "c", 2 ], [ "d", 3 ] ])).mapJoint(function(l, r)
 		{
 			return [ l, r.or("_") ];
 		}).collect();
@@ -15,8 +15,8 @@ describe("Test leftJoin", function()
 
 	it("leftJoin() partially", function()
 	{
-		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "b", 3 ], [ "c", 4 ] ]).leftJoin(
-				Canal.of([ [ "b", 1 ], [ "c", 2 ], [ "d", 3 ] ])).mapJoint(function(l, r)
+		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "b", 3 ], [ "c", 4 ] ]) //
+		.leftJoin(Canal.of([ [ "b", 1 ], [ "c", 2 ], [ "d", 3 ] ])).mapJoint(function(l, r)
 		{
 			return [ l, r.or("_") ];
 		}).take(2);
@@ -34,7 +34,8 @@ describe("Test leftJoin", function()
 
 	it("leftJoin() 3 vs empty partially", function()
 	{
-		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "c", 3 ] ]).leftJoin(Canal.of([])).mapJoint(function(l, r)
+		var result = Canal.of([ [ "a", 1 ], [ "b", 2 ], [ "c", 3 ] ]) //
+		.leftJoin(Canal.of([])).mapJoint(function(l, r)
 		{
 			return [ l, r.or("_") ];
 		}).take(2);
