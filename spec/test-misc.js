@@ -24,4 +24,15 @@ describe("Test miscellaneous", function()
 
 		expect(pairs).to.eql([ [ "a", 1 ], [ "b", 2 ], [ "c", 3 ] ]);
 	});
+
+	it("of(obj)", function()
+	{
+		var result = Canal.of({
+			"a" : 1,
+			"b" : 2,
+			"c" : 3
+		}).take(2);
+
+		expect(result).to.eql([ [ "a", 1 ], [ "b", 2 ] ]);
+	});
 });
