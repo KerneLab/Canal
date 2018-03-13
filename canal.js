@@ -2330,25 +2330,14 @@
 	function Iterator()
 	{
 	}
-	Iterator.prototype.close = function()
-	{
-	};
-	Iterator.prototype.hasNext = function()
-	{
-		return undefined;
-	};
-	Iterator.prototype.next = function()
-	{
-		return undefined;
-	};
+	Iterator.prototype.close = undefined; // () => Void
+	Iterator.prototype.hasNext = undefined; // () => boolean
+	Iterator.prototype.next = undefined; // () => Data
 
 	function Iterable()
 	{
 	}
-	Iterable.prototype.iterator = function()
-	{
-		return undefined;
-	};
+	Iterable.prototype.iterator = undefined; // () => Iterator
 
 	function Source(array, begin, end)
 	{
@@ -2442,18 +2431,9 @@
 	{
 		return undefined;
 	};
-	Option.prototype.or = function(that)
-	{
-		return undefined;
-	};
-	Option.prototype.orNull = function()
-	{
-		return undefined;
-	};
-	Option.prototype.given = function()
-	{
-		return undefined;
-	};
+	Option.prototype.or = undefined; // (defaultData) => Data
+	Option.prototype.orNull = undefined; // () => Data | null
+	Option.prototype.given = undefined; // () => boolean
 
 	function Some(val)
 	{
