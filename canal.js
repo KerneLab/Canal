@@ -32,6 +32,23 @@
 		return p[1];
 	};
 
+	// The function which always returns null.
+	var nullData = function()
+	{
+		return null;
+	};
+
+	// The function which always returns undefined.
+	var undefineData = function()
+	{
+		return undefined;
+	};
+
+	// The function which doesn't do anything.
+	var voidAction = function()
+	{
+	};
+
 	// Signum function
 	var signum = function(a, b)
 	{
@@ -235,10 +252,7 @@
 	var addWindowItem = function(c, aggr, updt, expr, alias, partBy, orderBy, between, byRows)
 	{
 		// Aggregation on each partition
-		aggr = aggr != null ? aggr : function()
-		{
-			return undefined;
-		};
+		aggr = aggr != null ? aggr : undefineData;
 
 		// Updater for each level
 		updt = updt != null ? updt : function(agg)
@@ -1638,6 +1652,7 @@
 
 	function ForeachOp(action) // (data[,index]) => Void
 	{
+		action = action == null ? voidAction : action;
 		function ForeachPond()
 		{
 		}
@@ -1647,10 +1662,7 @@
 			action(d, this.index++);
 			return true;
 		};
-		ForeachPond.prototype.get = function()
-		{
-			return undefined;
-		};
+		ForeachPond.prototype.get = undefineData;
 
 		this.newPond = function()
 		{
@@ -2427,10 +2439,7 @@
 	{
 	}
 	Option.prototype = new Canal();
-	Option.prototype.get = function()
-	{
-		return undefined;
-	};
+	Option.prototype.get = undefineData;
 	Option.prototype.or = undefined; // (defaultData) => Data
 	Option.prototype.orNull = undefined; // () => Data | null
 	Option.prototype.given = undefined; // () => boolean
@@ -2466,10 +2475,7 @@
 	{
 		return that;
 	};
-	None.prototype.orNull = function()
-	{
-		return null;
-	};
+	None.prototype.orNull = nullData;
 	None.prototype.given = function()
 	{
 		return false;
@@ -2491,10 +2497,7 @@
 
 		if (picker == null)
 		{
-			wrap = function()
-			{
-				return null;
-			};
+			wrap = nullData;
 		}
 		else if (typeof picker !== "function")
 		{ // Extract the attribute from data by the key

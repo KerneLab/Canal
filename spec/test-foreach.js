@@ -1,36 +1,45 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test foreach", function(){
-
-it("foreach()", function()
+describe("Test foreach", function()
 {
-	var result = [];
-	Canal.of([ 1, 2, 3 ]).foreach(function(d, i)
+	it("foreach()", function()
 	{
-		result.push(d + "-" + i);
+		var result = [];
+		Canal.of([ 1, 2, 3 ]).foreach(function(d, i)
+		{
+			result.push(d + "-" + i);
+		});
+		expect(result).to.eql([ "1-0", "2-1", "3-2" ]);
 	});
-	expect(result).to.eql([ "1-0", "2-1", "3-2" ]);
-});
 
-it("foreach() 1", function()
-{
-	var result = [];
-	Canal.of([ 1 ]).foreach(function(d, i)
+	it("foreach() 1", function()
 	{
-		result.push(d + "-" + i);
+		var result = [];
+		Canal.of([ 1 ]).foreach(function(d, i)
+		{
+			result.push(d + "-" + i);
+		});
+		expect(result).to.eql([ "1-0" ]);
 	});
-	expect(result).to.eql([ "1-0" ]);
-});
 
-it("foreach() empty", function()
-{
-	var result = [];
-	Canal.of([]).foreach(function(d, i)
+	it("foreach(null) 2", function()
 	{
-		result.push(d + "-" + i);
+		var result = [];
+		Canal.of([ 1, 2 ]).peek(function(d)
+		{
+			result.push(d + 1);
+		}).foreach();
+		expect(result).to.eql([ 2, 3 ]);
 	});
-	expect(result).to.eql([]);
-});
 
+	it("foreach() empty", function()
+	{
+		var result = [];
+		Canal.of([]).foreach(function(d, i)
+		{
+			result.push(d + "-" + i);
+		});
+		expect(result).to.eql([]);
+	});
 });
