@@ -16,12 +16,16 @@ describe("Test window", function()
 	
 	it("window() row_number", function()
 	{
+		var rn = Canal.wf.row_number()
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("row_num");
+		
+		expect(typeof rn.partBy()).to.be("object");
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.row_number()
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.as("row_num")
+			rn
 		).collect();
 	
 		expect(result).to.eql([
@@ -40,12 +44,16 @@ describe("Test window", function()
 	{
 		var f = Canal.field;
 		
+		var count = Canal.wf.count(f("id"))
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("count");
+		
+		expect(count.as()).to.be("count");
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.count(f("id"))
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.as("count")
+			count
 		).collect();
 	
 		expect(result).to.eql([
@@ -139,12 +147,16 @@ describe("Test window", function()
 	
 	it("window() sum", function()
 	{
+		var sum = Canal.wf.sum(function(d){return d.sal;})
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("sum_sal");
+		
+		expect(typeof sum.orderBy()).to.be("object");
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.sum(function(d){return d.sal;})
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.as("sum_sal")
+			sum
 		).collect();
 	
 		expect(result).to.eql([
@@ -227,13 +239,17 @@ describe("Test window", function()
 	
 	it("window() sum rows(-1,1)", function()
 	{
+		var sum = Canal.wf.sum(function(d){return d.sal;})
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.rows().between(-1, 1)
+		.as("sum_sal");
+		
+		expect(sum.between()).to.eql([ -1, 1 ]);
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.sum(function(d){return d.sal;})
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.rows().between(-1, 1)
-				.as("sum_sal")
+			sum
 		).collect();
 	
 		expect(result).to.eql([
@@ -1208,12 +1224,17 @@ describe("Test window", function()
 	
 	it("window() lead()", function()
 	{
+		var lead = Canal.wf.lead(function(d){return d.sal;}, 2, "N/A")
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("ld");
+		
+		expect(typeof lead.aggregator()).to.be("function");
+		expect(typeof lead.expressor()).to.be("function");
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.lead(function(d){return d.sal;}, 2, "N/A")
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.as("ld")
+			lead
 		).collect();
 	
 		expect(result).to.eql([
@@ -1230,12 +1251,16 @@ describe("Test window", function()
 	
 	it("window() cume_dist()", function()
 	{
+		var cume_dist = Canal.wf.cume_dist()
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("cum_dst");
+		
+		expect(typeof cume_dist.updater()).to.be("function");
+		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.cume_dist()
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.as("cum_dst")
+			cume_dist
 		).collect();
 	
 		expect(result).to.eql([
