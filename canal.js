@@ -2491,6 +2491,11 @@
 		return new None();
 	};
 
+	Canal.Option = function(val)
+	{
+		return val == null ? Canal.None() : Canal.Some(val);
+	};
+
 	Canal.wrapPicker = function(picker)
 	{
 		var wrap = picker;
@@ -2968,6 +2973,8 @@
 	Canal.kop = keyOfPair;
 
 	Canal.vop = valOfPair;
+
+	Canal.signum = signum;
 
 	if (typeof exports !== "undefined")
 	{

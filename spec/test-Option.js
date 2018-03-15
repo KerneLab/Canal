@@ -31,4 +31,11 @@ describe("Test Option", function()
 
 		expect(result.orNull()).to.be(null);
 	});
+
+	it("Option()", function()
+	{
+		expect(Canal.Option(null).given()).to.be(false);
+
+		expect(Canal.Option(1).given()).to.be(true);
+	});
 });
