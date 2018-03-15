@@ -1,7 +1,8 @@
 {
   "name": "canal.js",
-  "version": "1.0.29",
+  "version": "1.0.30",
   "description": "Streams Style API of Data Processing Framework in Javascript",
+  "main": "canal.js",
   "homepage": "https://github.com/KerneLab/Canal",
   "repository": {
     "type": "git",
@@ -10,14 +11,22 @@
   "bugs": {
     "url": "https://github.com/KerneLab/Canal/issues"
   },
-  "devDependencies": {
-    "grunt": "~0.4.5",
-    "grunt-contrib-jshint": "~0.10.0",
-    "grunt-contrib-nodeunit": "~0.4.1",
-    "grunt-contrib-qunit": "0.7.0",
-    "grunt-contrib-uglify": "~0.5.0",
-    "load-grunt-tasks": "3.2.0"
+  "scripts": {
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha -- --report lcov ./spec/*.js",
+    "report": "codecov -t ${CODECOV_TOKEN}",
+    "build": "uglifyjs --compress --mangle --comments /^!/ --output canal.min.js -- canal.js"
   },
+  "devDependencies": {
+    "codecov": "^3.0.0",
+    "expect.js": "^0.3.0",
+    "istanbul": "^0.4.5",
+    "mocha": "^5.0.0",
+    "uglify-es": "^3.0.0"
+  },
+  "files": [
+    "canal.js",
+    "canal.min.js"
+  ],
   "keywords": [
     "canal",
     "javascript",
@@ -32,14 +41,5 @@
   "license": "MIT",
   "engines": {
     "node": ">=0.12"
-  },
-  "main": "canal.js",
-  "directories": {
-    "test": "test"
-  },
-  "files": [
-    "canal.js",
-    "canal.min.js",
-    "canal.min.map"
-  ]
+  }
 }

@@ -1,17 +1,15 @@
 language: node_js
 sudo: false
 node_js:
-  - "0.12"
-before_install: npm install -g grunt-cli
-install: npm install
-script: grunt default --verbose
-#deploy:
-#  provider: releases
-#  api_key: "${GH_TOKEN}"
-#  file:
-#    - "canal.min.js"
-#    - "canal.min.map"
-#  skip_cleanup: true
-#  overwrite: true
-#  on:
-#     tags: true
+  - "node"
+  - "lts/*"
+  - "8"
+  - "6"
+  - "4"
+install:
+  - npm install -g codecov
+  - npm install
+script:
+  - npm run test
+  - npm run report
+  - npm run build
