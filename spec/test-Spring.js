@@ -25,7 +25,7 @@ it("Spring close", function()
 	var number = 0;
 	var result = Canal.of(function(index)
 	{
-		if (index < 5)
+		if (index < 2)
 		{
 			return index;
 		}
@@ -37,7 +37,7 @@ it("Spring close", function()
 	{
 		closed = true;
 		number = n;
-	}).take(2);
+	}).collect();
 	expect(result).to.eql([ 0, 1 ]);
 	expect(closed).to.be(true);
 	expect(number).to.be(2);

@@ -36,10 +36,7 @@ describe("Test foreach", function()
 	it("foreach() empty", function()
 	{
 		var result = [];
-		Canal.of([]).foreach(function(d, i)
-		{
-			result.push(d + "-" + i);
-		});
+		Canal.of([]).foreach();
 		expect(result).to.eql([]);
 	});
 });

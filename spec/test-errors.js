@@ -7,10 +7,7 @@ describe("Test Errors", function()
 	{
 		var c1 = Canal.of([ 1, 2, 3 ]);
 
-		var c2 = c1.map(function(d)
-		{
-			return d + 1;
-		});
+		var c2 = c1.map(Canal.unit);
 
 		c1.upstream(c2);
 

@@ -1,36 +1,34 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test unpack", function(){
-
-it("unpack() 3", function()
+describe("Test unpack", function()
 {
-	var result = Canal.of([ [ 1, 2 ], [ 2, 3 ], [ 3, 4 ] ]) //
-	.unpack(function(a, b)
+	var unpacker = function(a, b)
 	{
 		return a + b;
-	}).collect();
-	expect(result).to.eql([ 3, 5, 7 ]);
-});
+	};
 
-it("unpack() 1", function()
-{
-	var result = Canal.of([ [ 1, 2, 3 ] ]) //
-	.unpack(function(a, b, c)
+	it("unpack() 3", function()
 	{
-		return a * b;
-	}).collect();
-	expect(result).to.eql([ 2 ]);
-});
+		var result = Canal.of([ [ 1, 2 ], [ 2, 3 ], [ 3, 4 ] ]) //
+		.unpack(unpacker).collect();
+		expect(result).to.eql([ 3, 5, 7 ]);
+	});
 
-it("unpack() empty", function()
-{
-	var result = Canal.of([]) //
-	.unpack(function(a, b)
+	it("unpack() 1", function()
 	{
-		return a + b;
-	}).collect();
-	expect(result).to.eql([]);
-});
+		var result = Canal.of([ [ 1, 2, 3 ] ]) //
+		.unpack(function(a, b, c)
+		{
+			return a * b;
+		}).collect();
+		expect(result).to.eql([ 2 ]);
+	});
 
+	it("unpack() empty", function()
+	{
+		var result = Canal.of([]) //
+		.unpack(unpacker).collect();
+		expect(result).to.eql([]);
+	});
 });

@@ -1,46 +1,38 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test choose", function(){
-
-it("choose() 1 2 3", function()
+describe("Test choose", function()
 {
-	var result = Canal.of([ [ 1, 2 ], [ 3, 2 ], [ 3, 1 ] ]) //
-	.choose(function(a, b)
+	var chooser = function(a, b)
 	{
 		return a > b;
-	}).collect();
-	expect(result).to.eql([ [ 3, 2 ], [ 3, 1 ] ]);
-});
+	};
 
-it("choose() 1", function()
-{
-	var result = Canal.of([ [ 3, 2 ] ]) //
-	.choose(function(a, b)
+	it("choose() 1 2 3", function()
 	{
-		return a > b;
-	}).collect();
-	expect(result).to.eql([ [ 3, 2 ] ]);
-});
+		var result = Canal.of([ [ 1, 2 ], [ 3, 2 ], [ 3, 1 ] ]) //
+		.choose(chooser).collect();
+		expect(result).to.eql([ [ 3, 2 ], [ 3, 1 ] ]);
+	});
 
-it("choose() 0", function()
-{
-	var result = Canal.of([ [ 1, 2 ] ]) //
-	.choose(function(a, b)
+	it("choose() 1", function()
 	{
-		return a > b;
-	}).collect();
-	expect(result).to.eql([]);
-});
+		var result = Canal.of([ [ 3, 2 ] ]) //
+		.choose(chooser).collect();
+		expect(result).to.eql([ [ 3, 2 ] ]);
+	});
 
-it("choose() empty", function()
-{
-	var result = Canal.of([]) //
-	.choose(function(a, b)
+	it("choose() 0", function()
 	{
-		return a > b;
-	}).collect();
-	expect(result).to.eql([]);
-});
+		var result = Canal.of([ [ 1, 2 ] ]) //
+		.choose(chooser).collect();
+		expect(result).to.eql([]);
+	});
 
+	it("choose() empty", function()
+	{
+		var result = Canal.of([]) //
+		.choose(chooser).collect();
+		expect(result).to.eql([]);
+	});
 });

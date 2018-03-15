@@ -1,54 +1,51 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test off", function(){
-
-it("off() Array", function()
+describe("Test off", function()
 {
-	Canal.on(Array);
-
-	var result = [ 1, 2, 3 ].canal().count();
-
-	expect(result).to.eql(3);
-
-	Canal.off(Array);
-
-	var other = null;
-	try
+	it("off() Array", function()
 	{
-		[ 1, 2, 3 ].canal().count();
-		other = 1;
-	}
-	catch (e)
+		Canal.on(Array);
+
+		var result = [ 1, 2, 3 ].canal().count();
+
+		expect(result).to.eql(3);
+
+		Canal.off(Array);
+
+		var other = 1;
+		try
+		{
+			[ 1, 2, 3 ].canal().count();
+		}
+		catch (e)
+		{
+			other = 2;
+		}
+
+		expect(other).to.eql(2);
+	});
+
+	it("off() Array key", function()
 	{
-		other = 2;
-	}
+		Canal.on(Array, "$");
 
-	expect(other).to.eql(2);
-});
+		var result = [ 1, 2, 3 ].$().count();
 
-it("off() Array key", function()
-{
-	Canal.on(Array, "$");
+		expect(result).to.eql(3);
 
-	var result = [ 1, 2, 3 ].$().count();
+		Canal.off(Array, "$");
 
-	expect(result).to.eql(3);
+		var other = 1;
+		try
+		{
+			[ 1, 2, 3 ].$().count();
+		}
+		catch (e)
+		{
+			other = 2;
+		}
 
-	Canal.off(Array, "$");
-
-	var other = null;
-	try
-	{
-		[ 1, 2, 3 ].$().count();
-		other = 1;
-	}
-	catch (e)
-	{
-		other = 2;
-	}
-
-	expect(other).to.eql(2);
-});
-
+		expect(other).to.eql(2);
+	});
 });

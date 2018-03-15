@@ -1,36 +1,34 @@
 var Canal = require('../canal.js');
 var expect = require("expect.js");
 
-describe("Test first", function(){
-
-it("first()", function()
+describe("Test first", function()
 {
-	var result = Canal.of([ 1, 2, 3 ]).first().or("_");
-	expect(result).to.be(1);
-});
-
-it("first() empty", function()
-{
-	var result = Canal.of([]).first().or("_");
-	expect(result).to.be("_");
-});
-
-it("first(pred)", function()
-{
-	var result = Canal.of([ 1, 2, 3 ]).first(function(d)
+	var pred = function(d)
 	{
 		return d > 2;
-	}).or("_");
-	expect(result).to.be(3);
-});
+	};
 
-it("first(pred) empty", function()
-{
-	var result = Canal.of([]).first(function(d)
+	it("first()", function()
 	{
-		return d > 2;
-	}).or("_");
-	expect(result).to.be("_");
-});
+		var result = Canal.of([ 1, 2, 3 ]).first().or("_");
+		expect(result).to.be(1);
+	});
 
+	it("first() empty", function()
+	{
+		var result = Canal.of([]).first().or("_");
+		expect(result).to.be("_");
+	});
+
+	it("first(pred)", function()
+	{
+		var result = Canal.of([ 1, 2, 3 ]).first(pred).or("_");
+		expect(result).to.be(3);
+	});
+
+	it("first(pred) empty", function()
+	{
+		var result = Canal.of([]).first(pred).or("_");
+		expect(result).to.be("_");
+	});
 });
