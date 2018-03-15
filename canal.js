@@ -3,9 +3,13 @@
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
  */
-(function()
+(function(global, factory)
 {
-	var ROOT = (typeof global === "object" && global) || this;
+	typeof exports === "object" && typeof module !== "undefined" ? (module.exports = factory()) //
+	: typeof define === "function" && define.amd ? define(factory) : (global.Canal = factory());
+}(this, (function()
+{
+	"use strict";
 
 	// Constant of an empty array which MUST not be changed.
 	var emptyArray = [];
@@ -2976,20 +2980,5 @@
 
 	Canal.signum = signum;
 
-	if (typeof exports !== "undefined")
-	{
-		if (typeof module !== "undefined" && module.exports)
-		{
-			module.exports = Canal;
-		}
-		else
-		{
-			exports = Canal;
-		}
-	}
-	else
-	{
-		ROOT.Canal = Canal;
-	}
-
-}.call(this));
+	return Canal;
+})));
