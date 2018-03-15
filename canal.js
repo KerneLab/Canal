@@ -1244,6 +1244,7 @@
 
 	function PeekOp(action) // (data[,index]) => Void
 	{
+		action = action == null ? voidAction : action;
 		function PeekPond()
 		{
 		}
