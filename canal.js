@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.30 */
+/*! canal.kernelab.org v1.0.31 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2010,6 +2010,14 @@
 			})).mapJoint(function(left, right)
 			{
 				return [ left, right ];
+			});
+		};
+
+		this.zipWithIndex = function()
+		{
+			return this.map(function(d, i)
+			{
+				return [ d, i ];
 			});
 		};
 
