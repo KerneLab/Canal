@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.31 */
+/*! canal.kernelab.org v1.0.32 2018-12-30 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -52,21 +52,24 @@
 	{
 	};
 
-	// Signum function
-	var signum = function(a, b)
+	// Signum function which could compare LVal1 vs RVal1, LVal2 vs RVal2 ...
+	var signum = function()
 	{
-		if (a < b)
+		var l, r;
+		for (var i = 0; i < arguments.length; i += 2)
 		{
-			return -1;
+			l = arguments[i];
+			r = arguments[i + 1];
+			if (l < r)
+			{
+				return -1;
+			}
+			else if (l > r)
+			{
+				return 1;
+			}
 		}
-		else if (a > b)
-		{
-			return 1;
-		}
-		else
-		{
-			return 0;
-		}
+		return 0;
 	};
 
 	// Default equality
@@ -2336,14 +2339,25 @@
 		return map;
 	};
 
-	Canal.pairsOfMap = function(map)
+	Canal.pairsOfMap = function(map, keys)
 	{
 		var pairs = [];
 
-		for ( var k in map)
+		if (keys == null)
 		{
-			if (map.hasOwnProperty(k))
+			for ( var k in map)
 			{
+				if (map.hasOwnProperty(k))
+				{
+					pairs.push([ k, map[k] ]);
+				}
+			}
+		}
+		else
+		{
+			for (var i = 0; i < keys.length; i++)
+			{
+				var k = keys[i];
 				pairs.push([ k, map[k] ]);
 			}
 		}
@@ -2443,7 +2457,7 @@
 		}
 		else
 		{
-			return Canal.of(Canal.pairsOfMap(data));
+			return Canal.of(Canal.pairsOfMap(data, arguments[1]));
 		}
 	};
 
