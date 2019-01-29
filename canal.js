@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.32 2018-12-30 */
+/*! canal.kernelab.org v1.0.33 2019-01-29 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -56,7 +56,7 @@
 	var signum = function()
 	{
 		var l, r;
-		for (var i = 0; i < arguments.length; i += 2)
+		for (var i = 0; i < arguments.length - 1; i += 2)
 		{
 			l = arguments[i];
 			r = arguments[i + 1];
@@ -2326,6 +2326,24 @@
 		return endOfData;
 	};
 
+	Canal.keysOfObject = function(obj)
+	{
+		var keys = [];
+
+		if (obj != null)
+		{
+			for ( var key in obj)
+			{
+				if (obj.hasOwnProperty(key))
+				{
+					keys.push(key);
+				}
+			}
+		}
+
+		return keys;
+	};
+
 	Canal.mapOfPairs = function(pairs)
 	{
 		var map = {};
@@ -2345,21 +2363,13 @@
 
 		if (keys == null)
 		{
-			for ( var k in map)
-			{
-				if (map.hasOwnProperty(k))
-				{
-					pairs.push([ k, map[k] ]);
-				}
-			}
+			keys = Canal.keysOfObject(map);
 		}
-		else
+
+		for (var i = 0; i < keys.length; i++)
 		{
-			for (var i = 0; i < keys.length; i++)
-			{
-				var k = keys[i];
-				pairs.push([ k, map[k] ]);
-			}
+			var k = keys[i];
+			pairs.push([ k, map[k] ]);
 		}
 
 		return pairs;
