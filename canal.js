@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.33 2019-01-29 */
+/*! canal.kernelab.org v1.0.34 2019-09-21 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2766,6 +2766,26 @@
 				}
 			});
 		},
+		"first_value" : function(vop)
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(level)
+					{
+						return level;
+					}).collect();
+				},
+				"updt" : function(agg)
+				{
+					return agg;
+				},
+				"expr" : function(pos, rows)
+				{
+					return vop(rows[0]);
+				}
+			});
+		},
 		"fold" : function(init, folder)
 		{
 			var vop = arguments[2] != null ? arguments[2] : function(d)
@@ -2789,6 +2809,26 @@
 				}
 			});
 		},
+		"last_value" : function(vop)
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(level)
+					{
+						return level;
+					}).collect();
+				},
+				"updt" : function(agg)
+				{
+					return agg;
+				},
+				"expr" : function(pos, rows)
+				{
+					return vop(rows[rows.length - 1]);
+				}
+			});
+		},
 		"lead" : function(vop)
 		{
 			var off = Math.max(arguments.length > 1 ? arguments[1] : 1, 0);
@@ -2804,6 +2844,26 @@
 				"expr" : function(pos, res)
 				{
 					return pos + off >= res.length ? def : vop(res[pos + off]);
+				}
+			});
+		},
+		"map_part" : function(mapper)
+		{
+			return Canal.item({
+				"aggr" : function(levels)
+				{
+					return Canal.of(levels).flatMap(function(level)
+					{
+						return level;
+					}).collect();
+				},
+				"updt" : function(agg)
+				{
+					return agg;
+				},
+				"expr" : function(pos, rows)
+				{
+					return mapper(rows);
 				}
 			});
 		},
