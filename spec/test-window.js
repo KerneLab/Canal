@@ -71,10 +71,11 @@ describe("Test window", function()
 	it("window() count distinct", function()
 	{
 		var f = Canal.field;
+		var distinct = Canal.wf.distinct;
 		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.count(f("rnk"), true)
+			Canal.wf.count(distinct(f("rnk")))
 				.partBy(function(d){return d.grp;})
 				.as("count")
 		).collect();
@@ -145,6 +146,35 @@ describe("Test window", function()
 		]);
 	});
 	
+	it("window() fold distinct", function()
+	{
+		var f = Canal.field;
+		var distinct = Canal.wf.distinct;
+		
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.fold(function(){return [];},
+						function(last,data){
+							last.push(data);
+							return last;
+					  	},
+						distinct(f("rnk")))
+				.partBy(function(d){return d.grp;})
+				.as("fold_uniq")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_uniq":[1,2,3]},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_uniq":[1,2,3]},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_uniq":[1,2,3]},
+			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_uniq":[1,2,3]},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_uniq":[1,2,3]},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_uniq":[1,2]},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_uniq":[1,2]},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_uniq":[1,2]}
+		]);
+	});
+	
 	it("window() sum", function()
 	{
 		var sum = Canal.wf.sum(function(d){return d.sal;})
@@ -168,6 +198,30 @@ describe("Test window", function()
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+		]);
+	});
+	
+	it("window() sum distinct", function()
+	{
+		var f = Canal.field;
+		var distinct = Canal.wf.distinct;
+		
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.sum(distinct(f("rnk")))
+				.partBy(function(d){return d.grp;})
+				.as("sum_uniq")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_uniq":6},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_uniq":6},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_uniq":6},
+			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_uniq":6},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_uniq":6},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_uniq":3},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_uniq":3},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_uniq":3}
 		]);
 	});
 	

@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.34 2019-09-21 */
+/*! canal.kernelab.org v1.0.35 2019-12-15 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2701,23 +2701,22 @@
 	};
 
 	Canal.wf = {
-		"count" : function(vop) // vop[,distinct[,cmp]]
+		"count" : function(vop) // vop | Item
 		{
-			var distinct = arguments.length > 1 && arguments[1] === true;
-			var cmp = null;
-			if (distinct)
+			if (vop instanceof Item)
 			{
-				cmp = arguments[2];
-			}
-			return Canal.item(function(agg, rows, begin, end)
-			{
-				var c = Canal.of(rows, begin, end).map(vop);
-				if (distinct)
+				return Canal.item(function(agg, rows, begin, end)
 				{
-					c = c.distinct(cmp);
-				}
-				return c.count();
-			});
+					return vop.updater()(agg, rows, begin, end).count();
+				});
+			}
+			else
+			{
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return Canal.of(rows, begin, end).map(vop).count();
+				});
+			}
 		},
 		"cume_dist" : function()
 		{
@@ -2766,6 +2765,15 @@
 				}
 			});
 		},
+		"distinct" : function(vop) // vop[, cmp]
+		{
+			var vop = vop != null ? vop : valOfData;
+			var cmp = arguments.length > 1 ? arguments[1] : null;
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end).map(vop).distinct(cmp);
+			});
+		},
 		"first_value" : function(vop)
 		{
 			return Canal.item({
@@ -2788,15 +2796,24 @@
 		},
 		"fold" : function(init, folder)
 		{
-			var vop = arguments[2] != null ? arguments[2] : function(d)
+			if (arguments[2] instanceof Item)
 			{
-				return d;
-			};
-			return Canal.item(function(agg, rows, begin, end)
+				var vop = arguments[2];
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return vop.updater()(agg, rows, begin, end) //
+					.fold(init(), folder);
+				});
+			}
+			else
 			{
-				return Canal.of(rows, begin, end) //
-				.map(vop).fold(init(), folder);
-			});
+				var vop = arguments[2] != null ? arguments[2] : valOfData;
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return Canal.of(rows, begin, end) //
+					.map(vop).fold(init(), folder);
+				});
+			}
 		},
 		"lag" : function(vop)
 		{
@@ -3032,15 +3049,29 @@
 		},
 		"sum" : function(vop)
 		{
-			return Canal.item(function(agg, rows, begin, end)
+			if (vop instanceof Item)
 			{
-				return Canal.of(rows, begin, end) //
-				.map(vop) //
-				.reduce(function(a, b)
+				return Canal.item(function(agg, rows, begin, end)
 				{
-					return a + b;
-				}).get();
-			});
+					return vop.updater()(agg, rows, begin, end) //
+					.reduce(function(a, b)
+					{
+						return a + b;
+					}).get();
+				});
+			}
+			else
+			{
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return Canal.of(rows, begin, end) //
+					.map(vop) //
+					.reduce(function(a, b)
+					{
+						return a + b;
+					}).get();
+				});
+			}
 		}
 	};
 
