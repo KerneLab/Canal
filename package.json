@@ -37,7 +37,7 @@
     "fp",
     "js"
   ],
-  "author": "kernelforce",
+  "author": "kernelforce <kernelforce@gmail.com> (https://github.com/kernelforce)",
   "license": "MIT",
   "engines": {
     "node": ">=0.12"
