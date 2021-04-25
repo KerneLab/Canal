@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.35 2019-12-15 */
+/*! canal.kernelab.org v1.0.37 2021-04-25 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -10,14 +10,14 @@
 {
 	"use strict";
 
-	// Constant of an empty array which MUST not be changed.
+	// Constant of an empty array which MUST not be changed
 	var emptyArray = [];
 
 	// Constant of the end of data flow which MUST NOT be changed or in any
-	// data.
+	// data
 	var endOfData = {};
 
-	// Default value of a data which returns data itself.
+	// Default value of a data which returns data itself
 	var valOfData = function(d)
 	{
 		return d;
@@ -35,19 +35,19 @@
 		return p[1];
 	};
 
-	// The function which always returns null.
+	// The function which always returns null
 	var nullData = function()
 	{
 		return null;
 	};
 
-	// The function which always returns undefined.
+	// The function which always returns undefined
 	var undefineData = function()
 	{
 		return undefined;
 	};
 
-	// The function which doesn't do anything.
+	// The function which doesn't do anything
 	var voidAction = function()
 	{
 	};
@@ -70,6 +70,46 @@
 			}
 		}
 		return 0;
+	};
+
+	// Make a comparator to compare to two object according to given fields
+	var comparator = function()
+	{
+		var fields = [];
+		for (var i = 0; i < arguments.length; i++)
+		{
+			fields.push(arguments[i]);
+		}
+
+		return function(a, b)
+		{
+			if (a == b)
+			{
+				return 0;
+			}
+			else if (a == null)
+			{
+				return -1;
+			}
+			else if (b == null)
+			{
+				return 1;
+			}
+			else
+			{
+				var c = 0, f = null;
+				for (var i = 0; i < fields.length; i++)
+				{
+					f = fields[i];
+					c = signum(a[f], b[f]);
+					if (c != 0)
+					{
+						return c;
+					}
+				}
+				return 0;
+			}
+		};
 	};
 
 	// Default equality
@@ -1185,6 +1225,35 @@
 	}
 	LeftJoinOp.prototype = new Operator();
 
+	function LimitOp(num)
+	{
+		function LimitPond()
+		{
+		}
+		LimitPond.prototype = new Wheel();
+		LimitPond.prototype.accept = function(d)
+		{
+			if (this.index++ < num)
+			{
+				return this.downstream.accept(d);
+			}
+			else
+			{
+				if (this.downstream != null)
+				{
+					this.downstream.done();
+				}
+				return false;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new LimitPond();
+		};
+	}
+	LimitOp.prototype = new Operator();
+
 	function MapOp(fn) // (data [, index]) => Value
 	{
 		function MapPond()
@@ -1944,10 +2013,7 @@
 
 		this.limit = function(num)
 		{
-			return this.filter(function(d, i)
-			{
-				return i < num;
-			});
+			return this.add(new LimitOp(num));
 		};
 
 		this.map = function(mapper)
@@ -3100,6 +3166,8 @@
 	Canal.kop = keyOfPair;
 
 	Canal.vop = valOfPair;
+
+	Canal.cmp = comparator;
 
 	Canal.signum = signum;
 

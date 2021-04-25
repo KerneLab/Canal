@@ -38,4 +38,13 @@ it("limit(0) empty", function()
 	expect(result).to.eql([]);
 });
 
+it("limit(3) func", function()
+{
+	var result = Canal.of(function(i){
+		return i;
+	}) //
+	.limit(3).collect();
+	expect(result).to.eql([0,1,2]);
+});
+
 });
