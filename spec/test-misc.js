@@ -60,4 +60,26 @@ describe("Test miscellaneous", function()
 
 		expect(cmp).to.eql(1);
 	});
+
+	it("cmp() null null", function()
+	{
+		var cmp = Canal.cmp("id");
+
+		expect(cmp(null, null)).to.eql(0);
+	});
+
+	it("cmp() null 1", function()
+	{
+		var cmp = Canal.cmp("id");
+
+		expect(cmp(null, 1)).to.eql(-1);
+	});
+
+	it("cmp() 1 null", function()
+	{
+		var cmp = Canal.cmp("id");
+
+		expect(cmp(1, null)).to.eql(1);
+	});
+
 });
