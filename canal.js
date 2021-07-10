@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.38 2021-07-09 */
+/*! canal.kernelab.org v1.0.39 2021-07-10 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1233,7 +1233,7 @@
 		LimitPond.prototype = new Wheel();
 		LimitPond.prototype.accept = function(d)
 		{
-			if (num < 0 || this.index++ < num)
+			if (num == null || num < 0 || this.index++ < num)
 			{
 				return this.downstream.accept(d);
 			}
