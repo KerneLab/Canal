@@ -1,4 +1,4 @@
-Canal.js [![Travic CI](https://travis-ci.org/KerneLab/Canal.svg?branch=master)](https://travis-ci.org/KerneLab/Canal) [![Codecov](https://img.shields.io/codecov/c/github/KerneLab/Canal.svg)](https://codecov.io/gh/KerneLab/Canal) [![NPM](https://img.shields.io/npm/v/canal.js.svg)](https://www.npmjs.com/package/canal.js) [![License](https://img.shields.io/npm/l/canal.js.svg)](https://www.npmjs.com/package/canal.js)
+Canal.js [![Travic CI](https://travis-ci.com/KerneLab/Canal.svg?branch=master)](https://travis-ci.com/KerneLab/Canal) [![Codecov](https://img.shields.io/codecov/c/github/KerneLab/Canal.svg)](https://codecov.io/gh/KerneLab/Canal) [![NPM](https://img.shields.io/npm/v/canal.js.svg)](https://www.npmjs.com/package/canal.js) [![License](https://img.shields.io/npm/l/canal.js.svg)](https://www.npmjs.com/package/canal.js)
 =========================
 Streams Style API of Data Processing Framework in Javascript
 
