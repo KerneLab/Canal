@@ -25,6 +25,16 @@ it("distinct(cmp) obj", function()
 	expect(result).to.eql([ {"id":1, "name":"a"}, {"id":2, "name":"c"} ]);
 });
 
+it("distinct(cmp) obj by name", function()
+{
+	var result = Canal.of([ 
+		{"id":1, "name":"mike"},
+		{"id":2, "name":"john"},
+		{"id":3, "name":"mike"}
+	]).distinct(Canal.cmp("name")).collect();
+	expect(result).to.eql([ {"id":1, "name":"mike"}, {"id":2, "name":"john"} ]);
+});
+
 it("distinct().take(0) 1 2 3", function()
 {
 	var result = Canal.of([ 1, 2, 3 ]).distinct().take(0);

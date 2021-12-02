@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.39 2021-07-10 */
+/*! canal.kernelab.org v1.0.40 2021-12-02 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -843,24 +843,38 @@
 			if (this.downstream != null)
 			{
 				var settle = this.settle();
-				settle.sort(cmp);
-
-				var last = endOfData, next = null;
+				var sorts = [];
 				for (var i = 0; i < settle.length; i++)
 				{
-					next = settle[i];
-
+					sorts.push([ i, settle[i] ]);
+				}
+				sorts.sort(function(a, b)
+				{
+					var c = cmp(a[1], b[1]);
+					if (c != 0)
+					{
+						return c;
+					}
+					return a[0] - b[0];
+				});
+				var need = {}, last = endOfData, next = null;
+				for (var i = 0; i < sorts.length; i++)
+				{
+					next = sorts[i][1];
 					if (last !== endOfData && cmp(last, next) === 0)
 					{
 						continue;
 					}
+					need[sorts[i][0]] = true;
+					last = next;
+				}
 
-					if (!this.downstream.accept(next))
+				for (var i = 0; i < settle.length; i++)
+				{
+					if (need[i] && !this.downstream.accept(settle[i]))
 					{
 						break;
 					}
-
-					last = next;
 				}
 
 				this.downstream.done();
