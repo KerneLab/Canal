@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.41 2022-05-22 */
+/*! canal.kernelab.org v1.0.42 2022-05-22 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2242,7 +2242,7 @@
 				{
 					if (map.hasOwnProperty(k))
 					{
-						fields[k] = Canal.field(map[k]).as(k);
+						fields[k] = Canal.col(map[k]).as(k);
 					}
 				}
 
@@ -2612,9 +2612,9 @@
 		return val == null ? Canal.None() : Canal.Some(val);
 	};
 
-	Canal.field = function(picker)
+	Canal.col = function(picker)
 	{
-		var wrap = picker;
+		var wrap = null;
 
 		if (picker == null)
 		{
@@ -2630,18 +2630,15 @@
 			{
 				return data[key];
 			};
+			wrap.alias = key;
 		}
-
-		if (wrap.alias == null && picker != null)
+		else
 		{
-			if (typeof picker !== "function")
+			wrap = function(data)
 			{
-				wrap.alias = picker.toString();
-			}
-			else
-			{
-				wrap.alias = picker.alias;
-			}
+				return picker(data);
+			};
+			wrap.alias = picker.alias;
 		}
 
 		wrap.as = function(alias)

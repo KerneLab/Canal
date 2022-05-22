@@ -5,7 +5,7 @@ describe("Test select", function()
 {
 	it("select()", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		
 		var result = Canal.of([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00},
@@ -37,7 +37,7 @@ describe("Test select", function()
 	
 	it("select() with mapping", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		
 		var result = Canal.of([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00},

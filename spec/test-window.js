@@ -42,7 +42,7 @@ describe("Test window", function()
 	
 	it("window() count", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		
 		var count = Canal.wf.count(f("id"))
 		.partBy(function(d){return d.grp;})
@@ -70,7 +70,7 @@ describe("Test window", function()
 	
 	it("window() count distinct", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		var distinct = Canal.wf.distinct;
 		
 		var result = Canal.of(dataSource).select()
@@ -148,7 +148,7 @@ describe("Test window", function()
 	
 	it("window() fold distinct", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		var distinct = Canal.wf.distinct;
 		
 		var result = Canal.of(dataSource).select()
@@ -203,7 +203,7 @@ describe("Test window", function()
 	
 	it("window() sum distinct", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		var distinct = Canal.wf.distinct;
 		
 		var result = Canal.of(dataSource).select()
@@ -343,7 +343,7 @@ describe("Test window", function()
 	
 	it("window() sum desc rows(-1,1)", function()
 	{
-		var f = Canal.field;
+		var f = Canal.col;
 		
 		var result = Canal.of(dataSource).select()
 		.window(
