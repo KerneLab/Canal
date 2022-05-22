@@ -7,9 +7,6 @@ describe("Test select", function()
 	{
 		var f = Canal.field;
 		
-		var salpick = function(d){return d.sal+1000;};
-		salpick.alias = "salplus";
-		
 		var result = Canal.of([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00},
@@ -21,9 +18,9 @@ describe("Test select", function()
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00}
 		]).select("id",
 				f("grp"),
-				f("rnk","rank"),
-				f(salpick),
-				f(null,"null")
+				f("rnk").as("rank"),
+				f(function(d){return d.sal+1000;}).as("salplus"),
+				f(null).as("null")
 		).collect();
 		
 		expect(result).to.eql([

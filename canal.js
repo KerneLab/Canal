@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.40 2021-12-02 */
+/*! canal.kernelab.org v1.0.41 2022-05-22 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2242,7 +2242,7 @@
 				{
 					if (map.hasOwnProperty(k))
 					{
-						fields[k] = Canal.field(map[k], k);
+						fields[k] = Canal.field(map[k]).as(k);
 					}
 				}
 
@@ -2612,13 +2612,16 @@
 		return val == null ? Canal.None() : Canal.Some(val);
 	};
 
-	Canal.wrapPicker = function(picker)
+	Canal.field = function(picker)
 	{
 		var wrap = picker;
 
 		if (picker == null)
 		{
-			wrap = nullData;
+			wrap = function()
+			{
+				return null;
+			};
 		}
 		else if (typeof picker !== "function")
 		{ // Extract the attribute from data by the key
@@ -2629,28 +2632,25 @@
 			};
 		}
 
-		return wrap;
-	};
-
-	Canal.field = function(picker, alias)
-	{
-		if (alias == null && picker != null)
+		if (wrap.alias == null && picker != null)
 		{
 			if (typeof picker !== "function")
 			{
-				alias = picker.toString();
+				wrap.alias = picker.toString();
 			}
 			else
 			{
-				alias = picker.alias;
+				wrap.alias = picker.alias;
 			}
 		}
 
-		picker = Canal.wrapPicker(picker);
+		wrap.as = function(alias)
+		{
+			this.alias = alias;
+			return this;
+		};
 
-		picker.alias = alias;
-
-		return picker;
+		return wrap;
 	};
 
 	function Item()
