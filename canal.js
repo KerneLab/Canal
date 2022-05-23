@@ -1,4 +1,4 @@
-/*! canal.kernelab.org v1.0.42 2022-05-22 */
+/*! canal.js v1.0.43 2022-05-23 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -50,6 +50,40 @@
 	// The function which doesn't do anything
 	var voidAction = function()
 	{
+	};
+
+	// Make a Spring source according to given range
+	var range = function(begin, until, step)
+	{
+		if (step == null)
+		{
+			step = 1;
+		}
+
+		var index = begin - step;
+
+		return new Spring(function()
+		{
+			var has = false;
+
+			if (begin < until)
+			{
+				has = step > 0 && index + step < until;
+			}
+			else if (begin > until)
+			{
+				has = step < 0 && index + step > until;
+			}
+
+			if (has)
+			{
+				return index += step;
+			}
+			else
+			{
+				return endOfData;
+			}
+		});
 	};
 
 	// Signum function which could compare LVal1 vs RVal1, LVal2 vs RVal2 ...
@@ -2541,6 +2575,10 @@
 		{
 			return new Canal().source(new Source(data, arguments[1], arguments[2]));
 		}
+		else if (data instanceof Spring)
+		{
+			return new Canal().source(data);
+		}
 		else if (typeof data === "function")
 		{
 			return new Canal().source(new Spring(data, arguments[1]));
@@ -3179,6 +3217,8 @@
 	Canal.vop = valOfPair;
 
 	Canal.cmp = comparator;
+
+	Canal.range = range;
 
 	Canal.signum = signum;
 
