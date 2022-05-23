@@ -1,4 +1,4 @@
-/*! canal.js v1.0.43 2022-05-23 */
+/*! canal.js v1.0.44 2022-05-23 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2571,7 +2571,11 @@
 
 	Canal.of = function(data)
 	{
-		if (data instanceof Array)
+		if (data instanceof Canal)
+		{
+			return data;
+		}
+		else if (data instanceof Array)
 		{
 			return new Canal().source(new Source(data, arguments[1], arguments[2]));
 		}
@@ -2816,6 +2820,32 @@
 	};
 
 	Canal.wf = {
+		"avg" : function(vop)
+		{
+			if (vop instanceof Item)
+			{
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return vop.updater()(agg, rows, begin, end) //
+					.reduce(function(a, b)
+					{
+						return a + b;
+					}).get() / vop.updater()(agg, rows, begin, end).count();
+				});
+			}
+			else
+			{
+				return Canal.item(function(agg, rows, begin, end)
+				{
+					return Canal.of(rows, begin, end) //
+					.map(vop) //
+					.reduce(function(a, b)
+					{
+						return a + b;
+					}).get() / rows.length;
+				});
+			}
+		},
 		"count" : function(vop) // vop | Item
 		{
 			if (vop instanceof Item)

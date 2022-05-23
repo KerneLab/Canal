@@ -14,6 +14,17 @@ describe("Test window", function()
 		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
 	];
 	
+	var dataSource1 = [
+		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"2","grp":"1","rnk":1,"sal":1000.00},
+		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
+		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
+		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
+		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+	];
+	
 	it("window() row_number", function()
 	{
 		var rn = Canal.wf.row_number()
@@ -172,6 +183,60 @@ describe("Test window", function()
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_uniq":[1,2]},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_uniq":[1,2]},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_uniq":[1,2]}
+		]);
+	});
+	
+	it("window() avg", function()
+	{
+		var avg = Canal.wf.avg(function(d){return d.sal;})
+		.partBy(function(d){return d.grp;})
+		.orderBy(function(d){return d.rnk;})
+		.as("avg_sal");
+		
+		expect(typeof avg.orderBy()).to.be("object");
+		
+		var result = Canal.of(dataSource).select()
+		.window(
+			avg
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"avg_sal":1050.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"avg_sal":1050.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"avg_sal":1150.00},
+			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"avg_sal":1150.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"avg_sal":1200.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"avg_sal":1550.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"avg_sal":1550.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"avg_sal":1600.00}
+		]);
+	});
+	
+	it("window() avg distinct", function()
+	{
+		var f = Canal.col;
+		var distinct = Canal.wf.distinct;
+		
+		var avg = Canal.wf.avg(distinct(f("sal")))
+		.partBy(function(d){return d.grp;})
+		.as("avg_sal");
+		
+		expect(typeof avg.orderBy()).to.be("object");
+		
+		var result = Canal.of(dataSource1).select()
+		.window(
+			avg
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"avg_sal":1225.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1000.00,"avg_sal":1225.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"avg_sal":1225.00},
+			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"avg_sal":1225.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"avg_sal":1225.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"avg_sal":1600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"avg_sal":1600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"avg_sal":1600.00}
 		]);
 	});
 	

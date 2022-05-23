@@ -81,5 +81,12 @@ describe("Test miscellaneous", function()
 
 		expect(cmp(1, null)).to.eql(1);
 	});
+	
+	it("of(Canal)", function()
+	{
+		var res = Canal.of(Canal.of([ 1, 2, 3 ])).collect();
+
+		expect(res).to.eql([ 1, 2, 3 ]);
+	});
 
 });
