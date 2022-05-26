@@ -7,11 +7,12 @@ describe("Test window", function()
 		{"id":"1","grp":"1","rnk":1,"sal":1000.00},
 		{"id":"2","grp":"1","rnk":1,"sal":1100.00},
 		{"id":"3","grp":"1","rnk":2,"sal":1200.00},
-		{"id":"4","grp":"1","rnk":2,"sal":1300.00},
+		{"id":"4","grp":"1","rnk":2,"sal":null},
 		{"id":"5","grp":"1","rnk":3,"sal":1400.00},
 		{"id":"6","grp":"2","rnk":1,"sal":1500.00},
 		{"id":"7","grp":"2","rnk":1,"sal":1600.00},
-		{"id":"8","grp":"2","rnk":2,"sal":1700.00}
+		{"id":"8","grp":"2","rnk":2,"sal":1700.00},
+		{"id":"9","grp":"2","rnk":null,"sal":1800.00}
 	];
 	
 	var dataSource1 = [
@@ -43,11 +44,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"row_num":1},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"row_num":2},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"row_num":3},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"row_num":4},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"row_num":4},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"row_num":5},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"row_num":1},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"row_num":2},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"row_num":3}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"row_num":3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"row_num":4}
 		]);
 	});
 	
@@ -71,11 +73,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":2},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":2},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":4},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"count":4},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"count":4},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"count":5},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"count":2},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"count":2},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"count":3}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"count":3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"count":4}
 		]);
 	});
 	
@@ -86,20 +89,46 @@ describe("Test window", function()
 		
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.count(distinct(f("rnk")))
+			Canal.wf.count(distinct(f("sal")))
 				.partBy(function(d){return d.grp;})
 				.as("count")
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":3},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":3},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":3},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"count":3},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"count":3},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"count":2},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"count":2},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"count":2}
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":4},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":4},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":4},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"count":4},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"count":4},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"count":4},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"count":4},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"count":4},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"count":4}
+		]);
+	});
+
+	it("window() count distinct sal", function()
+	{
+		var f = Canal.col;
+		var distinct = Canal.wf.distinct;
+		
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.count(distinct(f("sal")))
+				.partBy(function(d){return d.grp;})
+				.as("count")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"count":4},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"count":4},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"count":4},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"count":4},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"count":4},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"count":4},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"count":4},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"count":4},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"count":4}
 		]);
 	});
 	
@@ -123,12 +152,44 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00]},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00]},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00]},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00]},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,null]},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"fold_sal":[1000.00,1100.00,1200.00,null]},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1500.00,1600.00]},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1500.00,1600.00]},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00]}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00]},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"fold_sal":[1500.00,1600.00,1700.00,1800.00]}
+		]);
+	});
+	
+	it("window() fold part order desc", function()
+	{
+		var f = Canal.col;
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.fold(function(){return [];},
+						  function(last,data){
+							last.push(data);
+							return last;
+						  },
+						  function(d){
+							return d.sal;
+						  })
+				.partBy(function(d){return d.grp;})
+				.orderBy(f(function(d){return d.rnk;}).nullsFirst())
+				.as("fold_sal")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00]},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00]},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,null]},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"fold_sal":[1000.00,1100.00,1200.00,null]},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"fold_sal":[1800.00]},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1800.00,1500.00,1600.00]},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1800.00,1500.00,1600.00]},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1800.00,1500.00,1600.00,1700.00]}
 		]);
 	});
 	
@@ -146,14 +207,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,1300.00,1400.00]},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1500.00,1600.00,1700.00]},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1500.00,1600.00,1700.00]},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00]}
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_sal":[1000.00,1100.00,1200.00,null,1400.00]},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_sal":[1500.00,1600.00,1700.00,1800.00]},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_sal":[1500.00,1600.00,1700.00,1800.00]},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_sal":[1500.00,1600.00,1700.00,1800.00]},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"fold_sal":[1500.00,1600.00,1700.00,1800.00]}
 		]);
 	});
 	
@@ -178,11 +240,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"fold_uniq":[1,2,3]},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"fold_uniq":[1,2,3]},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"fold_uniq":[1,2,3]},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"fold_uniq":[1,2,3]},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"fold_uniq":[1,2,3]},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"fold_uniq":[1,2,3]},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_uniq":[1,2]},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_uniq":[1,2]},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_uniq":[1,2]}
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"fold_uniq":[1,2,null]},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"fold_uniq":[1,2,null]},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"fold_uniq":[1,2,null]},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"fold_uniq":[1,2,null]}
 		]);
 	});
 	
@@ -203,16 +266,46 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"avg_sal":1050.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"avg_sal":1050.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"avg_sal":1150.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"avg_sal":1150.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"avg_sal":1200.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"avg_sal":1100.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"avg_sal":1100.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"avg_sal":1175.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"avg_sal":1550.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"avg_sal":1550.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"avg_sal":1600.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"avg_sal":1600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"avg_sal":1650.00}
 		]);
 	});
 	
 	it("window() avg distinct", function()
+	{
+		var f = Canal.col;
+		var distinct = Canal.wf.distinct;
+		
+		var avg = Canal.wf.avg(distinct(f("sal")))
+		.partBy(function(d){return d.grp;})
+		.as("avg_sal");
+		
+		expect(typeof avg.orderBy()).to.be("object");
+		
+		var result = Canal.of(dataSource).select()
+		.window(
+			avg
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"avg_sal":1175.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"avg_sal":1175.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"avg_sal":1175.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"avg_sal":1175.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"avg_sal":1175.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"avg_sal":1650.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"avg_sal":1650.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"avg_sal":1650.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"avg_sal":1650.00}
+		]);
+	});
+	
+	it("window() avg distinct 1", function()
 	{
 		var f = Canal.col;
 		var distinct = Canal.wf.distinct;
@@ -257,12 +350,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -282,11 +376,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_uniq":6},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_uniq":6},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_uniq":6},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_uniq":6},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_uniq":6},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_uniq":6},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_uniq":3},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_uniq":3},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_uniq":3}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_uniq":3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_uniq":3}
 		]);
 	});
 	
@@ -305,10 +400,11 @@ describe("Test window", function()
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":5200.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":5200.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":5200.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":9400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":9400.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":9400.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":10800.00}
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":8100.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":8100.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":8100.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":9500.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":11300.00}
 		]);
 	});
 	
@@ -323,14 +419,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":6600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":6600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":6600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -345,14 +442,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":10800.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":10800.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":10800.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":10800.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":10800.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":10800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":10800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":10800.00}
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":11300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":11300.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":11300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":11300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":11300.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":11300.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":11300.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":11300.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":11300.00}
 		]);
 	});
 	
@@ -374,16 +472,17 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3300.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":5100.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":3500.00}
 		]);
 	});
 	
-	it("window() sum rows(-1,1)", function()
+	it("window() sum rows [-1,1]", function()
 	{
 		var result = Canal.of(dataSource).select()
 		.window(
@@ -397,12 +496,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3300.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":5100.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":3500.00}
 		]);
 	});
 	
@@ -414,20 +514,21 @@ describe("Test window", function()
 		.window(
 			Canal.wf.sum(function(d){return d.sal;})
 				.partBy(f("grp"))
-				.orderBy(f("rnk"), false, function(d){return parseInt(d.id);}, true)
+				.orderBy(f("rnk"), false, function(d){return parseInt(d.id);})
 				.rows().between(-1, 1)
 				.as("sum_sal")
 		).collect();
 	
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3500.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3400.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2200.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3200.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4900.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":3400.00}
 		]);
 	});
 	
@@ -445,12 +546,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2300.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2500.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1200.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":1400.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3300.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3500.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -466,14 +568,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":5000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2700.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":1400.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3300.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00}
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":6600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":5100.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3500.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -489,14 +592,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3400.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2100.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":1100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1600.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":6600.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4900.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3400.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -515,11 +619,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":undefined},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":1000.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2300.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2500.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1200.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":undefined},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1500.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":3300.00}
 		]);
 	});
 	
@@ -537,58 +642,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2600.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2500.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1200.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":1000.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":undefined},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1700.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3200.00}
-		]);
-	});
-	
-	it("window() sum rows(-1,0)", function()
-	{
-		var result = Canal.of(dataSource).select()
-		.window(
-			Canal.wf.sum(function(d){return d.sal;})
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;})
-				.rows().between(-1, 0)
-				.as("sum_sal")
-		).collect();
-	
-		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2500.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2700.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1500.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3300.00}
-		]);
-	});
-	
-	it("window() sum desc rows(-1,0)", function()
-	{
-		var result = Canal.of(dataSource).select()
-		.window(
-			Canal.wf.sum(function(d){return d.sal;})
-				.partBy(function(d){return d.grp;})
-				.orderBy(function(d){return d.rnk;}, false, function(d){return parseInt(d.id);})
-				.rows().between(-1, 0)
-				.as("sum_sal")
-		).collect();
-	
-		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2500.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2300.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3200.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3200.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":3100.00}
 		]);
 	});
 	
@@ -607,11 +667,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1000.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1500.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -629,12 +690,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4900.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3600.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3200.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -651,13 +713,14 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2300.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2500.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2700.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":1400.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":1200.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":1400.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3300.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1700.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":undefined}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3500.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":undefined}
 		]);
 	});
 	
@@ -673,14 +736,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2500.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2300.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2100.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1200.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1000.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2100.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":1100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":undefined},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1600.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":undefined}
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3400.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":undefined}
 		]);
 	});
 	
@@ -696,14 +760,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -719,14 +784,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -744,12 +810,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -766,13 +833,14 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -788,14 +856,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -811,14 +880,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -834,14 +904,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00}
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":6600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":6600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3500.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -857,14 +928,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":6600.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4900.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4900.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -880,14 +952,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":6600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":6600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":6600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -903,14 +976,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":6600.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":6600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":6600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -928,12 +1002,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2100.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2100.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4600.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":4600.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":3300.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":3100.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":3100.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -950,13 +1025,14 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":1400.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":3900.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":3900.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2600.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":1700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -972,14 +1048,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4600.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4600.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":6000.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3300.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4700.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -995,14 +1072,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3900.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":6000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":6000.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":6000.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":6000.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":2600.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":4700.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":4700.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":4700.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":4700.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":4800.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":4800.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":4800.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":6600.00}
 		]);
 	});
 	
@@ -1018,14 +1096,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3900.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3900.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2600.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2600.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":1400.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":1400.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1700.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1700.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":undefined}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":undefined},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -1041,14 +1120,15 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4600.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3300.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2100.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2100.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":undefined},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":undefined},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":undefined},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":undefined}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":undefined},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -1067,11 +1147,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":undefined},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":undefined},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":2100.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":2100.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":4600.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":2100.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":3300.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":undefined},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":undefined},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":3100.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -1089,12 +1170,13 @@ describe("Test window", function()
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sum_sal":undefined},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sum_sal":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sum_sal":1400.00},
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":3900.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":3900.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sum_sal":1400.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sum_sal":2600.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sum_sal":2600.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sum_sal":undefined},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sum_sal":1700.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1700.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sum_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sum_sal":1800.00}
 		]);
 	});
 	
@@ -1180,11 +1262,36 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1100.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"min_sal":1200.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"min_sal":1300.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"min_sal":1200.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"min_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"min_sal":1500.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"min_sal":1500.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1600.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"min_sal":1700.00}
+		]);
+	});
+	
+	it("window() max part(grp) order(rnk) between(-1,0)", function()
+	{
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.max(function(d){return d.sal;})
+				.partBy(function(d){return d.grp;})
+				.orderBy(function(d){return d.rnk;})
+				.rows().between(-1,0)
+				.as("max_sal")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"max_sal":1000.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"max_sal":1100.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"max_sal":1200.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"max_sal":1200.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"max_sal":1400.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"max_sal":1500.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"max_sal":1600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"max_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"max_sal":1800.00}
 		]);
 	});
 	
@@ -1201,11 +1308,34 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"min_sal":1000.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"min_sal":1000.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"min_sal":1200.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"min_sal":1200.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"min_sal":1200.00},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"min_sal":1400.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"min_sal":1500.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"min_sal":1500.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1700.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"min_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"min_sal":1800.00}
+		]);
+	});
+	
+	it("window() max part(grp,rnk)", function()
+	{
+		var result = Canal.of(dataSource).select()
+		.window(
+			Canal.wf.max(function(d){return d.sal;})
+				.partBy(function(d){return d.grp;}, function(d){return d.rnk;})
+				.as("max_sal")
+		).collect();
+	
+		expect(result).to.eql([
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"max_sal":1100.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"max_sal":1100.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"max_sal":1200.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"max_sal":1200.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"max_sal":1400.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"max_sal":1600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"max_sal":1600.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"max_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"max_sal":1800.00}
 		]);
 	});
 	
@@ -1223,11 +1353,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"rank":1},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"rank":1},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"rank":3},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"rank":3},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"rank":3},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"rank":5},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"rank":1},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"rank":1},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":3}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"rank":4}
 		]);
 	});
 	
@@ -1245,11 +1376,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"rank":1},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"rank":1},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"rank":2},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"rank":2},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"rank":2},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"rank":3},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"rank":1},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"rank":1},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":2}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"rank":2},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"rank":3}
 		]);
 	});
 	
@@ -1267,11 +1399,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"pct_rnk":0},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"pct_rnk":0},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"pct_rnk":0.5},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"pct_rnk":0.5},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"pct_rnk":0.5},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"pct_rnk":1},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"pct_rnk":0},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"pct_rnk":0},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"pct_rnk":1}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"pct_rnk":2/3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"pct_rnk":1}
 		]);
 	});
 	
@@ -1289,11 +1422,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ntle":3},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"ntle":3},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ntle":4},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ntle":1},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ntle":2},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":3}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":3},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"ntle":4}
 		]);
 	});
 	
@@ -1311,11 +1445,12 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ntle":1},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ntle":1},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ntle":2},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ntle":2},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"ntle":2},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ntle":3},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ntle":1},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ntle":2},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":3}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ntle":1},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ntle":2},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"ntle":3}
 		]);
 	});
 	
@@ -1323,7 +1458,7 @@ describe("Test window", function()
 	{
 		var result = Canal.of(dataSource).select()
 		.window(
-			Canal.wf.lag(function(d){return d.sal;}, 2, "N/A")
+			Canal.wf.lag(function(d){return d.sal;}, 1, "N/A")
 				.partBy(function(d){return d.grp;})
 				.orderBy(function(d){return d.rnk;})
 				.as("lg")
@@ -1331,13 +1466,14 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"lg":"N/A"},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"lg":"N/A"},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"lg":1000.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"lg":1100.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"lg":1200.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"lg":1000.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"lg":1100.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"lg":1200.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"lg":null},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"lg":"N/A"},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"lg":"N/A"},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"lg":1500.00}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"lg":1500.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"lg":1600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"lg":1700.00}
 		]);
 	});
 	
@@ -1358,13 +1494,14 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"ld":1200.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ld":1300.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"ld":null},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"ld":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"ld":"N/A"},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"ld":"N/A"},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"ld":"N/A"},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"ld":1700.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ld":"N/A"},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ld":"N/A"}
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"ld":1800.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"ld":"N/A"},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"ld":"N/A"}
 		]);
 	});
 	
@@ -1386,19 +1523,21 @@ describe("Test window", function()
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"cum_dst":0.4},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"cum_dst":0.4},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"cum_dst":0.8},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"cum_dst":0.8},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"cum_dst":0.8},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"cum_dst":1.0},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"cum_dst":2/3},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"cum_dst":2/3},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"cum_dst":1.0}
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"cum_dst":0.5},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"cum_dst":0.5},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"cum_dst":0.75},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"cum_dst":1.0}
 		]);
 	});
 	
 	it("window() map_part()", function()
 	{
+		var f = Canal.col;
 		var map_part = Canal.wf.map_part(function(p){return p[1].sal;})
 		.partBy(function(d){return d.grp;})
-		.orderBy(function(d){return d.sal;})
+		.orderBy(f(function(d){return d.sal;}).nullsFirst())
 		.as("sec_sal");
 		
 		expect(typeof map_part.aggregator()).to.be("function");
@@ -1411,27 +1550,25 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sec_sal":1100.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sec_sal":1100.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sec_sal":1100.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"sec_sal":1100.00},
-			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sec_sal":1100.00},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"sec_sal":1000.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"sec_sal":1000.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"sec_sal":1000.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"sec_sal":1000.00},
+			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"sec_sal":1000.00},
 			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"sec_sal":1600.00},
 			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"sec_sal":1600.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sec_sal":1600.00}
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"sec_sal":1600.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"sec_sal":1600.00}
 		]);
 	});
 	
 	it("window() first_value()", function()
 	{
+		var f = Canal.col;
 		var first_value = Canal.wf.first_value(function(r){return r.sal;})
 		.partBy(function(d){return d.grp;})
-		.orderBy(function(d){return d.sal;},false)
+		.orderBy(f(function(d){return d.sal;}).desc().nullsLast())
 		.as("first_sal");
-		
-		expect(typeof first_value.aggregator()).to.be("function");
-		expect(typeof first_value.updater()).to.be("function");
-		expect(typeof first_value.expressor()).to.be("function");
 		
 		var result = Canal.of(dataSource).select()
 		.window(
@@ -1440,26 +1577,24 @@ describe("Test window", function()
 	
 		expect(result).to.eql([
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"first_sal":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"first_sal":1400.00},
 			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"first_sal":1400.00},
 			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"first_sal":1400.00},
 			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"first_sal":1400.00},
-			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"first_sal":1700.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"first_sal":1700.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"first_sal":1700.00}
+			{"id":"4","grp":"1","rnk":2,"sal":null,"first_sal":1400.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"first_sal":1800.00},
+			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"first_sal":1800.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"first_sal":1800.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"first_sal":1800.00}
 		]);
 	});
 	
 	it("window() last_value()", function()
 	{
+		var f = Canal.col;
 		var last_value = Canal.wf.last_value(function(r){return r.sal;})
 		.partBy(function(d){return d.grp;})
-		.orderBy(function(d){return d.sal;})
+		.orderBy(f(function(d){return d.rnk;}).asc().nullsFirst())
 		.as("last_sal");
-		
-		expect(typeof last_value.aggregator()).to.be("function");
-		expect(typeof last_value.updater()).to.be("function");
-		expect(typeof last_value.expressor()).to.be("function");
 		
 		var result = Canal.of(dataSource).select()
 		.window(
@@ -1467,13 +1602,14 @@ describe("Test window", function()
 		).collect();
 	
 		expect(result).to.eql([
-			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"last_sal":1400.00},
-			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"last_sal":1400.00},
-			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"last_sal":1400.00},
-			{"id":"4","grp":"1","rnk":2,"sal":1300.00,"last_sal":1400.00},
+			{"id":"1","grp":"1","rnk":1,"sal":1000.00,"last_sal":1100.00},
+			{"id":"2","grp":"1","rnk":1,"sal":1100.00,"last_sal":1100.00},
+			{"id":"3","grp":"1","rnk":2,"sal":1200.00,"last_sal":null},
+			{"id":"4","grp":"1","rnk":2,"sal":null,"last_sal":null},
 			{"id":"5","grp":"1","rnk":3,"sal":1400.00,"last_sal":1400.00},
-			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"last_sal":1700.00},
-			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"last_sal":1700.00},
+			{"id":"9","grp":"2","rnk":null,"sal":1800.00,"last_sal":1800.00},
+			{"id":"6","grp":"2","rnk":1,"sal":1500.00,"last_sal":1600.00},
+			{"id":"7","grp":"2","rnk":1,"sal":1600.00,"last_sal":1600.00},
 			{"id":"8","grp":"2","rnk":2,"sal":1700.00,"last_sal":1700.00}
 		]);
 	});

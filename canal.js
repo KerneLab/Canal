@@ -1,4 +1,4 @@
-/*! canal.js v1.0.44 2022-05-23 */
+/*! canal.js v1.0.45 2022-05-26 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -106,6 +106,27 @@
 		return 0;
 	};
 
+	// Compare two value by given order
+	var cmpval = function(a, b, asc, nullsFirst)
+	{
+		if (a == b)
+		{
+			return 0;
+		}
+		if (a == null || b == null)
+		{
+			if (nullsFirst === true)
+			{
+				return a == null ? -1 : 1;
+			}
+			else
+			{
+				return a == null ? 1 : -1;
+			}
+		}
+		return a < b ? -1 * asc : 1 * asc;
+	};
+
 	// Make a comparator to compare to two object according to given fields
 	var comparator = function()
 	{
@@ -200,7 +221,7 @@
 
 			if (typeof arg === "boolean")
 			{
-				asc = arg;
+				asc = arg === false ? -1 : 1;
 			}
 			else
 			{
@@ -211,7 +232,7 @@
 					{
 						ascs.push(asc);
 					}
-					asc = true;
+					asc = arg.order === false ? -1 : 1;
 				}
 			}
 		}
@@ -235,13 +256,9 @@
 			for (var i = 0; i < kops.length; i++)
 			{
 				var kop = kops[i];
-				cmp = signum(kop(a), kop(b));
+				cmp = cmpval(kop(a), kop(b), ascs[i], kop.nulls == "first");
 				if (cmp != 0)
 				{
-					if (!ascs[i])
-					{
-						cmp *= -1;
-					}
 					break;
 				}
 			}
@@ -362,10 +379,10 @@
 
 		var le = function(a, b)
 		{
-			return a <= b;
+			return a <= b && a != null && b != null || a == null && b == null;
 		}, ge = function(a, b)
 		{
-			return a >= b;
+			return a >= b && a != null && b != null || a == null && b == null;
 		};
 
 		var kops = [], ascs = [], kop = null, asc = null;
@@ -380,7 +397,7 @@
 		{
 			var dir = preced < 0 ? -1 : 1;
 			var lst = preced < 0 ? last : first;
-			var cmp = asc ? ge : le;
+			var cmp = asc > 0 ? ge : le;
 
 			return function(rows, current, preced, levelBegin, levelEnd)
 			{
@@ -397,7 +414,7 @@
 				else
 				{
 					var from = preced < 0 ? levelBegin : (levelEnd - 1);
-					var far = current + (asc ? 1 : -1) * preced;
+					var far = current != null ? current + asc * preced : null;
 					begin = seekIndexWhen(rows, kop, from, dir, lst, cmp, far);
 				}
 
@@ -409,7 +426,7 @@
 		{
 			var dir = follow > 0 ? 1 : -1;
 			var lst = follow > 0 ? last : first;
-			var cmp = asc ? le : ge;
+			var cmp = asc > 0 ? le : ge;
 
 			return function(rows, current, follow, levelBegin, levelEnd)
 			{
@@ -426,7 +443,7 @@
 				else
 				{
 					var from = follow > 0 ? (levelEnd - 1) : levelBegin;
-					var far = current + (asc ? 1 : -1) * follow;
+					var far = current != null ? current + asc * follow : null;
 					end = seekIndexWhen(rows, kop, from, dir, lst, cmp, far);
 				}
 
@@ -1795,6 +1812,34 @@
 	}
 	ForeachOp.prototype = new Operator();
 
+	function LastOp()
+	{
+		function LastPond()
+		{
+		}
+		LastPond.prototype = new Terminal();
+		LastPond.prototype.settling = function()
+		{
+			return endOfData;
+		};
+		LastPond.prototype.accept = function(d)
+		{
+			this.settle(d);
+			return true;
+		};
+		LastPond.prototype.get = function()
+		{
+			return this.settle() !== endOfData //
+			? Canal.Some(this.settle()) : Canal.None();
+		};
+
+		this.newPond = function()
+		{
+			return new LastPond();
+		};
+	}
+	LastOp.prototype = new Operator();
+
 	function ReduceOp(reducer) // (dat1,dat2) => dat3
 	{
 		function ReducePond()
@@ -2403,6 +2448,20 @@
 			this.evaluate(new ForeachOp(action));
 		};
 
+		this.last = function()
+		{
+			var pred = arguments[0];
+
+			var c = this;
+
+			if (pred !== undefined)
+			{
+				c = c.filter(pred);
+			}
+
+			return c.evaluate(new LastOp());
+		};
+
 		this.reduce = function(reducer)
 		{
 			return this.evaluate(new ReduceOp(reducer));
@@ -2681,11 +2740,37 @@
 				return picker(data);
 			};
 			wrap.alias = picker.alias;
+			wrap.order = picker.order;
+			wrap.nulls = picker.nulls;
 		}
 
 		wrap.as = function(alias)
 		{
 			this.alias = alias;
+			return this;
+		};
+
+		wrap.asc = function()
+		{
+			this.order = true; // null by default
+			return this;
+		};
+
+		wrap.desc = function()
+		{
+			this.order = false;
+			return this;
+		};
+
+		wrap.nullsFirst = function()
+		{
+			this.nulls = "first";
+			return this;
+		};
+
+		wrap.nullsLast = function()
+		{
+			this.nulls = "last"; // null by default
 			return this;
 		};
 
@@ -2826,23 +2911,31 @@
 			{
 				return Canal.item(function(agg, rows, begin, end)
 				{
-					return vop.updater()(agg, rows, begin, end) //
-					.reduce(function(a, b)
+					var c = vop.updater()(agg, rows, begin, end) //
+					.filter(function(d)
+					{
+						return d != null;
+					});
+					return c.reduce(function(a, b)
 					{
 						return a + b;
-					}).get() / vop.updater()(agg, rows, begin, end).count();
+					}).get() / c.count();
 				});
 			}
 			else
 			{
 				return Canal.item(function(agg, rows, begin, end)
 				{
-					return Canal.of(rows, begin, end) //
+					var c = Canal.of(rows, begin, end) //
 					.map(vop) //
-					.reduce(function(a, b)
+					.filter(function(d)
+					{
+						return d != null;
+					});
+					return c.reduce(function(a, b)
 					{
 						return a + b;
-					}).get() / rows.length;
+					}).get() / c.count();
 				});
 			}
 		},
@@ -2852,14 +2945,20 @@
 			{
 				return Canal.item(function(agg, rows, begin, end)
 				{
-					return vop.updater()(agg, rows, begin, end).count();
+					return vop.updater()(agg, rows, begin, end).filter(function(d)
+					{
+						return d != null;
+					}).count();
 				});
 			}
 			else
 			{
 				return Canal.item(function(agg, rows, begin, end)
 				{
-					return Canal.of(rows, begin, end).map(vop).count();
+					return Canal.of(rows, begin, end).map(vop).filter(function(d)
+					{
+						return d != null;
+					}).count();
 				});
 			}
 		},
@@ -2921,22 +3020,11 @@
 		},
 		"first_value" : function(vop)
 		{
-			return Canal.item({
-				"aggr" : function(levels)
-				{
-					return Canal.of(levels).flatMap(function(level)
-					{
-						return level;
-					}).collect();
-				},
-				"updt" : function(agg)
-				{
-					return agg;
-				},
-				"expr" : function(pos, rows)
-				{
-					return vop(rows[0]);
-				}
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.first().get();
 			});
 		},
 		"fold" : function(init, folder)
@@ -2973,22 +3061,11 @@
 		},
 		"last_value" : function(vop)
 		{
-			return Canal.item({
-				"aggr" : function(levels)
-				{
-					return Canal.of(levels).flatMap(function(level)
-					{
-						return level;
-					}).collect();
-				},
-				"updt" : function(agg)
-				{
-					return agg;
-				},
-				"expr" : function(pos, rows)
-				{
-					return vop(rows[rows.length - 1]);
-				}
+			return Canal.item(function(agg, rows, begin, end)
+			{
+				return Canal.of(rows, begin, end) //
+				.map(vop) //
+				.last().get();
 			});
 		},
 		"lead" : function(vop)
@@ -3037,6 +3114,10 @@
 			{
 				return Canal.of(rows, begin, end) //
 				.map(vop) //
+				.filter(function(d)
+				{
+					return d != null;
+				}) //
 				.reduce(function(a, b)
 				{
 					if (cmp(a, b) < 0)
@@ -3058,6 +3139,10 @@
 			{
 				return Canal.of(rows, begin, end) //
 				.map(vop) //
+				.filter(function(d)
+				{
+					return d != null;
+				}) //
 				.reduce(function(a, b)
 				{
 					if (cmp(a, b) > 0)
@@ -3109,7 +3194,7 @@
 			return Canal.item({
 				"aggr" : function(levels)
 				{
-					var lvs = levels.length - 1;
+					var lvs = flatten(levels).length - 1;
 					return Canal.of(levels).flatMap(function(level, group)
 					{
 						return Canal.of(level).map(function(d, row)
@@ -3117,17 +3202,31 @@
 							return group;
 						}).collect();
 					}) //
-					.map(function(d, i)
+					.map(function(g, i)
 					{
-						return [ i, d ];
+						return [ g, i ];
 					}) //
+					.groupByKey() //
+					.map(function(d)
+					{
+						var rs = d[1];
+						var m = Canal.of(rs).reduce(function(a, b)
+						{
+							return a < b ? a : b;
+						}).get();
+						return Canal.of(rs).map(function(d)
+						{
+							return [ d, m ];
+						}).collect();
+					}) //
+					.flatMap() //
 					.sortBy(function(d)
 					{
 						return d[0];
 					}) //
 					.map(function(d)
 					{
-						return lvs == 0 ? 0 : d[1] / lvs;
+						return lvs == 0 ? 0 : (d[1] / lvs);
 					}).collect();
 				},
 				"expr" : function(pos, agg)
