@@ -1,4 +1,4 @@
-/*! canal.js v1.0.45 2022-05-26 */
+/*! canal.js v1.0.46 2022-05-27 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -47,9 +47,31 @@
 		return undefined;
 	};
 
+	// Return the second argument if the first one is null or undefined
+	var nvl = function(val, bak)
+	{
+		return val == null ? bak : val;
+	};
+
+	var nvl0 = function(val)
+	{
+		return nvl(val, 0);
+	};
+
 	// The function which doesn't do anything
 	var voidAction = function()
 	{
+	};
+
+	// Make an item stand for pick all columns of the object
+	var pickAllColumns = function(obj)
+	{
+		var pick = function()
+		{
+			return obj;
+		};
+		pick.all = true;
+		return pick;
 	};
 
 	// Make a Spring source according to given range
@@ -2292,36 +2314,53 @@
 		{
 			if (arguments.length > 0)
 			{
-				var arg = arguments[0], map = null;
+				var map = {};
+				var arg = arguments[0];
 				if (isObject(arg))
 				{
-					map = arg;
+					var item = null;
+					for ( var k in arg)
+					{
+						item = arg[k];
+						if (typeof item === "function")
+						{
+							map[k] = item;
+						}
+						else
+						{
+							map[k] = Canal.col(item);
+						}
+					}
 				}
 				else
 				{
-					map = {};
 					var list = isArray(arg) ? arg : arguments;
 					var item = null;
 					for (var i = 0; i < list.length; i++)
 					{
 						item = list[i];
-						if (typeof item === "string")
-						{
-							map[item] = item;
-						}
-						else if (typeof item === "function" && item.alias != null)
+						if (typeof item === "function")
 						{
 							map[item.alias] = item;
+						}
+						else
+						{
+							map[item] = Canal.col(item);
 						}
 					}
 				}
 
-				var fields = {}, field = null;
+				var all = false;
+
 				for ( var k in map)
 				{
 					if (map.hasOwnProperty(k))
 					{
-						fields[k] = Canal.col(map[k]).as(k);
+						if (map[k].all)
+						{
+							all = true;
+							delete map[k];
+						}
 					}
 				}
 
@@ -2329,11 +2368,22 @@
 				{
 					var r = {};
 
-					for ( var k in fields)
+					if (all)
 					{
-						if (fields.hasOwnProperty(k))
+						for ( var k in d)
 						{
-							r[k] = fields[k](d);
+							if (d.hasOwnProperty(k))
+							{
+								r[k] = d[k];
+							}
+						}
+					}
+
+					for ( var k in map)
+					{
+						if (map.hasOwnProperty(k))
+						{
+							r[k] = map[k] != null ? map[k](d) : null;
 						}
 					}
 
@@ -2652,6 +2702,46 @@
 		}
 	};
 
+	var wrapPicker = function(picker)
+	{
+		if (picker.all)
+		{
+			return picker;
+		}
+
+		picker.as = function(alias)
+		{
+			this.alias = alias;
+			return this;
+		};
+
+		picker.asc = function()
+		{
+			this.order = true; // null by default
+			return this;
+		};
+
+		picker.desc = function()
+		{
+			this.order = false;
+			return this;
+		};
+
+		picker.nullsFirst = function()
+		{
+			this.nulls = "first";
+			return this;
+		};
+
+		picker.nullsLast = function()
+		{
+			this.nulls = "last"; // null by default
+			return this;
+		};
+
+		return picker;
+	};
+
 	function Option()
 	{
 	}
@@ -2660,6 +2750,46 @@
 	Option.prototype.or = undefined; // (defaultData) => Data
 	Option.prototype.orNull = undefined; // () => Data | null
 	Option.prototype.given = undefined; // () => boolean
+	Option.prototype.col = function(picker)
+	{
+		var wrap = null;
+		var data = this.or({});
+
+		if (picker == null)
+		{
+			wrap = function()
+			{
+				return null;
+			};
+		}
+		else if (picker === "*")
+		{
+			wrap = pickAllColumns(data);
+			wrap.alias = picker;
+		}
+		else if (typeof picker !== "function")
+		{ // Extract the attribute from data by the key
+			var key = picker.toString();
+			wrap = function()
+			{
+				return data[key];
+			};
+			wrap.alias = key;
+		}
+		else
+		{
+			wrap = function()
+			{
+				return picker(data);
+			};
+			wrap.alias = picker.alias;
+			wrap.order = picker.order;
+			wrap.nulls = picker.nulls;
+		}
+
+		return wrapPicker(wrap);
+	};
+	Option.prototype.$ = Option.prototype.col;
 
 	function Some(val)
 	{
@@ -2724,6 +2854,11 @@
 				return null;
 			};
 		}
+		else if (picker === "*")
+		{
+			wrap = pickAllColumns(null);
+			wrap.alias = picker;
+		}
 		else if (typeof picker !== "function")
 		{ // Extract the attribute from data by the key
 			var key = picker.toString();
@@ -2744,37 +2879,69 @@
 			wrap.nulls = picker.nulls;
 		}
 
-		wrap.as = function(alias)
-		{
-			this.alias = alias;
-			return this;
-		};
+		return wrapPicker(wrap);
+	};
 
-		wrap.asc = function()
+	Canal.row = function()
+	{
+		var map = {};
+		var arg = arguments[0];
+		var all = [];
+		if (isObject(arg))
 		{
-			this.order = true; // null by default
-			return this;
-		};
-
-		wrap.desc = function()
+			for ( var k in arg)
+			{
+				if (arg[k] != null && arg[k].all)
+				{
+					all.push(arg[k]);
+				}
+				else
+				{
+					map[k] = arg[k];
+				}
+			}
+		}
+		else
 		{
-			this.order = false;
-			return this;
-		};
+			var list = isArray(arg) ? arg : arguments;
+			var item = null;
+			for (var i = 0; i < list.length; i++)
+			{
+				item = list[i];
+				if (item.all)
+				{
+					all.push(item);
+				}
+				else
+				{
+					map[item.alias] = item;
+				}
+			}
+		}
 
-		wrap.nullsFirst = function()
+		var row = {};
+
+		for (var i = 0; i < all.length; i++)
 		{
-			this.nulls = "first";
-			return this;
-		};
+			var obj = all[i]();
+			for ( var k in obj)
+			{
+				if (obj.hasOwnProperty(k))
+				{
+					row[k] = obj[k];
+				}
+			}
+		}
 
-		wrap.nullsLast = function()
+		for ( var k in map)
 		{
-			this.nulls = "last"; // null by default
-			return this;
-		};
+			if (map.hasOwnProperty(k))
+			{
+				row[k] = map[k]();
+			}
+		}
 
-		return wrap;
+		return row;
 	};
 
 	function Item()
@@ -3298,6 +3465,7 @@
 				return Canal.item(function(agg, rows, begin, end)
 				{
 					return vop.updater()(agg, rows, begin, end) //
+					.map(nvl0) //
 					.reduce(function(a, b)
 					{
 						return a + b;
@@ -3310,6 +3478,7 @@
 				{
 					return Canal.of(rows, begin, end) //
 					.map(vop) //
+					.map(nvl0) //
 					.reduce(function(a, b)
 					{
 						return a + b;
@@ -3346,6 +3515,8 @@
 	Canal.vop = valOfPair;
 
 	Canal.cmp = comparator;
+
+	Canal.nvl = nvl;
 
 	Canal.range = range;
 

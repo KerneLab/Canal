@@ -51,4 +51,25 @@ describe("Test leftJoin", function()
 		.mapJoint(mapper).collect();
 		expect(result).to.eql([]);
 	});
+	
+	it("leftJoin() row", function()
+	{
+		var left = [
+			{"id":1,"name":"mike"},
+			{"id":2,"name":"john"}
+		];
+		var right = [
+			{"id":1,"sal":100}
+		];
+		var result = Canal.of(left).keyBy(Canal.col("id"))	//
+					.leftJoin(Canal.of(right).keyBy(Canal.col("id"))) //
+					.mapJoint(function(l,r){
+						var a = Canal.Some(l);
+						return Canal.row(a.col("id"), a.col("name"), r.col("sal"));
+					}).collect();
+		expect(result).to.eql([
+			{"id":1,"name":"mike","sal":100},
+			{"id":2,"name":"john","sal":undefined}
+		]);
+	});
 });
