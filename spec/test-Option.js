@@ -15,6 +15,8 @@ describe("Test Option", function()
 		expect(result.or(2)).to.eql(1);
 
 		expect(result.given()).to.be(true);
+		
+		expect(result.orElse(Canal.Some(2)).get()).to.be(1);
 
 		expect(result.orNull()).to.be(1);
 	});
@@ -28,6 +30,8 @@ describe("Test Option", function()
 		expect(result.or(2)).to.eql(2);
 
 		expect(result.given()).to.be(false);
+		
+		expect(result.orElse(Canal.Some(2)).get()).to.be(2);
 
 		expect(result.orNull()).to.be(null);
 	});
