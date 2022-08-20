@@ -1,4 +1,4 @@
-/*! canal.js v1.0.47 2022-08-14 */
+/*! canal.js v1.0.48 2022-08-20 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1738,6 +1738,58 @@
 		return this.settle();
 	};
 
+	function BatchOp(size, action)
+	{
+		action = action == null ? voidAction : action;
+		function BatchPond()
+		{
+		}
+		BatchPond.prototype = new Terminal();
+		BatchPond.prototype.settling = function()
+		{
+			return [];
+		};
+		BatchPond.prototype.accept = function(d)
+		{
+			if (size == null || size <= 0)
+			{
+				return false;
+			}
+
+			if (this.settle() == null)
+			{
+				this.settle(this.settling());
+			}
+
+			if (this.settle().length < size)
+			{
+				this.settle().push(d);
+			}
+
+			if (this.settle().length == size)
+			{
+				action(Canal.of(this.settle()));
+				this.settle(null);
+			}
+
+			return true;
+		};
+		BatchPond.prototype.done = function() // Void
+		{
+			if (this.settle() != null)
+			{
+				action(Canal.of(this.settle()));
+			}
+		};
+		BatchPond.prototype.get = undefineData;
+
+		this.newPond = function()
+		{
+			return new BatchPond();
+		};
+	}
+	BatchOp.prototype = new Operator();
+
 	function CollectOp()
 	{
 		function CollectPond()
@@ -2437,6 +2489,11 @@
 		};
 
 		// General Terminate Operations
+
+		this.batch = function(size, action)
+		{
+			return this.evaluate(new BatchOp(size, action));
+		};
 
 		this.collect = function()
 		{
