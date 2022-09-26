@@ -1,4 +1,4 @@
-/*! canal.js v1.0.49 2022-08-21 */
+/*! canal.js v1.0.50 2022-09-26 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -784,58 +784,6 @@
 
 	// Intermediate Operators
 
-	function BatchOp(size)
-	{
-		function BatchPond()
-		{
-		}
-		BatchPond.prototype = new Desilter();
-		BatchPond.prototype.settling = function()
-		{
-			return null;
-		};
-		BatchPond.prototype.accept = function(d)
-		{
-			if (size == null || size <= 0)
-			{
-				return false;
-			}
-
-			if (this.settle() == null)
-			{
-				this.settle([]);
-			}
-
-			if (this.settle().length < size)
-			{
-				this.settle().push(d);
-			}
-
-			if (this.settle().length == size)
-			{
-				var res = this.downstream.accept(Canal.of(this.settle()));
-				this.settle(null);
-				return res;
-			}
-
-			return true;
-		};
-		BatchPond.prototype.done = function(d)
-		{
-			if (this.settle() != null)
-			{
-				this.downstream.accept(Canal.of(this.settle()));
-			}
-			this.downstream.done();
-		};
-
-		this.newPond = function()
-		{
-			return new BatchPond();
-		};
-	}
-	BatchOp.prototype = new Operator();
-
 	function CartesianOp(that)
 	{
 		function CartesianPond()
@@ -1602,6 +1550,58 @@
 	}
 	SkipOp.prototype = new Operator();
 
+	function SliceOp(size)
+	{
+		function SlicePond()
+		{
+		}
+		SlicePond.prototype = new Desilter();
+		SlicePond.prototype.settling = function()
+		{
+			return null;
+		};
+		SlicePond.prototype.accept = function(d)
+		{
+			if (size == null || size <= 0)
+			{
+				return false;
+			}
+
+			if (this.settle() == null)
+			{
+				this.settle([]);
+			}
+
+			if (this.settle().length < size)
+			{
+				this.settle().push(d);
+			}
+
+			if (this.settle().length == size)
+			{
+				var res = this.downstream.accept(Canal.of(this.settle()));
+				this.settle(null);
+				return res;
+			}
+
+			return true;
+		};
+		SlicePond.prototype.done = function(d)
+		{
+			if (this.settle() != null)
+			{
+				this.downstream.accept(Canal.of(this.settle()));
+			}
+			this.downstream.done();
+		};
+
+		this.newPond = function()
+		{
+			return new SlicePond();
+		};
+	}
+	SliceOp.prototype = new Operator();
+
 	function SortOp(cmp, asc) // cmp: (a,b) => 0(=) -1(<) 1(>)
 	{
 		asc = asc != null ? asc : true;
@@ -2135,11 +2135,6 @@
 
 		// General Intermediate Operations
 
-		this.batch = function(size)
-		{
-			return this.add(new BatchOp(size));
-		};
-
 		this.cartesian = function(that)
 		{
 			return this.add(new CartesianOp(that));
@@ -2206,6 +2201,11 @@
 		this.skip = function(num)
 		{
 			return this.add(new SkipOp(num));
+		};
+
+		this.slice = function(size)
+		{
+			return this.add(new SliceOp(size));
 		};
 
 		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
