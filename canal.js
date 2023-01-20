@@ -1,4 +1,4 @@
-/*! canal.js v1.0.50 2022-09-26 */
+/*! canal.js v1.0.51 2023-01-20 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1550,21 +1550,29 @@
 	}
 	SkipOp.prototype = new Operator();
 
-	function SliceOp(size)
+	function SlidingOp(size, step)
 	{
-		function SlicePond()
+		function SlidingPond()
 		{
+			this.gap = 0;
+			this.added = false;
 		}
-		SlicePond.prototype = new Desilter();
-		SlicePond.prototype.settling = function()
+		SlidingPond.prototype = new Desilter();
+		SlidingPond.prototype.settling = function()
 		{
 			return null;
 		};
-		SlicePond.prototype.accept = function(d)
+		SlidingPond.prototype.accept = function(d)
 		{
 			if (size == null || size <= 0)
 			{
 				return false;
+			}
+
+			if (this.gap > 0)
+			{
+				this.gap--;
+				return true;
 			}
 
 			if (this.settle() == null)
@@ -1575,20 +1583,23 @@
 			if (this.settle().length < size)
 			{
 				this.settle().push(d);
+				this.added = true;
 			}
 
 			if (this.settle().length == size)
 			{
 				var res = this.downstream.accept(Canal.of(this.settle()));
-				this.settle(null);
+				this.settle(this.settle().slice(step));
+				this.gap = step - size;
+				this.added = false;
 				return res;
 			}
 
 			return true;
 		};
-		SlicePond.prototype.done = function(d)
+		SlidingPond.prototype.done = function(d)
 		{
-			if (this.settle() != null)
+			if (this.settle() != null && this.added === true)
 			{
 				this.downstream.accept(Canal.of(this.settle()));
 			}
@@ -1597,10 +1608,10 @@
 
 		this.newPond = function()
 		{
-			return new SlicePond();
+			return new SlidingPond();
 		};
 	}
-	SliceOp.prototype = new Operator();
+	SlidingOp.prototype = new Operator();
 
 	function SortOp(cmp, asc) // cmp: (a,b) => 0(=) -1(<) 1(>)
 	{
@@ -2203,9 +2214,13 @@
 			return this.add(new SkipOp(num));
 		};
 
-		this.slice = function(size)
+		this.sliding = function(size, step)
 		{
-			return this.add(new SliceOp(size));
+			if (step == null || step <= 0)
+			{
+				step = size;
+			}
+			return this.add(new SlidingOp(size, step));
 		};
 
 		this.sortBy = function() // (kop1[,asc1[,kop2[,asc2...]]])
