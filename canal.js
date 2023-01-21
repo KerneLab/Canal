@@ -1,4 +1,4 @@
-/*! canal.js v1.0.51 2023-01-20 */
+/*! canal.js v1.0.52 2023-01-21 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1589,7 +1589,7 @@
 			if (this.settle().length == size)
 			{
 				var res = this.downstream.accept(Canal.of(this.settle()));
-				this.settle(this.settle().slice(step));
+				this.settle(step >= size ? [] : this.settle().slice(step));
 				this.gap = step - size;
 				this.added = false;
 				return res;
