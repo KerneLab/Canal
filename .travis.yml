@@ -3,7 +3,6 @@ os:
   - linux
 dist: xenial
 node_js:
-  - "stable"
   - "17"
   - "16"
   - "8"
