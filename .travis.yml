@@ -3,7 +3,7 @@ os:
   - linux
 dist: xenial
 node_js:
-  - "lts/*"
+  - "18"
   - "17"
   - "8"
 install:
