@@ -1,4 +1,4 @@
-Canal.js [![Travic CI](https://api.travis-ci.com/KerneLab/Canal.svg?branch=master)](https://app.travis-ci.com/github/KerneLab/Canal) [![Codecov](https://img.shields.io/codecov/c/github/KerneLab/Canal.svg)](https://codecov.io/gh/KerneLab/Canal) [![NPM](https://img.shields.io/npm/v/canal.js.svg)](https://www.npmjs.com/package/canal.js) [![License](https://img.shields.io/npm/l/canal.js.svg)](https://www.npmjs.com/package/canal.js)
+Canal.js [![CircleCI](https://dl.circleci.com/status-badge/img/gh/KerneLab/Canal/tree/master.svg?style=shield)](https://dl.circleci.com/status-badge/redirect/gh/KerneLab/Canal/tree/master) [![Codecov](https://img.shields.io/codecov/c/github/KerneLab/Canal.svg)](https://codecov.io/gh/KerneLab/Canal) [![NPM](https://img.shields.io/npm/v/canal.js.svg)](https://www.npmjs.com/package/canal.js) [![License](https://img.shields.io/npm/l/canal.js.svg)](https://www.npmjs.com/package/canal.js)
 =========================
 A Fluent API of Data Processing Framework in Javascript
 
