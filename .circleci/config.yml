@@ -13,14 +13,14 @@ workflows:
 
 jobs:
   build_and_test:
-    executor: node/default
+    working_directory: ~/mern-starter
+    docker:
+      - image: circleci/node:10.16.3
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@5'
+          command: 'sudo npm install -g npm@3'
       - restore_cache:
           key: dependency-cache-{{ checksum "package.json" }}
       - run:
