@@ -7,7 +7,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3 ]).sliding(2).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2], [3] ]);
 	});
@@ -16,7 +16,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3 ]).sliding(2,1).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2], [2,3] ]);
 	});
@@ -25,7 +25,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3 ]).sliding(3,2).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2,3] ]);
 	});
@@ -34,7 +34,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3, 4 ]).sliding(3,2).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2,3], [3,4] ]);
 	});
@@ -43,7 +43,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3, 4, 5 ]).sliding(3,2).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2,3], [3,4,5] ]);
 	});
@@ -52,7 +52,7 @@ describe("Test sliding", function()
 	{
 		var result = [];
 		Canal.of([ 1, 2, 3, 4, 5 ]).sliding(2,3).foreach(function(c){
-			result.push(c.collect());
+			result.push(c);
 		});
 		expect(result).to.eql([ [1,2], [4,5] ]);
 	});
