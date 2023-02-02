@@ -35,7 +35,7 @@ jobs:
           command: npm run test
       - run:
           name: code-coverage
-          command: cat ./coverage/lcov.info | ./node_modules/codecov/bin/codecov
+          command: npm run report
       - run:
           name: build-app
           command: npm run build
