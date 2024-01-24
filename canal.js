@@ -1,4 +1,4 @@
-/*! canal.js v1.0.53 2023-02-01 */
+/*! canal.js v1.0.54 2024-01-24 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2823,6 +2823,8 @@
 	Option.prototype.orElse = undefined; // (Option) => Option
 	Option.prototype.orNull = undefined; // () => Data | null
 	Option.prototype.given = undefined; // () => boolean
+	Option.prototype.filter = undefined;
+	Option.prototype.map = undefined;
 	Option.prototype.col = function(picker)
 	{
 		var wrap = null;
@@ -2889,6 +2891,21 @@
 	{
 		return true;
 	};
+	Some.prototype.filter = function(pred)
+	{
+		if (pred(this.get(), 0))
+		{
+			return this;
+		}
+		else
+		{
+			return Canal.None();
+		}
+	};
+	Some.prototype.map = function(mapper)
+	{
+		return Canal.Some(mapper(this.get(), 0));
+	};
 
 	function None()
 	{
@@ -2907,6 +2924,14 @@
 	None.prototype.given = function()
 	{
 		return false;
+	};
+	None.prototype.filter = function(pred)
+	{
+		return this;
+	};
+	None.prototype.map = function(mapper)
+	{
+		return this;
 	};
 
 	Canal.Some = function(val)
