@@ -1,4 +1,4 @@
-/*! canal.js v1.0.54 2024-01-24 */
+/*! canal.js v1.0.55 2024-04-22 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1790,6 +1790,43 @@
 	}
 	UnpackOp.prototype = new Operator();
 
+	function UntilOp(until, drop)
+	{
+		function UntilPond()
+		{
+			if (drop != null)
+			{
+				drop[0] = Canal.None();
+			}
+		}
+		UntilPond.prototype = new Wheel();
+		UntilPond.prototype.accept = function(d)
+		{
+			if (until(d, this.index++))
+			{
+				if (drop != null)
+				{
+					drop[0] = Canal.Some(d);
+				}
+				if (this.downstream != null)
+				{
+					this.downstream.done();
+				}
+				return false;
+			}
+			else
+			{
+				return this.downstream.accept(d);
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new UntilPond();
+		};
+	}
+	UntilOp.prototype = new Operator();
+
 	// Terminate Operators
 
 	function Terminal()
@@ -2253,6 +2290,11 @@
 		this.union = function(that)
 		{
 			return this.add(new UnionOp(that));
+		};
+
+		this.until = function(pred)
+		{
+			return this.add(new UntilOp(pred, arguments[1]));
 		};
 
 		this.zip = function(that)
