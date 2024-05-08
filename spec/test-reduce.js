@@ -31,4 +31,19 @@ describe("Test reduce", function()
 		var result = Canal.of([]).reduce(reducer).or("_");
 		expect(result).to.eql("_");
 	});
+
+	it("reduce() 1 2 until", function()
+	{
+		var result = Canal.of([ 1, 2 ]).reduce(reducer, function(r)
+		{
+			return r >= 2;
+		}).or("_");
+		expect(result).to.eql(2);
+	});
+
+	it("reduce() until empty", function()
+	{
+		var result = Canal.of([]).reduce(reducer, null).or("_");
+		expect(result).to.eql("_");
+	});
 });

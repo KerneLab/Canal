@@ -1,4 +1,4 @@
-/*! canal.js v1.0.55 2024-04-22 */
+/*! canal.js v1.0.56 2024-05-08 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1886,24 +1886,51 @@
 	}
 	CollectAsMapOp.prototype = new Operator();
 
-	function FoldOp(init, folder) // (res,data) => res
+	function FoldOp(init, folder, until) // (res,data) => res
 	{
 		function FoldPond()
 		{
+			this.empty = true;
+			this.meet = until == null;
 		}
 		FoldPond.prototype = new Terminal();
 		FoldPond.prototype.settling = function()
 		{
-			return init;
+			return typeof (init) == "function" ? endOfData : init;
 		};
 		FoldPond.prototype.accept = function(d)
 		{
+			if (this.empty)
+			{
+				this.empty = false;
+				if (typeof (init) == "function")
+				{
+					this.settle(init());
+				}
+			}
 			var res = folder(this.settle(), d);
 			if (res !== undefined)
 			{
 				this.settle(res);
 			}
+			if (until != null && until(this.settle()))
+			{
+				this.meet = true;
+				return false;
+			}
 			return true;
+		};
+		FoldPond.prototype.get = function()
+		{
+			if (typeof (init) != "function" && until == null)
+			{
+				return this.settle();
+			}
+			else
+			{
+				return this.meet && !this.empty //
+				? Canal.Some(this.settle()) : Canal.None();
+			}
 		};
 
 		this.newPond = function()
@@ -1962,10 +1989,11 @@
 	}
 	LastOp.prototype = new Operator();
 
-	function ReduceOp(reducer) // (dat1,dat2) => dat3
+	function ReduceOp(reducer, until) // (dat1,dat2) => dat3
 	{
 		function ReducePond()
 		{
+			this.meet = until == null;
 		}
 		ReducePond.prototype = new Terminal();
 		ReducePond.prototype.settling = function()
@@ -1982,11 +2010,16 @@
 			{
 				this.settle(d);
 			}
+			if (until != null && until(this.settle()))
+			{
+				this.meet = true;
+				return false;
+			}
 			return true;
 		};
 		ReducePond.prototype.get = function()
 		{
-			return this.settle() !== endOfData //
+			return this.meet && this.settle() !== endOfData //
 			? Canal.Some(this.settle()) : Canal.None();
 		};
 
@@ -2602,9 +2635,9 @@
 			return arr.length > 0 ? Canal.Some(arr[0]) : Canal.None();
 		};
 
-		this.fold = function(init, folder)
+		this.fold = function(init, folder, until)
 		{
-			return this.evaluate(new FoldOp(init, folder));
+			return this.evaluate(new FoldOp(init, folder, until));
 		};
 
 		this.foreach = function(action)
@@ -2626,9 +2659,9 @@
 			return c.evaluate(new LastOp());
 		};
 
-		this.reduce = function(reducer)
+		this.reduce = function(reducer, until)
 		{
-			return this.evaluate(new ReduceOp(reducer));
+			return this.evaluate(new ReduceOp(reducer, until));
 		};
 
 		this.take = function(num)
