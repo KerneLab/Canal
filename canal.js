@@ -1,4 +1,4 @@
-/*! canal.js v1.0.56 2024-05-08 */
+/*! canal.js v1.0.57 2024-08-09 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1940,6 +1940,37 @@
 	}
 	FoldOp.prototype = new Operator();
 
+	function ForallOp(cond)
+	{
+		function ForallPond()
+		{
+			this.meet = true;
+		}
+		ForallPond.prototype = new Terminal();
+		ForallPond.prototype.settle = function()
+		{
+			return this.meet;
+		};
+		ForallPond.prototype.accept = function(d)
+		{
+			if (!cond(d))
+			{
+				this.meet = false;
+				return false;
+			}
+			else
+			{
+				return true;
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new ForallPond();
+		};
+	}
+	ForallOp.prototype = new Operator();
+
 	function ForeachOp(action) // (data[,index]) => Void
 	{
 		action = action == null ? voidAction : action;
@@ -2638,6 +2669,11 @@
 		this.fold = function(init, folder, until)
 		{
 			return this.evaluate(new FoldOp(init, folder, until));
+		};
+
+		this.forall = function(cond)
+		{
+			return this.evaluate(new ForallOp(cond));
 		};
 
 		this.foreach = function(action)
