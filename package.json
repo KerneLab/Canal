@@ -1,6 +1,6 @@
 {
   "name": "canal.js",
-  "version": "1.0.57",
+  "version": "1.0.58",
   "description": "Streams Style API of Data Processing Framework in Javascript",
   "main": "canal.js",
   "homepage": "https://github.com/KerneLab/Canal",

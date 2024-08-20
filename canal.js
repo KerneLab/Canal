@@ -1,4 +1,4 @@
-/*! canal.js v1.0.57 2024-08-09 */
+/*! canal.js v1.0.58 2024-08-20 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1827,6 +1827,46 @@
 	}
 	UntilOp.prototype = new Operator();
 
+	function ZipWithEndOp()
+	{
+		function ZipWithEndPond()
+		{
+			this.next = endOfData;
+		}
+		ZipWithEndPond.prototype = new Pond();
+		ZipWithEndPond.prototype.accept = function(d)
+		{
+			if (this.next == endOfData)
+			{
+				this.next = d;
+				return true;
+			}
+			else
+			{
+				var n = this.next;
+				this.next = d;
+				return this.downstream.accept([ n, false ]);
+			}
+		};
+		ZipWithEndPond.prototype.done = function(d)
+		{
+			if (this.downstream != null)
+			{
+				if (this.next != endOfData)
+				{
+					this.downstream.accept([ this.next, true ]);
+				}
+				this.downstream.done();
+			}
+		};
+
+		this.newPond = function()
+		{
+			return new ZipWithEndPond();
+		};
+	}
+	ZipWithEndOp.prototype = new Operator();
+
 	// Terminate Operators
 
 	function Terminal()
@@ -2373,6 +2413,11 @@
 			{
 				return [ left, right ];
 			});
+		};
+
+		this.zipWithEnd = function()
+		{
+			return this.add(new ZipWithEndOp());
 		};
 
 		this.zipWithIndex = function()
