@@ -30,32 +30,32 @@ describe("Test zip", function()
 		.zip(Canal.of([])).collect();
 		expect(result).to.eql([]);
 	});
+	
+	it("zipWithPhase() 1", function()
+	{
+		var result = Canal.of([ "one" ]).zipWithPhase().collect();
+
+		expect(result).to.eql([ [ "one", 3 ] ]);
+	});
+	
+	it("zipWithPhase() empty", function()
+	{
+		var result = Canal.of([ ]).zipWithPhase().collect();
+
+		expect(result).to.eql([ ]);
+	});
+	
+	it("zipWithPhase()", function()
+	{
+		var result = Canal.of([ "one", "two", "three" ]).zipWithPhase().collect();
+
+		expect(result).to.eql([ [ "one", 1 ], [ "two", 0 ], [ "three", 2 ] ]);
+	});
 
 	it("zipWithIndex()", function()
 	{
 		var result = Canal.of([ "one", "two", "three" ]).zipWithIndex().collect();
 
 		expect(result).to.eql([ [ "one", 0 ], [ "two", 1 ], [ "three", 2 ] ]);
-	});
-	
-	it("zipWithEnd() 1", function()
-	{
-		var result = Canal.of([ "one" ]).zipWithEnd().collect();
-
-		expect(result).to.eql([ [ "one", true ] ]);
-	});
-	
-	it("zipWithEnd() empty", function()
-	{
-		var result = Canal.of([ ]).zipWithEnd().collect();
-
-		expect(result).to.eql([ ]);
-	});
-	
-	it("zipWithEnd()", function()
-	{
-		var result = Canal.of([ "one", "two", "three" ]).zipWithEnd().collect();
-
-		expect(result).to.eql([ [ "one", false ], [ "two", false ], [ "three", true ] ]);
 	});
 });

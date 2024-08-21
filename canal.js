@@ -1,4 +1,4 @@
-/*! canal.js v1.0.58 2024-08-20 */
+/*! canal.js v1.0.59 2024-08-21 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1827,14 +1827,15 @@
 	}
 	UntilOp.prototype = new Operator();
 
-	function ZipWithEndOp()
+	function ZipWithPhaseOp()
 	{
-		function ZipWithEndPond()
+		function ZipWithPhasePond()
 		{
 			this.next = endOfData;
+			this.head = 1;
 		}
-		ZipWithEndPond.prototype = new Pond();
-		ZipWithEndPond.prototype.accept = function(d)
+		ZipWithPhasePond.prototype = new Pond();
+		ZipWithPhasePond.prototype.accept = function(d)
 		{
 			if (this.next == endOfData)
 			{
@@ -1843,18 +1844,19 @@
 			}
 			else
 			{
-				var n = this.next;
+				var n = this.next, h = this.head;
 				this.next = d;
-				return this.downstream.accept([ n, false ]);
+				this.head = 0;
+				return this.downstream.accept([ n, h | 0 ]);
 			}
 		};
-		ZipWithEndPond.prototype.done = function(d)
+		ZipWithPhasePond.prototype.done = function(d)
 		{
 			if (this.downstream != null)
 			{
 				if (this.next != endOfData)
 				{
-					this.downstream.accept([ this.next, true ]);
+					this.downstream.accept([ this.next, this.head | 2 ]);
 				}
 				this.downstream.done();
 			}
@@ -1862,10 +1864,10 @@
 
 		this.newPond = function()
 		{
-			return new ZipWithEndPond();
+			return new ZipWithPhasePond();
 		};
 	}
-	ZipWithEndOp.prototype = new Operator();
+	ZipWithPhaseOp.prototype = new Operator();
 
 	// Terminate Operators
 
@@ -2415,17 +2417,17 @@
 			});
 		};
 
-		this.zipWithEnd = function()
-		{
-			return this.add(new ZipWithEndOp());
-		};
-
 		this.zipWithIndex = function()
 		{
 			return this.map(function(d, i)
 			{
 				return [ d, i ];
 			});
+		};
+
+		this.zipWithPhase = function()
+		{
+			return this.add(new ZipWithPhaseOp());
 		};
 
 		// Pair Intermediate Operations
