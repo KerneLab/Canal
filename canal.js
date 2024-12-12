@@ -1,4 +1,4 @@
-/*! canal.js v1.0.59 2024-08-21 */
+/*! canal.js v1.0.60 2024-12-12 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1341,7 +1341,7 @@
 	}
 	LimitOp.prototype = new Operator();
 
-	function MapOp(fn) // (data [, index]) => Value
+	function MapOp(fn) // (data[, index]) => Value
 	{
 		function MapPond()
 		{
@@ -1399,6 +1399,28 @@
 		};
 	}
 	MapValuesOp.prototype = new Operator();
+
+	function MapWithStateOp(st, fn) // (data[,state,[index]]) => Value
+	{
+		if (typeof (st) === "function")
+		{
+			st = st();
+		}
+		function MapWithStatePond()
+		{
+		}
+		MapWithStatePond.prototype = new Wheel();
+		MapWithStatePond.prototype.accept = function(d)
+		{
+			return this.downstream.accept(fn(d, st, this.index++));
+		};
+
+		this.newPond = function()
+		{
+			return new MapWithStatePond();
+		};
+	}
+	MapWithStateOp.prototype = new Operator();
 
 	function PeekOp(action) // (data[,index]) => Void
 	{
@@ -2340,6 +2362,11 @@
 		this.map = function(mapper)
 		{
 			return this.add(new MapOp(mapper));
+		};
+
+		this.mapWithState = function(state, mapper)
+		{
+			return this.add(new MapWithStateOp(state, mapper));
 		};
 
 		this.peek = function(action)
