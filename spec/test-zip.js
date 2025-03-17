@@ -30,21 +30,38 @@ describe("Test zip", function()
 		.zip(Canal.of([])).collect();
 		expect(result).to.eql([]);
 	});
-	
+
+	it("zipOuter() 1 2 3 vs 2 3", function()
+	{
+		var result = Canal.of([ 1, 2, 3 ]) //
+		.zipOuter(Canal.of([ 2, 3 ])).map(function(d)
+		{
+			return [ d[0].or(0), d[1].or(0) ];
+		}).collect();
+		expect(result).to.eql([ [ 1, 2 ], [ 2, 3 ], [ 3, 0 ] ]);
+	});
+
+	it("zipOuter() empty vs empty", function()
+	{
+		var result = Canal.of([]) //
+		.zipOuter(Canal.of([])).collect();
+		expect(result).to.eql([]);
+	});
+
 	it("zipWithPhase() 1", function()
 	{
 		var result = Canal.of([ "one" ]).zipWithPhase().collect();
 
 		expect(result).to.eql([ [ "one", 3 ] ]);
 	});
-	
+
 	it("zipWithPhase() empty", function()
 	{
-		var result = Canal.of([ ]).zipWithPhase().collect();
+		var result = Canal.of([]).zipWithPhase().collect();
 
-		expect(result).to.eql([ ]);
+		expect(result).to.eql([]);
 	});
-	
+
 	it("zipWithPhase()", function()
 	{
 		var result = Canal.of([ "one", "two", "three" ]).zipWithPhase().collect();

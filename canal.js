@@ -1,4 +1,4 @@
-/*! canal.js v1.0.60 2024-12-12 */
+/*! canal.js v1.0.61 2025-03-18 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -2436,6 +2436,20 @@
 			{
 				return [ i, d ];
 			}).join(that.map(function(d, i)
+			{
+				return [ i, d ];
+			})).mapJoint(function(left, right)
+			{
+				return [ left, right ];
+			});
+		};
+
+		this.zipOuter = function(that)
+		{
+			return this.map(function(d, i)
+			{
+				return [ i, d ];
+			}).fullJoin(that.map(function(d, i)
 			{
 				return [ i, d ];
 			})).mapJoint(function(left, right)
