@@ -1,4 +1,4 @@
-/*! canal.js v1.0.61 2025-03-18 */
+/*! canal.js v1.0.62 2025-12-28 */
 /**
  * Functional Programming Framework of Data Processing in Javascript.
  * https://github.com/KerneLab/Canal
@@ -1902,7 +1902,7 @@
 		return this.settle();
 	};
 
-	function CollectOp()
+	function CollectOp(res)
 	{
 		function CollectPond()
 		{
@@ -1910,7 +1910,7 @@
 		CollectPond.prototype = new Terminal();
 		CollectPond.prototype.settling = function()
 		{
-			return [];
+			return res != null ? res : [];
 		};
 		CollectPond.prototype.accept = function(d)
 		{
@@ -1925,7 +1925,7 @@
 	}
 	CollectOp.prototype = new Operator();
 
-	function CollectAsMapOp(key, val)
+	function CollectAsMapOp(res, key, val)
 	{
 		key = key != null ? key : keyOfPair;
 		val = val != null ? val : valOfPair;
@@ -1935,7 +1935,7 @@
 		CollectMapPond.prototype = new Terminal();
 		CollectMapPond.prototype.settling = function()
 		{
-			return {};
+			return res != null ? res : {};
 		};
 		CollectMapPond.prototype.accept = function(d)
 		{
@@ -2706,7 +2706,7 @@
 
 		this.collect = function()
 		{
-			return this.evaluate(new CollectOp());
+			return this.evaluate(new CollectOp(arguments[0]));
 		};
 
 		this.count = function()
@@ -2797,7 +2797,7 @@
 
 		this.collectAsMap = function()
 		{
-			return this.evaluate(new CollectAsMapOp(arguments[0], arguments[1]));
+			return this.evaluate(new CollectAsMapOp(arguments[0], arguments[1], arguments[2]));
 		};
 
 		this.countByKey = function()

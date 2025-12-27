@@ -22,6 +22,15 @@ it("collectAsMap() 1", function()
 	});
 });
 
+it("collectAsMap({\"z\":0}) 1", function()
+{
+	var result = Canal.of([ [ "a", 1 ] ]).collectAsMap({"z":0});
+	expect(result).to.eql({
+		"z" : 0,
+		"a" : 1
+	});
+});
+
 it("collectAsMap() empty", function()
 {
 	var result = Canal.of([]).collectAsMap();

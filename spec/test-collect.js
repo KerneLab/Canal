@@ -15,6 +15,12 @@ it("collect() 1", function()
 	expect(result).to.eql([ 1 ]);
 });
 
+it("collect([0]) 1", function()
+{
+	var result = Canal.of([ 1 ]).collect([0]);
+	expect(result).to.eql([ 0, 1 ]);
+});
+
 it("collect() empty", function()
 {
 	var result = Canal.of([]).collect();
